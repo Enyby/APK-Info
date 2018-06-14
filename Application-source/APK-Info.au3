@@ -1,4 +1,5 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
+#AutoIt3Wrapper_OutFile=..\APK-Info.exe
 #AutoIt3Wrapper_icon=APK-Info.ico
 #AutoIt3Wrapper_UseAnsi=n
 #AutoIt3Wrapper_UseUpx=n
@@ -76,6 +77,8 @@ IF $ForcedGUILanguage = "auto" then
 Else
 	$Language_code=$ForcedGUILanguage
 EndIf
+
+$CheckSignature=Iniread ($Inidir & $IniProgramSettings, "Settings", "CheckSignature", "1");
 
 $ShowLog=Iniread ($Inidir & $IniProgramSettings, "Settings", "ShowLog", "0");
 $ShowLangCode=Iniread ($Inidir & $IniProgramSettings, "Settings", "ShowLangCode", "1");
@@ -416,17 +419,19 @@ Func _OpenNewFile($apk)
 EndFunc
 
 Func _getSignature($prmAPK)
-   Local $foo = Run('java -jar apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
-   Local $output
-   While 1
-	  $output &= StderrRead($foo)
-	  If @error Then ExitLoop
-   Wend
-   While 1
-	  $output &= StdoutRead($foo)
-	  If @error Then ExitLoop
-   Wend
-   $apk_Signature = $output
+	$output = ''
+	If $CheckSignature == 1 Then
+		$foo = Run('java -jar apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+		While 1
+			$output &= StderrRead($foo)
+			If @error Then ExitLoop
+		Wend
+		While 1
+			$output &= StdoutRead($foo)
+			If @error Then ExitLoop
+		Wend
+	EndIf
+	$apk_Signature = $output
 EndFunc
 
 Func _getBadge($prmAPK)
