@@ -18,7 +18,9 @@ Then was updated by bovirus and this is the [reworked thread on XDA](https://for
 - Windows shell integration (optional)
 
 # Download
-[Latest APK-Info version - v. 1.13 - 11.06.2018](https://mega.nz/#!2FQ1hSob!2GpF2g-IETmzPl_fqbb9W7NGeLcz7qRc0FwXaqA2em0)
+https://github.com/Enyby/APK-Info/releases
+
+[APK-Info version - v. 1.13 - 11.06.2018](https://mega.nz/#!2FQ1hSob!2GpF2g-IETmzPl_fqbb9W7NGeLcz7qRc0FwXaqA2em0)
 
 [Library of previous APK-Info versions](https://mega.nz/#F!DNZxjaAb!2Xx8Y_CO6PYwGDnLRgS5_g)
 
