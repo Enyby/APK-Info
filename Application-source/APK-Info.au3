@@ -118,6 +118,8 @@ $String27=Iniread ($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "
 $String28=Iniread ($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String28", "ABIs")
 $String29=Iniread ($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String29", "Signature")
 $String30=Iniread ($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String30", "Debug")
+$String31=Iniread ($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String31", "Icon")
+$String32=Iniread ($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String32", "Loading")
 
 $URLPlayStore=Iniread ($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
 
@@ -371,11 +373,20 @@ Func _OpenNewFile($apk)
 	$fileAPK     = _SplitPath($fullPathAPK,false)
 	$apk_Build = ''
 
-	_getSignature($fullPathAPK)
+	ProgressOn($String32 & "...", $fileAPK)
+
+	ProgressSet(0, $String04 & '...')
 
 	$tmpArrBadge = _getBadge($fullPathAPK)
 	_parseLines($tmpArrBadge)
+
+	ProgressSet(25, $String31 & '...')
+
 	_extractIcon()
+
+	ProgressSet(75, $String29 & '...')
+
+	_getSignature($fullPathAPK)
 
 	If $apk_MinSDKVer <> "" Then $sMinAndroidString = 'Android ' & $apk_MinSDKVer  & ' (' & $apk_MinSDKName & ')'
 	If $apk_TargetSDKVer <> "" Then $sTgtAndroidString = 'Android ' & $apk_TargetSDKVer  & ' (' & $apk_TargetSDKName & ')'
@@ -400,6 +411,8 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData ($Input12, $sNewFilenameAPK)
 
 	_drawPNG()
+
+	ProgressOff()
 EndFunc
 
 Func _getSignature($prmAPK)
@@ -525,6 +538,8 @@ Func _extractIcon()
 			EndIf
 		Next
 	EndIf
+
+	ProgressSet(50, $String31 & '...')
 
 	; extract icon
 	DirCreate($tempPath)

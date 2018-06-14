@@ -18,9 +18,9 @@ You can do it with ex. Notepad++ and set the right path for APK-Info.exe (path w
 
 ********************************************** Multilanguage Info
 
-The strings used by APK-Info GUI are located in APK-Info-GUI.ini file.
-I included the strings to translate (and send to me) in the file
-"APK-Info-GUI-Strings-en-master.txt" file
+The strings used by APK-Info GUI are located in APK-Info.ini file.
+If you want add new translation - use section [Strings-en] as source.
+Copy it and translate.
 
 To create french translation add [String-fr] section
 
