@@ -1,7 +1,6 @@
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_OutFile=..\APK-Info.exe
 #AutoIt3Wrapper_icon=APK-Info.ico
-#AutoIt3Wrapper_UseAnsi=n
 #AutoIt3Wrapper_UseUpx=n
 #AutoIt3Wrapper_UseX64=n
 #AutoIt3Wrapper_Res_Comment=Shows info about Android Package Files (APK)
@@ -398,7 +397,7 @@ Func _OpenNewFile($apk)
 
 	GUICtrlSetData ($Input1 , $apk_Label)
 	GUICtrlSetData ($Input2 , $apk_VersionName)
-	GUICtrlSetData ($Input3 , $apk_VersionCode)
+	GUICtrlSetData ($Input3 , $apk_VersionCode & $apk_Build)
 	GUICtrlSetData ($Input4 , $apk_PkgName)
 	GUICtrlSetData ($Input5 , $apk_MinSDK	)
 	GUICtrlSetData ($Input6 , $sMinAndroidString)
