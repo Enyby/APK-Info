@@ -225,3 +225,7 @@ Move LastFolder (used) variable in APK-Info.LastFolder.ini (first was in APK-Inf
 *** APK-Info 1.14 (14.06.2018)
 
 - Added drag&drop .apk to the main form.
+
+*** APK-Info 1.15 (14.06.2018)
+
+- Improved load icon from the apk.
