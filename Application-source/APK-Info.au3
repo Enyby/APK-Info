@@ -375,7 +375,7 @@ Func _OpenNewFile($apk)
 
 	$tmpArrBadge = _getBadge($fullPathAPK)
 	_parseLines($tmpArrBadge)
-	_extractIcon($fullPathAPK, $apk_IconPath)
+	_extractIcon()
 
 	If $apk_MinSDKVer <> "" Then $sMinAndroidString = 'Android ' & $apk_MinSDKVer  & ' (' & $apk_MinSDKName & ')'
 	If $apk_TargetSDKVer <> "" Then $sTgtAndroidString = 'Android ' & $apk_TargetSDKVer  & ' (' & $apk_TargetSDKName & ')'
@@ -493,15 +493,42 @@ Func _parseLines($prmArrayLines)
 	Next
 EndFunc
 
-Func _extractIcon($prmAPK, $prmIconPath)
-	DirCreate($tempPath)
-	$runCmd = "unzip.exe -o -j " & '"' & $prmAPK & '" ' & $prmIconPath & " -d " & '"' & $tempPath & '"'
-	RunWait($runCmd, @ScriptDir, @SW_HIDE)
-EndFunc
+Func _extractIcon()
+	; find png
+	;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _extractIcon = ' & $apk_IconPath & '; ' & $apk_IconName & @crlf)
+	If StringRight($apk_IconPath, 4) == '.xml' Then
+		$foo = Run('unzip.exe -l ' & '"' & $fullPathAPK & '"', @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+		$output = ''
+		While 1
+			$output &= StdoutRead($foo)
+			If @error Then ExitLoop
+		Wend
+		$arrayLines = _StringExplode($output, @CRLF)
 
-Func _convertIcon($prmPNGPath)
-	;not used
-	$runCmd = 'convert.exe ' & '"' & $prmPNGPath & '"' & " -background #f0f0f0 -flatten -alpha off " & '"' & $tempPath & "\Icon.bmp" & '"'
+		$start = StringLeft($apk_IconPath, 10) ; 'res/mipmap' or 'res/drawab'
+		$end = '/' & StringReplace($apk_IconName, '.xml', '.png')
+		$bestSize = 0
+		For $line in $arrayLines
+			$check = _StringBetween($line, $start, $end)
+			;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check & @crlf)
+			If $check <> 0 Then
+				$size = Int(StringStripWS($line, 3))
+				;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check[0] & '; ' & $size & '; ' & $bestSize & @crlf)
+				If $size > $bestSize Then
+					$bestSize = $size
+					$apk_IconPath = $start & $check[0] & $end
+					$tmp_arr = _StringExplode($apk_IconPath, "/")
+					$apk_IconName = $tmp_arr[UBound($tmp_arr)-1]
+
+					;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @crlf & $bestSize & ': ' & $apk_IconPath & @crlf)
+				EndIf
+			EndIf
+		Next
+	EndIf
+
+	; extract icon
+	DirCreate($tempPath)
+	$runCmd = "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $apk_IconPath & " -d " & '"' & $tempPath & '"'
 	RunWait($runCmd, @ScriptDir, @SW_HIDE)
 EndFunc
 
@@ -520,13 +547,13 @@ Func _openPlay()
 EndFunc
 
 Func _translateSDKLevel($prmSDKLevel, $prmReturnCodeName = false)
-if $prmSDKLevel="1000" then
-	$sVersion=$String21
-	$sCodeName=$String22
-Else
-	$sVersion=Iniread ($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-Version", $String23)
-	$sCodeName=Iniread ($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-CodeName", $String24)
-Endif
+	if $prmSDKLevel="1000" then
+		$sVersion=$String21
+		$sCodeName=$String22
+	Else
+		$sVersion=Iniread ($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-Version", $String23)
+		$sCodeName=Iniread ($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-CodeName", $String24)
+	Endif
 	Switch $prmReturnCodeName
 		Case true
 			Return $sCodeName
