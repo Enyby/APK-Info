@@ -9,7 +9,6 @@
 
 
 ************************** APK-Info Changelog
-
 *** APK-Info 0.7B (22.09.2015)
 
 - Update aapt (build tool)
@@ -18,13 +17,9 @@
 - Added option to enable/disable show OSLangCode (for help in translation)
 - If anyone want to show the program in specific language pelase edit english strings in APK-Info.ini and post here the specific language 
 
-
-
 *** APK-Info 0.7C (07.12.2015)
 
 - Replace appt.exe with new version compatible with SDK23 (Android 6.x)
-
-
 
 *** APK-Info 0.7D (08.12.2015
 
@@ -38,8 +33,6 @@
 * Problem not solved
 - Recognize apk file name with chinese characters. 
 
-
-
 *** APK-Info 0.7E (09.12.2015)
 
 - Solved problem recognizing KK (SDK 19).
@@ -52,16 +45,12 @@ Note: The language file should be in UTF16 for special characters.
 - Add program option in APK-Info.ini to show comamnd line paranmetrs.
 More detail in Readme.txt text file.
 
-
-
 *** APK-Info 0.7G (12.12.2015)
 
 - Added hungarian strings (thanks to gidano)
 - Change GUI strings name (APK-Info-GUI.ini). Text file format UTF16.
 - Add strings in APK-Info-GUI.ini for SDK version and code name. Now to add a new SDK detection is not required change to program code.
 - Add OS Language code detction table in APK-GUI.ini. Now to add a new language detection is not required change to program cdoe.
-
-
 
 *** APK-Info 0.7H (18.12.2015)
 
@@ -71,8 +60,6 @@ More detail in Readme.txt text file.
 - Using special character (ex. japanese) for filename/app name are not supported
 - Using browser command to load another apk, the icon didn't change.
 - Added indonesian translation (thanks to exodius48)
-
-
 
 *** APK-Info 0.7I (20.12.2015)
 * Fix
@@ -85,20 +72,14 @@ ShowLog enables to save in APK-Info-Log.ini many info about variable use interna
 - If you load a new file from Browse the icon remain unchanged.
 - If the filename or app name use character like japanese are not supported. 
 
-
-
-**APK-Info 0.7K (23.01.2016)
+*** APK-Info 0.7K (23.01.2016)
 
 - Added polish translation (thanks to Eselter).
 
-
-
-**APK-Info 0.7L (29.01.2016)
+*** APK-Info 0.7L (29.01.2016)
 
 - Added spanish language (thanks to Ksawery).
 - Added chinese language (thanks to Li Guiquan).
-
-
 
 *** APK-Info 0.7M (17.04.2016)
 
@@ -107,27 +88,19 @@ ShowLog enables to save in APK-Info-Log.ini many info about variable use interna
 - Added German language (thanks to mosu)
 - Updated aapt (Android Build Tool) to 23.0.3
 
-
-
 *** APK-Info 0.7N (15.05.2016)
 
 - Add options in APk.Info to change version/date without recompile source (just for new translation)
 - Added Chinese (Taiwan) language (thanks to Li Bibo)
 
-
-
 *** APK-Info 0.7O (23.06.2016)
 
 - Update Android Build Tool (aapt.exe) with new version 24.0.0
-
-
 
 *** APK-Info 0.7P (29.08.2016)
 
 - Replace aapt 24.0.0 with 23.0.6 for compatibility problem with apk name.
 - Add support for SDK 24 (Android 6.0.1) / SDK 25 (Android 7.0)
-
-
 
 *** APK-Info 0.7Q (01.06.2017)
 
@@ -150,8 +123,7 @@ ShowLog enables to save in APK-Info-Log.ini many info about variable use interna
 
 *** APK-Info 0.7Q (05.06.2017)
 
-Move LastFolder (used) variable in APK-Info.LastFolder.ini (first was in APK-Info.ini)
-
+- Move LastFolder (used) variable in APK-Info.LastFolder.ini (first was in APK-Info.ini)
 
 *** APK-Info 1.00 (10.06.2017)
 
@@ -229,3 +201,8 @@ Move LastFolder (used) variable in APK-Info.LastFolder.ini (first was in APK-Inf
 *** APK-Info 1.15 (14.06.2018)
 
 - Improved load icon from the apk.
+
+*** APK-Info 1.16 (14.06.2018)
+
+- Added option CheckSignature.
+- Added progress bar.
