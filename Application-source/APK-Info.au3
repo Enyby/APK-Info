@@ -29,14 +29,14 @@ Opt("TrayIconHide",1)
 #AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
 
 
-Global $apk_Label, $apk_IconPath, $apk_PkgName, $apk_VersionCode, $apk_VersionName
-Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_original, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
+Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_VersionCode, $apk_VersionName
+Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
 Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK
-Global $sNewFilenameAPK
+Global $sNewFilenameAPK, $searchPngCache
 
 $IniProgramSettings="APK-Info.ini"
 $IniLastFolderSettings="APK-Info.LastFolder.ini"
@@ -334,6 +334,9 @@ Func MY_WM_PAINT($hWnd, $Msg, $wParam, $lParam)
 	$hBrush = _GDIPlus_BrushCreateSolid($defBkColor)
 	_GDIPlus_GraphicsFillRect($hGraphic, $x, $y, $s, $s, $hBrush)
 	_GDIPlus_BrushDispose($hBrush)
+	If $hImage_bg Then
+		_GDIPlus_GraphicsDrawImage($hGraphic, $hImage_bg, $x, $y)
+	EndIf
     _GDIPlus_GraphicsDrawImage($hGraphic, $hImage, $x, $y)
     _WinAPI_RedrawWindow($hGUI, 0, 0, $RDW_VALIDATE)
     Return $GUI_RUNDEFMSG
@@ -370,6 +373,7 @@ Func _checkFileParameter($prmFilename)
 EndFunc
 
 Func _OpenNewFile($apk)
+	$searchPngCache = False
 	$fullPathAPK = _checkFileParameter($apk)
 	$dirAPK      = _SplitPath($fullPathAPK,true)
 	$fileAPK     = _SplitPath($fullPathAPK,false)
@@ -415,6 +419,7 @@ Func _OpenNewFile($apk)
 	_drawPNG()
 
 	ProgressOff()
+	$searchPngCache = False
 EndFunc
 
 Func _getSignature($prmAPK)
@@ -466,6 +471,7 @@ Func _parseLines($prmArrayLines)
 				$apk_Label = $tmp_arr[0]
 				$tmp_arr =  _StringBetween($value, "icon='", "'")
 				$apk_IconPath = $tmp_arr[0]
+				$apk_IconPathBg = False
 
 			Case 'package'
 				$tmp_arr =  _StringBetween($value, "name='", "'")
@@ -508,11 +514,72 @@ Func _parseLines($prmArrayLines)
 	Next
 EndFunc
 
-Func _extractIcon()
-	; find png
-	;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _extractIcon = ' & $apk_IconPath & @crlf)
-	If StringRight($apk_IconPath, 4) == '.xml' Then
+Func _searchPng($res)
+	$ret = $res
+
+	If Not $searchPngCache Then
 		$foo = Run('unzip.exe -l ' & '"' & $fullPathAPK & '"', @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+		$output = ''
+		While 1
+			$output &= StdoutRead($foo)
+			If @error Then ExitLoop
+		Wend
+		$searchPngCache = _StringExplode($output, @CRLF)
+	EndIf
+
+	$start = StringLeft($res, 10) ; 'res/mipmap' or 'res/drawab'
+	$apk_IconName = _lastPart($res, "/")
+	$end = '/' & StringLeft($apk_IconName, StringLen($apk_IconName) - 3) & 'png'
+	$bestSize = 0
+	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _searchPng = ' & $start & '; ' & $end & @crlf)
+	For $line in $searchPngCache
+		$check = _StringBetween($line, $start, $end)
+		;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check & @crlf)
+		If $check <> 0 Then
+			$size = Int(StringStripWS($line, 3))
+			;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check[0] & '; ' & $size & '; ' & $bestSize & @crlf)
+			If $size > $bestSize Then
+				$bestSize = $size
+				$ret = $start & $check[0] & $end
+
+				;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @crlf & $bestSize & ': ' & $apk_IconPath & @crlf)
+			EndIf
+		EndIf
+	Next
+	return $ret
+EndFunc
+
+Func _parseXmlIcon()
+	$foo = Run('aapt.exe d xmltree ' & '"' & $fullPathAPK & '" "' & $apk_IconPath & '"', @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+	$output = ''
+	While 1
+		$output &= StdoutRead($foo)
+		If @error Then ExitLoop
+	Wend
+	$arrayLines = _StringExplode($output, @CRLF)
+
+	$fg = 1
+	Local $ids[2]
+	$ids[0] = 0;
+	$ids[1] = 0;
+	For $line in $arrayLines
+		Select
+			Case StringInStr($line, 'E: background')
+				$fg = 0
+
+			Case StringInStr($line, 'E: foreground')
+				$fg = 1
+
+			Case StringInStr($line, 'A: android:drawable')
+				$ids[$fg] = _lastPart($line, "@")
+		EndSelect
+	Next
+	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $ids[0] & '; ' & $ids[1] & @crlf)
+
+	ProgressSet(45, $String31 & '...')
+
+	If $ids[0] Or $ids[1] Then
+		$foo = Run('aapt.exe d resources ' & '"' & $fullPathAPK & '"', @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		$output = ''
 		While 1
 			$output &= StdoutRead($foo)
@@ -520,36 +587,65 @@ Func _extractIcon()
 		Wend
 		$arrayLines = _StringExplode($output, @CRLF)
 
-		$start = StringLeft($apk_IconPath, 10) ; 'res/mipmap' or 'res/drawab'
-		$tmp_arr = _StringExplode($apk_IconPath, "/")
-		$apk_IconName = $tmp_arr[UBound($tmp_arr)-1]
-		$end = '/' & StringReplace($apk_IconName, '.xml', '.png')
-		$bestSize = 0
+		Local $png[2]
+		$png[0] = 0;
+		$png[1] = 0;
 		For $line in $arrayLines
-			$check = _StringBetween($line, $start, $end)
-			;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check & @crlf)
-			If $check <> 0 Then
-				$size = Int(StringStripWS($line, 3))
-				;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check[0] & '; ' & $size & '; ' & $bestSize & @crlf)
-				If $size > $bestSize Then
-					$bestSize = $size
-					$apk_IconPath = $start & $check[0] & $end
-
-					;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @crlf & $bestSize & ': ' & $apk_IconPath & @crlf)
-				EndIf
+			If Not StringInStr($line, 'spec resource ') Then
+				ContinueLoop
 			EndIf
+			For $i = 0 To 1
+				If Not $ids[$i] Or $png[$i] Or Not StringInStr($line, $ids[$i]) Then
+					ContinueLoop
+				EndIf
+				$tmp_arr =  _StringBetween($line, ":", ":")
+				$png[$i] = $tmp_arr[0]
+			Next
 		Next
+
+		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $png[0] & '; ' & $png[1] & @crlf)
+
+		ProgressSet(55, $String31 & '...')
+
+		If $png[0] Then
+			$apk_IconPathBg = _searchPng('res/' & $png[0] & '.png')
+		EndIf
+		If $png[1] Then
+			$apk_IconPath = _searchPng('res/' & $png[1] & '.png')
+		EndIf
+
+		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $apk_IconPathBg & '; ' & $apk_IconPath & @crlf)
+	EndIf
+EndFunc
+
+Func _extractIcon()
+	;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _extractIcon = ' & $apk_IconPath & @crlf)
+	If StringRight($apk_IconPath, 4) == '.xml' Then
+		$apk_IconPath = _searchPng($apk_IconPath)
 	EndIf
 
-	ProgressSet(50, $String31 & '...')
+	ProgressSet(35, $String31 & '...')
+
+	If StringRight($apk_IconPath, 4) == '.xml' Then
+		_parseXmlIcon()
+	EndIf
+
+	ProgressSet(65, $String31 & '...')
 
 	; extract icon
 	DirCreate($tempPath)
-	$runCmd = "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $apk_IconPath & " -d " & '"' & $tempPath & '"'
+	$files = $apk_IconPath
+	If $apk_IconPathBg Then
+		$files = $files & ' ' & $apk_IconPathBg
+	EndIf
+	$runCmd = "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"'
 	RunWait($runCmd, @ScriptDir, @SW_HIDE)
 EndFunc
 
 Func _cleanUp()
+	If $hImage_bg Then
+		_GDIPlus_ImageDispose($hImage_bg)
+	EndIf
 	_GDIPlus_ImageDispose($hImage)
 	_GDIPlus_GraphicsDispose($hGraphic)
 	_GDIPlus_Shutdown()
@@ -580,23 +676,38 @@ Func _translateSDKLevel($prmSDKLevel, $prmReturnCodeName = false)
 EndFunc
 
 Func _drawPNG()
-	; Png Workaround
-	; Load PNG image
-	$tmp_arr = _StringExplode($apk_IconPath, "/")
-	$apk_IconName = $tmp_arr[UBound($tmp_arr)-1]
+	If $hImage_bg Then
+		_GDIPlus_ImageDispose($hImage_bg)
+	EndIf
+	$hImage_bg = 0
+	If $apk_IconPathBg Then
+		$hImage_bg = _drawImg($apk_IconPathBg)
+	EndIf
+	If $hImage Then
+		_GDIPlus_ImageDispose($hImage)
+	EndIf
+	$hImage = _drawImg($apk_IconPath)
+EndFunc
+
+Func _drawImg($path)
+	$apk_IconName = _lastPart($path, "/")
 	$filename = $tempPath & "\" & $apk_IconName;
 	$hImage_original   = _GDIPlus_ImageLoadFromFile($filename)
+	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $type = ' & VarGetType($hImage_original) & '; ' & $hImage_original & @crlf & '>Error code: ' & @error & @crlf)
 	If $ShowLog= "1" then
 		IniWrite($Inidir & $IniLogReport, "Icon", "TempFilePath", $tempPath);
 		IniWrite($Inidir & $IniLogReport, "Icon", "ApkIconeName", $apk_IconName);
 	Endif
-		; resize always the bigger icon to 48x48 pixels
-	If $hImage Then
-		_GDIPlus_ImageDispose($hImage)
-	EndIf
-	$hImage   = _GDIPlus_ImageResize ($hImage_original, 48, 48)
+	; resize always the bigger icon to 48x48 pixels
+	$hImage_ret   = _GDIPlus_ImageResize ($hImage_original, 48, 48)
 	_GDIPlus_ImageDispose($hImage_original)
 	FileDelete($filename); // no need - try delete
-	$type = VarGetType($hImage)
+	$type = VarGetType($hImage_ret)
 	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $type = ' & $type & @crlf & '>Error code: ' & @error & @crlf) ;### Debug Console
+	return $hImage_ret
+EndFunc
+
+Func _lastPart($str, $sep)
+	$tmp_arr = _StringExplode($str, $sep)
+	return $tmp_arr[UBound($tmp_arr)-1]
 EndFunc
