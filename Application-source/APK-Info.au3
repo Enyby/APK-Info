@@ -196,25 +196,25 @@ GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
 
-$Input1 = _makeField($String01, $apk_Label, False, 0)
-$Input2 = _makeField($String02, $apk_VersionName, False, 0)
-$Input3 = _makeField($String03, $apk_VersionCode & $apk_Build, False, 0)
-$Input4 = _makeField($String04, $apk_PkgName, False, 0)
+$inpLabel = _makeField($String01, $apk_Label, False, 0)
+$inpVersion = _makeField($String02, $apk_VersionName, False, 0)
+$inpBuild = _makeField($String03, $apk_VersionCode & $apk_Build, False, 0)
+$inpPkg = _makeField($String04, $apk_PkgName, False, 0)
 
-$Input6 = GUICtrlCreateInput($sMinAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
+$inpMinSDKStr = GUICtrlCreateInput($sMinAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
-$Input5 = _makeField($String05, $apk_MinSDK, False, 20)
+$inpMinSDK = _makeField($String05, $apk_MinSDK, False, 20)
 
-$Input8 = GUICtrlCreateInput($sTgtAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
+$inpTargetSDKStr = GUICtrlCreateInput($sTgtAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
-$Input7 = _makeField($String06, $apk_TargetSDK, False, 20)
+$inpTargetSDK = _makeField($String06, $apk_TargetSDK, False, 20)
 
-$Input9 = _makeField($String07, $apk_Screens, False, 0)
-$Input10 = _makeField($String08, $apk_Densities, False, 0)
-$Input13 = _makeField($String28, $apk_ABIs, False, 0)
+$inpScreens = _makeField($String07, $apk_Screens, False, 0)
+$inpDensities = _makeField($String08, $apk_Densities, False, 0)
+$inpABIs = _makeField($String28, $apk_ABIs, False, 0)
 
-$Edit1 = _makeField($String09, $apk_Permissions, True, 0)
-$Edit2 = _makeField($String10, $apk_Features, True, 0)
+$edtPermissions = _makeField($String09, $apk_Permissions, True, 0)
+$edtFeatures = _makeField($String10, $apk_Features, True, 0)
 
 $chSignature = GUICtrlCreateCheckbox($String29, $labelStart, $offsetHeight + $labelTop, $labelWidth, $labelHeight)
 Local $tmpStyle = $globalStyle
@@ -225,10 +225,10 @@ Else
 EndIf
 GUICtrlSetState(-1, $tmpStyle)
 
-$Edit3 = _makeField(False, $apk_Signature, True, 0)
+$edtSignature = _makeField(False, $apk_Signature, True, 0)
 
-$Input11 = _makeField($String11, $fileAPK, False, 0)
-$Input12 = _makeField($String12, $sNewFilenameAPK, False, 0)
+$inpName = _makeField($String11, $fileAPK, False, 0)
+$inpNewName = _makeField($String12, $sNewFilenameAPK, False, 0)
 
 ; Show OS language and language code
 If $ShowLangCode = "1" Then
@@ -415,22 +415,22 @@ Func _OpenNewFile($apk)
 
 	$sNewFilenameAPK = StringReplace($apk_Label, " ", $FileNameSpace) & $FileNamePrefix & StringReplace($apk_VersionName, " ", $FileNameSpace) & $FileNameSuffix & StringReplace($apk_VersionCode, " ", $FileNameSpace) & ".apk"
 
-	GUICtrlSetData($Input1, $apk_Label)
-	GUICtrlSetData($Input2, $apk_VersionName)
-	GUICtrlSetData($Input3, $apk_VersionCode & $apk_Build)
-	GUICtrlSetData($Input4, $apk_PkgName)
-	GUICtrlSetData($Input5, $apk_MinSDK)
-	GUICtrlSetData($Input6, $sMinAndroidString)
-	GUICtrlSetData($Input7, $apk_TargetSDK)
-	GUICtrlSetData($Input8, $sTgtAndroidString)
-	GUICtrlSetData($Input9, $apk_Screens)
-	GUICtrlSetData($Input10, $apk_Densities)
-	GUICtrlSetData($Input13, $apk_ABIs)
-	GUICtrlSetData($Edit1, $apk_Permissions)
-	GUICtrlSetData($Edit2, $apk_Features)
-	GUICtrlSetData($Edit3, $apk_Signature)
-	GUICtrlSetData($Input11, $fileAPK)
-	GUICtrlSetData($Input12, $sNewFilenameAPK)
+	GUICtrlSetData($inpLabel, $apk_Label)
+	GUICtrlSetData($inpVersion, $apk_VersionName)
+	GUICtrlSetData($inpBuild, $apk_VersionCode & $apk_Build)
+	GUICtrlSetData($inpPkg, $apk_PkgName)
+	GUICtrlSetData($inpMinSDK, $apk_MinSDK)
+	GUICtrlSetData($inpMinSDKStr, $sMinAndroidString)
+	GUICtrlSetData($inpTargetSDK, $apk_TargetSDK)
+	GUICtrlSetData($inpTargetSDKStr, $sTgtAndroidString)
+	GUICtrlSetData($inpScreens, $apk_Screens)
+	GUICtrlSetData($inpDensities, $apk_Densities)
+	GUICtrlSetData($inpABIs, $apk_ABIs)
+	GUICtrlSetData($edtPermissions, $apk_Permissions)
+	GUICtrlSetData($edtFeatures, $apk_Features)
+	GUICtrlSetData($edtSignature, $apk_Signature)
+	GUICtrlSetData($inpName, $fileAPK)
+	GUICtrlSetData($inpNewName, $sNewFilenameAPK)
 
 	_drawPNG()
 
