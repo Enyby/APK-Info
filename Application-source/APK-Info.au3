@@ -221,7 +221,17 @@ $Input13 = _makeField($String28, $apk_ABIs, False, 0)
 
 $Edit1 = _makeField($String09, $apk_Permissions, True, 0)
 $Edit2 = _makeField($String10, $apk_Features, True, 0)
-$Edit3 = _makeField($String29, $apk_Signature, True, 0)
+
+$chSignature = GUICtrlCreateCheckbox($String29, $labelStart, $offsetHeight + $labelTop, $labelWidth, $labelHeight)
+Local $tmpStyle = $globalStyle
+If $CheckSignature == 1 Then
+	$tmpStyle = $tmpStyle + $GUI_CHECKED
+Else
+	$tmpStyle = $tmpStyle + $GUI_UNCHECKED
+EndIf
+GUICtrlSetState(-1, $tmpStyle)
+
+$Edit3 = _makeField(False, $apk_Signature, True, 0)
 
 $Input11 = _makeField($String11, $fileAPK, False, 0)
 $Input12 = _makeField($String12, $sNewFilenameAPK, False, 0)
@@ -275,6 +285,14 @@ While 1
 			_OpenNewFile(@GUI_DragFile)
 			MY_WM_PAINT(0, 0, 0, 0)
 
+		Case $chSignature
+			If BitAND(GUICtrlRead($chSignature), $GUI_CHECKED) = $GUI_CHECKED Then
+				$CheckSignature = 1
+			Else
+				$CheckSignature = 0
+			EndIf
+			IniWrite($Inidir & $IniProgramSettings, "Settings", "CheckSignature", $CheckSignature)
+
 		Case $gBtn_Rename
 			$sNewNameInput = InputBox($String16, $String17, $sNewFilenameAPK, "", 300, 130)
 			If $ShowLog = "1" Then
@@ -282,9 +300,11 @@ While 1
 				IniWrite($Inidir & $IniLogReport, "NewFile", "NewNameInput", $sNewNameInput)
 			EndIf
 			If $sNewNameInput <> "" Then _renameAPK($sNewNameInput)
+
 		Case $gBtn_Exit
 			_cleanUp()
 			Exit
+
 		Case $GUI_EVENT_CLOSE
 			_cleanUp()
 			Exit
