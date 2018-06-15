@@ -60,12 +60,6 @@ $Inidir = @ScriptDir & "\"
 $ProgramVersion = "1.16"
 $ProgramReleaseDate = "15.06.2018"
 
-$ForcedGUILanguage = IniRead($Inidir & $IniProgramSettings, "Settings", "ForcedGUILanguage", "auto")
-
-
-; Check OS language
-$OS_language = @OSLang
-
 ; more info on country code
 ; https://www.autoitscript.com/autoit3/docs/appendix/OSLangCodes.htm
 
@@ -125,7 +119,7 @@ $String32 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, 
 
 $URLPlayStore = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
 
-$PlayStoreLanguage = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "PlayStoreLanguage", "en")
+$PlayStoreLanguage = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "PlayStoreLanguage", $Language_code)
 
 Dim $sMinAndroidString, $sTgtAndroidString
 
