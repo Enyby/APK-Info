@@ -84,38 +84,36 @@ $FileNameSpace = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNameSpa
 If $FileNameSpace = "" Then $FileNameSpace = " "
 $Lastfolder = IniRead($Inidir & $IniLastFolderSettings, "Settings", "LastFolder", @WorkingDir)
 
-$String01 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String01", "Application")
-$String02 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String02", "Version")
-$String03 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String03", "Version Code")
-$String04 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String04", "Package")
-$String05 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String05", "Min. SDK")
-$String06 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String06", "Traget SDK")
-$String07 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String07", "Screen Size")
-$String08 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String08", "Resolution")
-$String09 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String09", "Permission")
-$String10 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String10", "Feature")
-$String11 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String11", "Current name")
-$String12 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String12", "New name")
-$String13 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String13", "Play Store")
-$String14 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String14", "Rename File")
-$String15 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String15", "Exit")
-$String16 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String16", "Rename APK File")
-$String17 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String17", "New APK Filename")
-$String18 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String18", "Error!")
-$String19 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String19", "APK File could not be renamed.")
-$String20 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String20", "Select APK file")
-$String21 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String21", "Cur_Dev")
-$String22 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String22", "Current Dev. Build")
-$String23 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String23", "Unknown")
-$String24 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String24", "Unknown")
-$String25 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String25", "Browse")
-$String26 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String26", "OS Lang Code")
-$String27 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String27", "Lang Name")
-$String28 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String28", "ABIs")
-$String29 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String29", "Signature")
-$String30 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String30", "Debug")
-$String31 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String31", "Icon")
-$String32 = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String32", "Loading")
+$strLabel = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String01", "Application")
+$strVersion = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String02", "Version")
+$strBuild = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String03", "Version Code")
+$strPkg = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String04", "Package")
+$strMinSDK = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String05", "Min. SDK")
+$strTargetSDK = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String06", "Traget SDK")
+$strScreens = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String07", "Screen Size")
+$strResolution = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String08", "Resolution")
+$strPermission = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String09", "Permission")
+$strFeature = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String10", "Feature")
+$strFilename = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String11", "Current name")
+$strNewFilename = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String12", "New name")
+$strPlayStore = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String13", "Play Store")
+$strRename = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String14", "Rename File")
+$strExit = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String15", "Exit")
+$strRenameAPK = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String16", "Rename APK File")
+$strNewName = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String17", "New APK Filename")
+$strError = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String18", "Error!")
+$strRenameFail = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String19", "APK File could not be renamed.")
+$strSelectAPK = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String20", "Select APK file")
+$strCurDev = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String21", "Cur_Dev")
+$strCurDevBuild = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String22", "Current Dev. Build")
+$strUnknown = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String23", "Unknown")
+$strLangCode = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String26", "OS Lang Code")
+$strLangName = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String27", "Lang Name")
+$strABIs = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String28", "ABIs")
+$strSignature = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String29", "Signature")
+$strDebug = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String30", "Debug")
+$strIcon = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String31", "Icon")
+$strLoading = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "String32", "Loading")
 
 $URLPlayStore = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
 
@@ -196,27 +194,27 @@ GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
 
-$inpLabel = _makeField($String01, $apk_Label, False, 0)
-$inpVersion = _makeField($String02, $apk_VersionName, False, 0)
-$inpBuild = _makeField($String03, $apk_VersionCode & $apk_Build, False, 0)
-$inpPkg = _makeField($String04, $apk_PkgName, False, 0)
+$inpLabel = _makeField($strLabel, $apk_Label, False, 0)
+$inpVersion = _makeField($strVersion, $apk_VersionName, False, 0)
+$inpBuild = _makeField($strBuild, $apk_VersionCode & $apk_Build, False, 0)
+$inpPkg = _makeField($strPkg, $apk_PkgName, False, 0)
 
 $inpMinSDKStr = GUICtrlCreateInput($sMinAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
-$inpMinSDK = _makeField($String05, $apk_MinSDK, False, 20)
+$inpMinSDK = _makeField($strMinSDK, $apk_MinSDK, False, 20)
 
 $inpTargetSDKStr = GUICtrlCreateInput($sTgtAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
-$inpTargetSDK = _makeField($String06, $apk_TargetSDK, False, 20)
+$inpTargetSDK = _makeField($strTargetSDK, $apk_TargetSDK, False, 20)
 
-$inpScreens = _makeField($String07, $apk_Screens, False, 0)
-$inpDensities = _makeField($String08, $apk_Densities, False, 0)
-$inpABIs = _makeField($String28, $apk_ABIs, False, 0)
+$inpScreens = _makeField($strScreens, $apk_Screens, False, 0)
+$inpDensities = _makeField($strResolution, $apk_Densities, False, 0)
+$inpABIs = _makeField($strABIs, $apk_ABIs, False, 0)
 
-$edtPermissions = _makeField($String09, $apk_Permissions, True, 0)
-$edtFeatures = _makeField($String10, $apk_Features, True, 0)
+$edtPermissions = _makeField($strPermission, $apk_Permissions, True, 0)
+$edtFeatures = _makeField($strFeature, $apk_Features, True, 0)
 
-$chSignature = GUICtrlCreateCheckbox($String29, $labelStart, $offsetHeight + $labelTop, $labelWidth, $labelHeight)
+$chSignature = GUICtrlCreateCheckbox($strSignature, $labelStart, $offsetHeight + $labelTop, $labelWidth, $labelHeight)
 Local $tmpStyle = $globalStyle
 If $CheckSignature == 1 Then
 	$tmpStyle = $tmpStyle + $GUI_CHECKED
@@ -227,16 +225,16 @@ GUICtrlSetState(-1, $tmpStyle)
 
 $edtSignature = _makeField(False, $apk_Signature, True, 0)
 
-$inpName = _makeField($String11, $fileAPK, False, 0)
-$inpNewName = _makeField($String12, $sNewFilenameAPK, False, 0)
+$inpName = _makeField($strFilename, $fileAPK, False, 0)
+$inpNewName = _makeField($strNewFilename, $sNewFilenameAPK, False, 0)
 
 ; Show OS language and language code
 If $ShowLangCode = "1" Then
-	GUICtrlCreateLabel($String26, $rightColumnStart, 84, $rightColumnWidth, $labelHeight, $SS_CENTER)
+	GUICtrlCreateLabel($strLangCode, $rightColumnStart, 84, $rightColumnWidth, $labelHeight, $SS_CENTER)
 	GUICtrlSetState(-1, $globalStyle)
 	GUICtrlCreateLabel($OSLanguageCode, $rightColumnStart, 108, $rightColumnWidth, $labelHeight, $SS_CENTER)
 	GUICtrlSetState(-1, $globalStyle)
-	GUICtrlCreateLabel($String27, $rightColumnStart, 156, $rightColumnWidth, $labelHeight, $SS_CENTER)
+	GUICtrlCreateLabel($strLangName, $rightColumnStart, 156, $rightColumnWidth, $labelHeight, $SS_CENTER)
 	GUICtrlSetState(-1, $globalStyle)
 	GUICtrlCreateLabel($Language_code, $rightColumnStart, 180, $rightColumnWidth, $labelHeight, $SS_CENTER)
 	GUICtrlSetState(-1, $globalStyle)
@@ -248,9 +246,9 @@ $offsetHeight += 11 ; buttons row gap
 
 ; Button Play / Rename / Exit
 $offsetWidth = 10
-$gBtn_Play = _makeButton($String13)
-$gBtn_Rename = _makeButton($String14)
-$gBtn_Exit = _makeButton($String15)
+$gBtn_Play = _makeButton($strPlayStore)
+$gBtn_Rename = _makeButton($strRename)
+$gBtn_Exit = _makeButton($strExit)
 
 _GDIPlus_Startup()
 $hGraphic = _GDIPlus_GraphicsCreateFromHWND($hGUI)
@@ -288,7 +286,7 @@ While 1
 			IniWrite($Inidir & $IniProgramSettings, "Settings", "CheckSignature", $CheckSignature)
 
 		Case $gBtn_Rename
-			$sNewNameInput = InputBox($String16, $String17, $sNewFilenameAPK, "", 300, 130)
+			$sNewNameInput = InputBox($strRenameAPK, $strNewName, $sNewFilenameAPK, "", 300, 130)
 			If $ShowLog = "1" Then
 				IniWrite($Inidir & $IniLogReport, "NewFile", "NewFilenameAPK", $sNewFilenameAPK)
 				IniWrite($Inidir & $IniLogReport, "NewFile", "NewNameInput", $sNewNameInput)
@@ -361,7 +359,7 @@ EndFunc   ;==>MY_WM_PAINT
 Func _renameAPK($prmNewFilenameAPK)
 	$result = FileMove($fullPathAPK, $dirAPK & "\" & $prmNewFilenameAPK)
 	; if result<> = error
-	If $result <> 1 Then MsgBox(0, $String18, $String19)
+	If $result <> 1 Then MsgBox(0, $strError, $strRenameFail)
 EndFunc   ;==>_renameAPK
 
 Func _SplitPath($prmFullPath, $prmReturnDir = False)
@@ -379,7 +377,7 @@ Func _checkFileParameter($prmFilename)
 	If FileExists($prmFilename) Then
 		Return $prmFilename
 	Else
-		$f_Sel = FileOpenDialog($String20, $Lastfolder, "(*.apk)", 1, "")
+		$f_Sel = FileOpenDialog($strSelectAPK, $Lastfolder, "(*.apk)", 1, "")
 		If @error Then Exit
 		$Lastfolder = _SplitPath($f_Sel, True)
 		IniWrite($Inidir & $IniLastFolderSettings, "Settings", "Lastfolder", $Lastfolder)
@@ -395,18 +393,18 @@ Func _OpenNewFile($apk)
 	$fileAPK = _SplitPath($fullPathAPK, False)
 	$apk_Build = ''
 
-	ProgressOn($String32 & "...", $fileAPK)
+	ProgressOn($strLoading & "...", $fileAPK)
 
-	ProgressSet(0, $String04 & '...')
+	ProgressSet(0, $strPkg & '...')
 
 	$tmpArrBadge = _getBadge($fullPathAPK)
 	_parseLines($tmpArrBadge)
 
-	ProgressSet(25, $String31 & '...')
+	ProgressSet(25, $strIcon & '...')
 
 	_extractIcon()
 
-	ProgressSet(75, $String29 & '...')
+	ProgressSet(75, $strSignature & '...')
 
 	_getSignature($fullPathAPK)
 
@@ -470,7 +468,7 @@ Func _parseLines($prmArrayLines)
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 
 		If $line == 'application-debuggable' Then
-			$apk_Build = ' ' & $String30
+			$apk_Build = ' ' & $strDebug
 		EndIf
 
 		$arraySplit = _StringExplode($line, ":", 1)
@@ -592,7 +590,7 @@ Func _parseXmlIcon()
 	Next
 	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $ids[0] & '; ' & $ids[1] & @CRLF)
 
-	ProgressSet(45, $String31 & '...')
+	ProgressSet(45, $strIcon & '...')
 
 	If $ids[0] Or $ids[1] Then
 		$foo = Run('aapt.exe d resources ' & '"' & $fullPathAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
@@ -621,7 +619,7 @@ Func _parseXmlIcon()
 
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $png[0] & '; ' & $png[1] & @CRLF)
 
-		ProgressSet(55, $String31 & '...')
+		ProgressSet(55, $strIcon & '...')
 
 		If $png[0] Then
 			$apk_IconPathBg = _searchPng('res/' & $png[0] & '.png')
@@ -640,13 +638,13 @@ Func _extractIcon()
 		$apk_IconPath = _searchPng($apk_IconPath)
 	EndIf
 
-	ProgressSet(35, $String31 & '...')
+	ProgressSet(35, $strIcon & '...')
 
 	If StringRight($apk_IconPath, 4) == '.xml' Then
 		_parseXmlIcon()
 	EndIf
 
-	ProgressSet(65, $String31 & '...')
+	ProgressSet(65, $strIcon & '...')
 
 	; extract icon
 	DirCreate($tempPath)
@@ -677,11 +675,11 @@ EndFunc   ;==>_openPlay
 
 Func _translateSDKLevel($prmSDKLevel, $prmReturnCodeName = False)
 	If $prmSDKLevel = "1000" Then
-		$sVersion = $String21
-		$sCodeName = $String22
+		$sVersion = $strCurDev
+		$sCodeName = $strCurDevBuild
 	Else
-		$sVersion = IniRead($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-Version", $String23)
-		$sCodeName = IniRead($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-CodeName", $String24)
+		$sVersion = IniRead($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-Version", $strUnknown)
+		$sCodeName = IniRead($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-CodeName", $strUnknown)
 	EndIf
 	Switch $prmReturnCodeName
 		Case True
