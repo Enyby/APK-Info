@@ -29,13 +29,13 @@ Opt("TrayIconHide",1)
 #AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
 
 
-Global $apk_Label, $apk_IconPath, $apk_IconName, $apk_PkgName, $apk_VersionCode, $apk_VersionName
+Global $apk_Label, $apk_IconPath, $apk_PkgName, $apk_VersionCode, $apk_VersionName
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_original, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
-Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK,$fullPathAPK
+Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK
 Global $sNewFilenameAPK
 
 $IniProgramSettings="APK-Info.ini"
@@ -466,8 +466,6 @@ Func _parseLines($prmArrayLines)
 				$apk_Label = $tmp_arr[0]
 				$tmp_arr =  _StringBetween($value, "icon='", "'")
 				$apk_IconPath = $tmp_arr[0]
-				$tmp_arr = _StringExplode($apk_IconPath, "/")
-				$apk_IconName = $tmp_arr[UBound($tmp_arr)-1]
 
 			Case 'package'
 				$tmp_arr =  _StringBetween($value, "name='", "'")
@@ -512,7 +510,7 @@ EndFunc
 
 Func _extractIcon()
 	; find png
-	;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _extractIcon = ' & $apk_IconPath & '; ' & $apk_IconName & @crlf)
+	;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _extractIcon = ' & $apk_IconPath & @crlf)
 	If StringRight($apk_IconPath, 4) == '.xml' Then
 		$foo = Run('unzip.exe -l ' & '"' & $fullPathAPK & '"', @ScriptDir,  @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		$output = ''
@@ -523,6 +521,8 @@ Func _extractIcon()
 		$arrayLines = _StringExplode($output, @CRLF)
 
 		$start = StringLeft($apk_IconPath, 10) ; 'res/mipmap' or 'res/drawab'
+		$tmp_arr = _StringExplode($apk_IconPath, "/")
+		$apk_IconName = $tmp_arr[UBound($tmp_arr)-1]
 		$end = '/' & StringReplace($apk_IconName, '.xml', '.png')
 		$bestSize = 0
 		For $line in $arrayLines
@@ -534,8 +534,6 @@ Func _extractIcon()
 				If $size > $bestSize Then
 					$bestSize = $size
 					$apk_IconPath = $start & $check[0] & $end
-					$tmp_arr = _StringExplode($apk_IconPath, "/")
-					$apk_IconName = $tmp_arr[UBound($tmp_arr)-1]
 
 					;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @crlf & $bestSize & ': ' & $apk_IconPath & @crlf)
 				EndIf
@@ -584,6 +582,8 @@ EndFunc
 Func _drawPNG()
 	; Png Workaround
 	; Load PNG image
+	$tmp_arr = _StringExplode($apk_IconPath, "/")
+	$apk_IconName = $tmp_arr[UBound($tmp_arr)-1]
 	$filename = $tempPath & "\" & $apk_IconName;
 	$hImage_original   = _GDIPlus_ImageLoadFromFile($filename)
 	If $ShowLog= "1" then
