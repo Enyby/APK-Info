@@ -453,8 +453,8 @@ Func _getSignature($prmAPK)
 EndFunc   ;==>_getSignature
 
 Func _getBadge($prmAPK)
-	Local $foo = Run('aapt.exe d badging ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
-	Local $output
+	$foo = Run('aapt.exe d badging ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+	$output = ''
 	While 1
 		$output &= StdoutRead($foo)
 		If @error Then ExitLoop
@@ -464,6 +464,8 @@ Func _getBadge($prmAPK)
 EndFunc   ;==>_getBadge
 
 Func _parseLines($prmArrayLines)
+	$apk_Permissions = ''
+	$apk_Features = ''
 	For $line In $prmArrayLines
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 
@@ -650,7 +652,7 @@ Func _extractIcon()
 	DirCreate($tempPath)
 	$files = $apk_IconPath
 	If $apk_IconPathBg Then
-		$files = $files & ' ' & $apk_IconPathBg
+		$files &= ' ' & $apk_IconPathBg
 	EndIf
 	$runCmd = "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"'
 	RunWait($runCmd, @ScriptDir, @SW_HIDE)
