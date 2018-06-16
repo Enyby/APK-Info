@@ -5,7 +5,7 @@
 #AutoIt3Wrapper_UseX64=n
 #AutoIt3Wrapper_Res_Comment=Shows info about Android Package Files (APK)
 #AutoIt3Wrapper_Res_Description=APK-Info
-#AutoIt3Wrapper_Res_Fileversion=1.17.0.0
+#AutoIt3Wrapper_Res_Fileversion=1.18.0.0
 #AutoIt3Wrapper_Res_LegalCopyright=zoster
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #pragma compile(AutoItExecuteAllowed True)
@@ -57,7 +57,7 @@ $Inidir = @ScriptDir & "\"
 ;$ProgramVersion=Iniread ($Inidir & $IniProgramSettings, "Settings", "ProgramVersion", "0.7Q");
 ;$ProgramReleaseDate=Iniread ($Inidir & $IniProgramSettings, "Settings", "ProgramReleaseDate", "01.06.2017");
 
-$ProgramVersion = "1.17"
+$ProgramVersion = "1.18"
 $ProgramReleaseDate = "16.06.2018"
 
 ; more info on country code
