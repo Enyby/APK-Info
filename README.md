@@ -10,11 +10,11 @@ Then was updated by bovirus and this is the [reworked thread on XDA](https://for
 # APK-Info functionalities
 - Support up to latest API Levels available
 - To add future SDK don't require program changes because is defined in external ini file.
-- Multilanguage GUI. It's possible add new language without program change, but hust editing external INI file.
+- Multilingual GUI. It's possible add new language without program change, but just editing external INI file.
 - Automatic recognition of OS language and set the right GUI language (en/fr/hu/id/it/pl/sk)
-- Optiont in configuration file to force a specifc GUI language
-- Optiont in configuration file to define pre and post filename characters
-- Automatic log of the operation (that can be dsiabled via external ini file)
+- Option in configuration file to force a specifc GUI language
+- Option in configuration file to define pre and post filename characters
+- Automatic log of the operation (that can be disabled via external ini file)
 - Windows shell integration (optional)
 
 # Download
