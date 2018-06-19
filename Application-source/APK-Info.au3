@@ -210,25 +210,25 @@ $globalInputStyle = $GUI_ONTOP
 $edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 20, $editFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 
-$inpLabel = _makeField($strLabel, $apk_Label, False, 0)
-$inpVersion = _makeField($strVersion, $apk_VersionName, False, 0)
-$inpBuild = _makeField($strBuild, $apk_Build & $apk_Debug, False, 0)
-$inpPkg = _makeField($strPkg, $apk_PkgName, False, 0)
+$inpLabel = _makeField($strLabel, False, 0)
+$inpVersion = _makeField($strVersion, False, 0)
+$inpBuild = _makeField($strBuild, False, 0)
+$inpPkg = _makeField($strPkg, False, 0)
 
 $inpMinSDKStr = GUICtrlCreateInput($sMinAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
-$inpMinSDK = _makeField($strMinSDK, $apk_MinSDK, False, 20)
+$inpMinSDK = _makeField($strMinSDK, False, 20)
 
 $inpTargetSDKStr = GUICtrlCreateInput($sTgtAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
-$inpTargetSDK = _makeField($strTargetSDK, $apk_TargetSDK, False, 20)
+$inpTargetSDK = _makeField($strTargetSDK, False, 20)
 
-$inpScreens = _makeField($strScreens, $apk_Screens, False, 0)
-$inpDensities = _makeField($strResolution, $apk_Densities, False, 0)
-$inpABIs = _makeField($strABIs, $apk_ABIs, False, 0)
+$inpScreens = _makeField($strScreens, False, 0)
+$inpDensities = _makeField($strResolution, False, 0)
+$inpABIs = _makeField($strABIs, False, 0)
 
-$edtPermissions = _makeField($strPermission, $apk_Permissions, True, 0)
-$edtFeatures = _makeField($strFeature & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired, $apk_Features, True, 0)
+$edtPermissions = _makeField($strPermission, True, 0)
+$edtFeatures = _makeField($strFeature & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired, True, 0)
 
 $chSignature = GUICtrlCreateCheckbox($strSignature, $labelStart, $offsetHeight + $labelTop, $labelWidth, $inputHeight)
 Local $tmpStyle = $globalStyle
@@ -239,10 +239,10 @@ Else
 EndIf
 GUICtrlSetState(-1, $tmpStyle)
 
-$edtSignature = _makeField(False, $apk_Signature, True, 0)
+$edtSignature = _makeField(False, True, 0)
 
-$inpName = _makeField($strFilename, $fileAPK, False, $editWidth)
-$inpNewName = _makeField($strNewFilename, $sNewFilenameAPK, False, $editWidth)
+$inpName = _makeField($strFilename, False, $editWidth)
+$inpNewName = _makeField($strNewFilename, False, $editWidth)
 
 ; Show OS language and language code
 If $ShowLangCode = "1" Then
@@ -321,14 +321,14 @@ WEnd
 
 ;==================== End GUI =====================================
 
-Func _makeButton($value)
-	$ret = GUICtrlCreateButton($value, $offsetWidth, $offsetHeight, $btnWidth)
+Func _makeButton($label)
+	$ret = GUICtrlCreateButton($label, $offsetWidth, $offsetHeight, $btnWidth)
 	GUICtrlSetState(-1, $globalStyle)
 	$offsetWidth += $btnWidth + 20
 	Return $ret
 EndFunc   ;==>_makeButton
 
-Func _makeField($label, $value, $isEdit, $width)
+Func _makeField($label, $isEdit, $width)
 	If $width == 0 Then $width = $inputWidth
 	$labelHeight = $inputHeight
 	If $isEdit Then $labelHeight = $editHeight
@@ -337,11 +337,11 @@ Func _makeField($label, $value, $isEdit, $width)
 		GUICtrlSetState(-1, $globalStyle)
 	EndIf
 	If $isEdit Then
-		$ret = GUICtrlCreateEdit($value, $inputStart, $offsetHeight, $editWidth, $editHeight, $editFlags)
+		$ret = GUICtrlCreateEdit('', $inputStart, $offsetHeight, $editWidth, $editHeight, $editFlags)
 		GUICtrlSetState(-1, $globalInputStyle)
 		$offsetHeight += $bigFieldHeight
 	Else
-		$ret = GUICtrlCreateInput($value, $inputStart, $offsetHeight, $width, $inputHeight, $inputFlags)
+		$ret = GUICtrlCreateInput('', $inputStart, $offsetHeight, $width, $inputHeight, $inputFlags)
 		GUICtrlSetState(-1, $globalInputStyle)
 		$offsetHeight += $fieldHeight
 	EndIf
