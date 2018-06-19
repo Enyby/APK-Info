@@ -527,11 +527,13 @@ Func _parseLines($prmArrayLines)
 
 			Case 'uses-permission'
 				$tmp_arr = _StringBetween($value, "'", "'")
-				$apk_Permissions &= StringLower(StringReplace($tmp_arr[0], "android.permission.", "") & @CRLF)
+				If $apk_Permissions <> '' Then $apk_Permissions &= @CRLF
+				$apk_Permissions &= StringLower(StringReplace($tmp_arr[0], "android.permission.", ""))
 
 			Case 'uses-feature'
 				$tmp_arr = _StringBetween($value, "'", "'")
-				$apk_Features &= StringLower(StringReplace($tmp_arr[0], "android.hardware.", "") & @CRLF)
+				If $apk_Features <> '' Then $apk_Features &= @CRLF
+				$apk_Features &= StringLower(StringReplace($tmp_arr[0], "android.hardware.", ""))
 
 			Case 'sdkVersion'
 				$tmp_arr = _StringBetween($value, "'", "'")
