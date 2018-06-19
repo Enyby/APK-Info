@@ -29,7 +29,7 @@ Opt("TrayIconHide", 1)
 #AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
 
 
-Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_LeanbackIconPath, $apk_PkgName, $apk_VersionCode, $apk_VersionName
+Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_LeanbackIconPath, $apk_PkgName, $apk_Build, $apk_VersionName
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
@@ -72,6 +72,7 @@ Else
 EndIf
 
 $CheckSignature = IniRead($Inidir & $IniProgramSettings, "Settings", "CheckSignature", "1")
+$FileNameWithBuild = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNameWithBuild", "1")
 
 $ShowLog = IniRead($Inidir & $IniProgramSettings, "Settings", "ShowLog", "0")
 $ShowLangCode = IniRead($Inidir & $IniProgramSettings, "Settings", "ShowLangCode", "1")
@@ -121,7 +122,7 @@ $PlayStoreLanguage = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Langua
 
 Dim $sMinAndroidString, $sTgtAndroidString
 
-Global $apk_Build = ''
+Global $apk_Debug = ''
 Global $iconProgress = 5
 
 ;================== GUI ===========================
@@ -197,7 +198,7 @@ $globalInputStyle = $GUI_ONTOP
 
 $inpLabel = _makeField($strLabel, $apk_Label, False, 0)
 $inpVersion = _makeField($strVersion, $apk_VersionName, False, 0)
-$inpBuild = _makeField($strBuild, $apk_VersionCode & $apk_Build, False, 0)
+$inpBuild = _makeField($strBuild, $apk_Build & $apk_Debug, False, 0)
 $inpPkg = _makeField($strPkg, $apk_PkgName, False, 0)
 
 $inpMinSDKStr = GUICtrlCreateInput($sMinAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
@@ -392,7 +393,6 @@ Func _OpenNewFile($apk)
 	$fullPathAPK = _checkFileParameter($apk)
 	$dirAPK = _SplitPath($fullPathAPK, True)
 	$fileAPK = _SplitPath($fullPathAPK, False)
-	$apk_Build = ''
 
 	ProgressOn($strLoading & "...", $fileAPK)
 
@@ -412,11 +412,15 @@ Func _OpenNewFile($apk)
 	If $apk_MinSDKVer <> "" Then $sMinAndroidString = 'Android ' & $apk_MinSDKVer & ' (' & $apk_MinSDKName & ')'
 	If $apk_TargetSDKVer <> "" Then $sTgtAndroidString = 'Android ' & $apk_TargetSDKVer & ' (' & $apk_TargetSDKName & ')'
 
-	$sNewFilenameAPK = StringReplace($apk_Label, " ", $FileNameSpace) & $FileNamePrefix & StringReplace($apk_VersionName, " ", $FileNameSpace) & $FileNameSuffix & StringReplace($apk_VersionCode, " ", $FileNameSpace) & ".apk"
+	$sNewFilenameAPK = StringReplace($apk_Label, " ", $FileNameSpace) & $FileNamePrefix & StringReplace($apk_VersionName, " ", $FileNameSpace)
+	If $FileNameWithBuild == 1 Then
+		$sNewFilenameAPK &= $FileNameSuffix & StringReplace($apk_Build, " ", $FileNameSpace) & ".apk"
+	EndIf
+	$sNewFilenameAPK &= ".apk"
 
 	GUICtrlSetData($inpLabel, $apk_Label)
 	GUICtrlSetData($inpVersion, $apk_VersionName)
-	GUICtrlSetData($inpBuild, $apk_VersionCode & $apk_Build)
+	GUICtrlSetData($inpBuild, $apk_Build & $apk_Debug)
 	GUICtrlSetData($inpPkg, $apk_PkgName)
 	GUICtrlSetData($inpMinSDK, $apk_MinSDK)
 	GUICtrlSetData($inpMinSDKStr, $sMinAndroidString)
@@ -465,13 +469,13 @@ Func _getBadge($prmAPK)
 EndFunc   ;==>_getBadge
 
 Func _parseLines($prmArrayLines)
-	$apk_Build = ''
+	$apk_Debug = ''
 	$apk_LeanbackIconPath = False
 	$apk_Label = ''
 	$apk_IconPath = False
 	$apk_IconPathBg = False
 	$apk_PkgName = ''
-	$apk_VersionCode = ''
+	$apk_Build = ''
 	$apk_VersionName = ''
 	$apk_Permissions = ''
 	$apk_Features = ''
@@ -488,7 +492,7 @@ Func _parseLines($prmArrayLines)
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 
 		If $line == 'application-debuggable' Then
-			$apk_Build = ' ' & $strDebug
+			$apk_Debug = ' ' & $strDebug
 		EndIf
 
 		$arraySplit = _StringExplode($line, ":", 1)
@@ -514,7 +518,7 @@ Func _parseLines($prmArrayLines)
 				$tmp_arr = _StringBetween($value, "name='", "'")
 				$apk_PkgName = $tmp_arr[0]
 				$tmp_arr = _StringBetween($value, "versionCode='", "'")
-				$apk_VersionCode = $tmp_arr[0]
+				$apk_Build = $tmp_arr[0]
 				$tmp_arr = _StringBetween($value, "versionName='", "'")
 				$apk_VersionName = $tmp_arr[0]
 
