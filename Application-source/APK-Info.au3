@@ -566,13 +566,13 @@ Func _parseLines($prmArrayLines)
 				$apk_TargetSDKName = _translateSDKLevel($apk_TargetSDK, True)
 
 			Case 'supports-screens'
-				$apk_Screens = StringStripWS(StringReplace($value, "'", ""), 3)
+				$apk_Screens = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 			Case 'densities'
-				$apk_Densities = StringStripWS(StringReplace($value, "'", ""), 3)
+				$apk_Densities = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 			Case 'native-code'
-				$apk_ABIs = StringStripWS(StringReplace($value, "'", ""), 3)
+				$apk_ABIs = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 			Case 'locales'
 				$apk_Locales = StringReplace(StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING + $STR_STRIPSPACES), ' ', @CRLF)
@@ -613,7 +613,7 @@ Func _searchPng($res)
 		$check = _StringBetween($line, $start, $end)
 		;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check & @crlf)
 		If $check <> 0 Then
-			$size = Int(StringStripWS($line, 3))
+			$size = Int(StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING))
 			;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check[0] & '; ' & $size & '; ' & $bestSize & @crlf)
 			If $size > $bestSize Then
 				$bestSize = $size
