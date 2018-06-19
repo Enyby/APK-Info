@@ -217,3 +217,8 @@ ShowLog enables to save in APK-Info-Log.ini many info about variable use interna
 
 - Fixed bug with update fields on drag&drop.
 - Fixed Spanish translation.
+
+*** APK-Info 1.19 (19.06.2018)
+
+- Improved load APK icons.
+- Add option FileNameWithBuild in .ini file.
