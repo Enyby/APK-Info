@@ -29,7 +29,7 @@ Opt("TrayIconHide", 1)
 #AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
 
 
-Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_VersionCode, $apk_VersionName
+Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_LeanbackIconPath, $apk_PkgName, $apk_VersionCode, $apk_VersionName
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
@@ -122,6 +122,7 @@ $PlayStoreLanguage = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Langua
 Dim $sMinAndroidString, $sTgtAndroidString
 
 Global $apk_Build = ''
+Global $iconProgress = 5
 
 ;================== GUI ===========================
 
@@ -464,8 +465,25 @@ Func _getBadge($prmAPK)
 EndFunc   ;==>_getBadge
 
 Func _parseLines($prmArrayLines)
+	$apk_Build = ''
+	$apk_LeanbackIconPath = False
+	$apk_Label = ''
+	$apk_IconPath = False
+	$apk_IconPathBg = False
+	$apk_PkgName = ''
+	$apk_VersionCode = ''
+	$apk_VersionName = ''
 	$apk_Permissions = ''
 	$apk_Features = ''
+	$apk_MinSDK = 0
+	$apk_MinSDKVer = 0
+	$apk_MinSDKName = ''
+	$apk_TargetSDK = 0
+	$apk_TargetSDKVer = 0
+	$apk_TargetSDKName = ''
+	$apk_Screens = ''
+	$apk_Densities = ''
+	$apk_ABIs = ''
 	For $line In $prmArrayLines
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 
@@ -482,12 +500,15 @@ Func _parseLines($prmArrayLines)
 		EndIf
 
 		Switch $key
+			Case 'leanback-launchable-activity'
+				$tmp_arr = _StringBetween($value, "icon='", "'")
+				$apk_LeanbackIconPath = $tmp_arr[0]
+
 			Case 'application'
 				$tmp_arr = _StringBetween($value, "label='", "'")
 				$apk_Label = $tmp_arr[0]
 				$tmp_arr = _StringBetween($value, "icon='", "'")
 				$apk_IconPath = $tmp_arr[0]
-				$apk_IconPathBg = False
 
 			Case 'package'
 				$tmp_arr = _StringBetween($value, "name='", "'")
@@ -565,8 +586,8 @@ Func _searchPng($res)
 	Return $ret
 EndFunc   ;==>_searchPng
 
-Func _parseXmlIcon()
-	$foo = Run('aapt.exe d xmltree ' & '"' & $fullPathAPK & '" "' & $apk_IconPath & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+Func _parseXmlIcon($progress, $iconPath)
+	$foo = Run('aapt.exe d xmltree ' & '"' & $fullPathAPK & '" "' & $iconPath & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 	$output = ''
 	While 1
 		$output &= StdoutRead($foo)
@@ -588,11 +609,14 @@ Func _parseXmlIcon()
 
 			Case StringInStr($line, 'A: android:drawable')
 				$ids[$fg] = _lastPart($line, "@")
+
+			Case StringInStr($line, 'A: android:src')
+				$ids[$fg] = _lastPart($line, "@")
 		EndSelect
 	Next
 	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $ids[0] & '; ' & $ids[1] & @CRLF)
 
-	ProgressSet(45, $strIcon & '...')
+	ProgressSet($progress + $iconProgress, $strIcon & '...')
 
 	If $ids[0] Or $ids[1] Then
 		$foo = Run('aapt.exe d resources ' & '"' & $fullPathAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
@@ -621,7 +645,7 @@ Func _parseXmlIcon()
 
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $png[0] & '; ' & $png[1] & @CRLF)
 
-		ProgressSet(55, $strIcon & '...')
+		ProgressSet($progress + $iconProgress * 2, $strIcon & '...')
 
 		If $png[0] Then
 			$apk_IconPathBg = _searchPng('res/' & $png[0] & '.png')
@@ -634,16 +658,29 @@ Func _parseXmlIcon()
 	EndIf
 EndFunc   ;==>_parseXmlIcon
 
-Func _extractIcon()
-	;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _extractIcon = ' & $apk_IconPath & @crlf)
-	If StringRight($apk_IconPath, 4) == '.xml' Then
-		$apk_IconPath = _searchPng($apk_IconPath)
+Func _loadIcon($progress, $iconPath)
+	If StringRight($iconPath, 4) == '.xml' Then
+		$iconPath = _searchPng($iconPath)
 	EndIf
 
-	ProgressSet(35, $strIcon & '...')
+	ProgressSet($progress + $iconProgress, $strIcon & '...')
 
-	If StringRight($apk_IconPath, 4) == '.xml' Then
-		_parseXmlIcon()
+	If StringRight($iconPath, 4) == '.xml' Then
+		_parseXmlIcon($progress + $iconProgress, $iconPath)
+	Else
+		$apk_IconPath = $iconPath
+	EndIf
+
+	ProgressSet($progress + $iconProgress * 4, $strIcon & '...')
+EndFunc   ;==>_loadIcon
+
+Func _extractIcon()
+	;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _extractIcon = ' & $apk_IconPath & @crlf)
+
+	_loadIcon(25, $apk_IconPath)
+
+	If $apk_LeanbackIconPath And StringRight($apk_IconPath, 4) == '.xml' Then
+		_loadIcon(25 + $iconProgress * 4, $apk_LeanbackIconPath)
 	EndIf
 
 	ProgressSet(65, $strIcon & '...')
