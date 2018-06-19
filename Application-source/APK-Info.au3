@@ -166,7 +166,6 @@ $bigFieldHeight = 93
 
 $labelStart = 8
 $labelWidth = 100
-$labelHeight = 20
 $labelTop = 3
 
 $inputStart = 125
@@ -214,9 +213,9 @@ $inpDensities = _makeField($strResolution, $apk_Densities, False, 0)
 $inpABIs = _makeField($strABIs, $apk_ABIs, False, 0)
 
 $edtPermissions = _makeField($strPermission, $apk_Permissions, True, 0)
-$edtFeatures = _makeField($strFeature, $apk_Features, True, 0)
+$edtFeatures = _makeField($strFeature & @CRLF & @CRLF & "+ = " & 'uses' & @CRLF & "# = " & 'implies' & @CRLF & "- = " & 'not required', $apk_Features, True, 0)
 
-$chSignature = GUICtrlCreateCheckbox($strSignature, $labelStart, $offsetHeight + $labelTop, $labelWidth, $labelHeight)
+$chSignature = GUICtrlCreateCheckbox($strSignature, $labelStart, $offsetHeight + $labelTop, $labelWidth, $inputHeight)
 Local $tmpStyle = $globalStyle
 If $CheckSignature == 1 Then
 	$tmpStyle = $tmpStyle + $GUI_CHECKED
@@ -232,13 +231,13 @@ $inpNewName = _makeField($strNewFilename, $sNewFilenameAPK, False, 0)
 
 ; Show OS language and language code
 If $ShowLangCode = "1" Then
-	GUICtrlCreateLabel($strLangCode, $rightColumnStart, 84, $rightColumnWidth, $labelHeight, $SS_CENTER)
+	GUICtrlCreateLabel($strLangCode, $rightColumnStart, 84, $rightColumnWidth, $inputHeight, $SS_CENTER)
 	GUICtrlSetState(-1, $globalStyle)
-	GUICtrlCreateLabel($OSLanguageCode, $rightColumnStart, 108, $rightColumnWidth, $labelHeight, $SS_CENTER)
+	GUICtrlCreateLabel($OSLanguageCode, $rightColumnStart, 108, $rightColumnWidth, $inputHeight, $SS_CENTER)
 	GUICtrlSetState(-1, $globalStyle)
-	GUICtrlCreateLabel($strLangName, $rightColumnStart, 156, $rightColumnWidth, $labelHeight, $SS_CENTER)
+	GUICtrlCreateLabel($strLangName, $rightColumnStart, 156, $rightColumnWidth, $inputHeight, $SS_CENTER)
 	GUICtrlSetState(-1, $globalStyle)
-	GUICtrlCreateLabel($Language_code, $rightColumnStart, 180, $rightColumnWidth, $labelHeight, $SS_CENTER)
+	GUICtrlCreateLabel($Language_code, $rightColumnStart, 180, $rightColumnWidth, $inputHeight, $SS_CENTER)
 	GUICtrlSetState(-1, $globalStyle)
 	;GUICtrlCreateLabel($sPadSpace,		 455, 228, 100,  20)
 	;GUICtrlSetState(-1, $globalStyle)
@@ -315,9 +314,9 @@ Func _makeButton($value)
 EndFunc   ;==>_makeButton
 
 Func _makeField($label, $value, $isEdit, $width)
-	If $width == 0 Then
-		$width = $inputWidth
-	EndIf
+	If $width == 0 Then $width = $inputWidth
+	$labelHeight = $inputHeight
+	If $isEdit Then $labelHeight = $editHeight
 	If $label Then
 		GUICtrlCreateLabel($label, $labelStart, $offsetHeight + $labelTop, $labelWidth, $labelHeight)
 		GUICtrlSetState(-1, $globalStyle)
@@ -511,42 +510,32 @@ Func _parseLines($prmArrayLines)
 
 		Switch $key
 			Case 'leanback-launchable-activity'
-				$tmp_arr = _StringBetween($value, "icon='", "'")
-				$apk_LeanbackIconPath = $tmp_arr[0]
+				$apk_LeanbackIconPath = _StringBetween($value, "icon='", "'")[0]
 
 			Case 'application'
-				$tmp_arr = _StringBetween($value, "label='", "'")
-				$apk_Label = $tmp_arr[0]
-				$tmp_arr = _StringBetween($value, "icon='", "'")
-				$apk_IconPath = $tmp_arr[0]
+				$apk_Label = _StringBetween($value, "label='", "'")[0]
+				$apk_IconPath = _StringBetween($value, "icon='", "'")[0]
 
 			Case 'package'
-				$tmp_arr = _StringBetween($value, "name='", "'")
-				$apk_PkgName = $tmp_arr[0]
-				$tmp_arr = _StringBetween($value, "versionCode='", "'")
-				$apk_Build = $tmp_arr[0]
-				$tmp_arr = _StringBetween($value, "versionName='", "'")
-				$apk_VersionName = $tmp_arr[0]
+				$apk_PkgName = _StringBetween($value, "name='", "'")[0]
+				$apk_Build = _StringBetween($value, "versionCode='", "'")[0]
+				$apk_VersionName = _StringBetween($value, "versionName='", "'")[0]
 
 			Case 'uses-permission'
-				$tmp_arr = _StringBetween($value, "'", "'")
 				If $apk_Permissions <> '' Then $apk_Permissions &= @CRLF
-				$apk_Permissions &= $tmp_arr[0]
+				$apk_Permissions &= _StringBetween($value, "'", "'")[0]
 
 			Case 'uses-feature'
-				$tmp_arr = _StringBetween($value, "'", "'")
 				If $featuresUsed <> '' Then $featuresUsed &= @CRLF
-				$featuresUsed &= '+ ' & $tmp_arr[0]
+				$featuresUsed &= '+ ' & _StringBetween($value, "'", "'")[0]
 
 			Case 'uses-feature-not-required'
-				$tmp_arr = _StringBetween($value, "'", "'")
 				If $featuresNotRequired <> '' Then $featuresNotRequired &= @CRLF
-				$featuresNotRequired &= '- ' & $tmp_arr[0]
+				$featuresNotRequired &= '- ' & _StringBetween($value, "'", "'")[0]
 
 			Case 'uses-implied-feature'
-				$tmp_arr = _StringBetween($value, "'", "'")
 				If $featuresImplied <> '' Then $featuresImplied &= @CRLF
-				$featuresImplied &= '+` ' & $tmp_arr[0]
+				$featuresImplied &= '# ' & _StringBetween($value, "'", "'")[0] & ' (' & _StringBetween($value, "reason='", "'")[0] & ')'
 
 			Case 'sdkVersion'
 				$tmp_arr = _StringBetween($value, "'", "'")
@@ -555,8 +544,7 @@ Func _parseLines($prmArrayLines)
 				$apk_MinSDKName = _translateSDKLevel($apk_MinSDK, True)
 
 			Case 'targetSdkVersion'
-				$tmp_arr = _StringBetween($value, "'", "'")
-				$apk_TargetSDK = $tmp_arr[0]
+				$apk_TargetSDK = _StringBetween($value, "'", "'")[0]
 				$apk_TargetSDKVer = _translateSDKLevel($apk_TargetSDK)
 				$apk_TargetSDKName = _translateSDKLevel($apk_TargetSDK, True)
 
@@ -579,7 +567,7 @@ Func _parseLines($prmArrayLines)
 	$apk_Features &= $featuresNotRequired
 
 	$apk_Permissions = StringReplace(StringLower($apk_Permissions), "android.permission.", "")
-	$apk_Features = StringReplace(StringLower($apk_Features), "android.hardware.", "")
+	$apk_Features = StringReplace(StringReplace(StringLower($apk_Features), "android.hardware.", ""), "android.permission.", "")
 EndFunc   ;==>_parseLines
 
 Func _searchPng($res)
