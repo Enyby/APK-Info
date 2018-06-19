@@ -500,7 +500,7 @@ Func _parseLines($prmArrayLines)
 
 		$arraySplit = _StringExplode($line, ":", 1)
 		If UBound($arraySplit) > 1 Then
-			$key = $arraySplit[0]
+			$key = StringStripWS($arraySplit[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
 			$value = $arraySplit[1]
 		Else
 			ContinueLoop
