@@ -446,12 +446,14 @@ Func _getSignature($prmAPK)
 	If $CheckSignature == 1 Then
 		$foo = Run('java -jar apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		While 1
-			$output &= StderrRead($foo)
+			$bin = StderrRead($foo, False, True)
 			If @error Then ExitLoop
+			$output &= BinaryToString($bin, $SB_UTF8)
 		WEnd
 		While 1
-			$output &= StdoutRead($foo)
+			$bin = StdoutRead($foo, False, True)
 			If @error Then ExitLoop
+			$output &= BinaryToString($bin, $SB_UTF8)
 		WEnd
 	EndIf
 	$apk_Signature = $output
@@ -461,8 +463,9 @@ Func _getBadge($prmAPK)
 	$foo = Run('aapt.exe d badging ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 	$output = ''
 	While 1
-		$output &= StdoutRead($foo)
+		$bin = StdoutRead($foo, False, True)
 		If @error Then ExitLoop
+		$output &= BinaryToString($bin, $SB_UTF8)
 	WEnd
 	$arrayLines = _StringExplode($output, @CRLF)
 	Return $arrayLines
@@ -562,8 +565,9 @@ Func _searchPng($res)
 		$foo = Run('unzip.exe -l ' & '"' & $fullPathAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		$output = ''
 		While 1
-			$output &= StdoutRead($foo)
+			$bin = StdoutRead($foo, False, True)
 			If @error Then ExitLoop
+			$output &= BinaryToString($bin, $SB_UTF8)
 		WEnd
 		$searchPngCache = _StringExplode($output, @CRLF)
 	EndIf
@@ -594,8 +598,9 @@ Func _parseXmlIcon($progress, $iconPath)
 	$foo = Run('aapt.exe d xmltree ' & '"' & $fullPathAPK & '" "' & $iconPath & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 	$output = ''
 	While 1
-		$output &= StdoutRead($foo)
+		$bin = StdoutRead($foo, False, True)
 		If @error Then ExitLoop
+		$output &= BinaryToString($bin, $SB_UTF8)
 	WEnd
 	$arrayLines = _StringExplode($output, @CRLF)
 
@@ -626,8 +631,9 @@ Func _parseXmlIcon($progress, $iconPath)
 		$foo = Run('aapt.exe d resources ' & '"' & $fullPathAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		$output = ''
 		While 1
-			$output &= StdoutRead($foo)
+			$bin = StdoutRead($foo, False, True)
 			If @error Then ExitLoop
+			$output &= BinaryToString($bin, $SB_UTF8)
 		WEnd
 		$arrayLines = _StringExplode($output, @CRLF)
 
