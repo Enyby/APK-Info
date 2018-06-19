@@ -165,6 +165,8 @@ If $aCmdLine[0] = 0 And $ShowLog = "1" Then
 	;	IniWrite($Inidir & $IniLogReport, "CommandLine", "Parameter2", $aCmdLine[1]);
 EndIf
 
+$rightColumnWidth = 100
+
 $fieldHeight = 24
 $bigFieldHeight = 93
 
@@ -177,12 +179,12 @@ $inputWidth = 300
 $inputHeight = 20
 $inputFlags = BitOR($GUI_SS_DEFAULT_INPUT, $ES_READONLY)
 
+$editWidth = $inputWidth + 10 + $rightColumnWidth
 $editHeight = 85
 $editFlags = BitOR($ES_READONLY, $ES_AUTOVSCROLL, $ES_AUTOHSCROLL, $WS_VSCROLL, $ES_WANTRETURN)
 
 $offsetHeight = 9
 
-$rightColumnWidth = 100
 $rightColumnStart = $inputStart + $inputWidth + 10
 
 $fullWidth = $rightColumnStart + $rightColumnWidth + 10
@@ -230,8 +232,8 @@ GUICtrlSetState(-1, $tmpStyle)
 
 $edtSignature = _makeField(False, $apk_Signature, True, 0)
 
-$inpName = _makeField($strFilename, $fileAPK, False, 0)
-$inpNewName = _makeField($strNewFilename, $sNewFilenameAPK, False, 0)
+$inpName = _makeField($strFilename, $fileAPK, False, $editWidth)
+$inpNewName = _makeField($strNewFilename, $sNewFilenameAPK, False, $editWidth)
 
 ; Show OS language and language code
 If $ShowLangCode = "1" Then
@@ -326,7 +328,7 @@ Func _makeField($label, $value, $isEdit, $width)
 		GUICtrlSetState(-1, $globalStyle)
 	EndIf
 	If $isEdit Then
-		$ret = GUICtrlCreateEdit($value, $inputStart, $offsetHeight, $inputWidth + 10 + $rightColumnWidth, $editHeight, $editFlags)
+		$ret = GUICtrlCreateEdit($value, $inputStart, $offsetHeight, $editWidth, $editHeight, $editFlags)
 		GUICtrlSetState(-1, $globalInputStyle)
 		$offsetHeight += $bigFieldHeight
 	Else
