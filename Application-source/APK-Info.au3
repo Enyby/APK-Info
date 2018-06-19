@@ -32,6 +32,7 @@ Opt("TrayIconHide", 1)
 Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_LeanbackIconPath, $apk_PkgName, $apk_Build, $apk_VersionName
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
+Global $apk_Locales
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
@@ -192,6 +193,11 @@ $fullHeight = $offsetHeight + $fieldHeight * 11 + $bigFieldHeight * 3 + 50
 
 $btnWidth = $fullWidth / 3 - 20
 
+$localesWidth = 60
+$localesStart = $fullWidth;
+
+$fullWidth += $localesWidth + 5
+
 $hGUI = GUICreate($ProgramTitle, $fullWidth, $fullHeight, -1, -1, -1, $WS_EX_ACCEPTFILES)
 
 GUICtrlCreateLabel("", 0, 0, $fullWidth, $fullHeight, $WS_CLIPSIBLINGS) ; for accept drag & drop
@@ -200,6 +206,9 @@ GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
+
+$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 20, $editFlags)
+GUICtrlSetState(-1, $globalInputStyle)
 
 $inpLabel = _makeField($strLabel, $apk_Label, False, 0)
 $inpVersion = _makeField($strVersion, $apk_VersionName, False, 0)
@@ -439,6 +448,7 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($edtSignature, $apk_Signature)
 	GUICtrlSetData($inpName, $fileAPK)
 	GUICtrlSetData($inpNewName, $sNewFilenameAPK)
+	GUICtrlSetData($edtLocales, $apk_Locales)
 
 	_drawPNG()
 
@@ -495,6 +505,7 @@ Func _parseLines($prmArrayLines)
 	$apk_Screens = ''
 	$apk_Densities = ''
 	$apk_ABIs = ''
+	$apk_Locales = ''
 
 	$featuresUsed = ''
 	$featuresNotRequired = ''
@@ -562,6 +573,9 @@ Func _parseLines($prmArrayLines)
 
 			Case 'native-code'
 				$apk_ABIs = StringStripWS(StringReplace($value, "'", ""), 3)
+
+			Case 'locales'
+				$apk_Locales = StringReplace(StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING + $STR_STRIPSPACES), ' ', @CRLF)
 
 		EndSwitch
 	Next
