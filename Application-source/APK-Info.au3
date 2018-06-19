@@ -481,7 +481,6 @@ Func _parseLines($prmArrayLines)
 	$apk_Build = ''
 	$apk_VersionName = ''
 	$apk_Permissions = ''
-	$apk_Features = ''
 	$apk_MinSDK = 0
 	$apk_MinSDKVer = 0
 	$apk_MinSDKName = ''
@@ -491,6 +490,10 @@ Func _parseLines($prmArrayLines)
 	$apk_Screens = ''
 	$apk_Densities = ''
 	$apk_ABIs = ''
+
+	$featuresUsed = ''
+	$featuresNotRequired = ''
+	$featuresImplied = ''
 	For $line In $prmArrayLines
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 
@@ -528,12 +531,22 @@ Func _parseLines($prmArrayLines)
 			Case 'uses-permission'
 				$tmp_arr = _StringBetween($value, "'", "'")
 				If $apk_Permissions <> '' Then $apk_Permissions &= @CRLF
-				$apk_Permissions &= StringLower(StringReplace($tmp_arr[0], "android.permission.", ""))
+				$apk_Permissions &= $tmp_arr[0]
 
 			Case 'uses-feature'
 				$tmp_arr = _StringBetween($value, "'", "'")
-				If $apk_Features <> '' Then $apk_Features &= @CRLF
-				$apk_Features &= StringLower(StringReplace($tmp_arr[0], "android.hardware.", ""))
+				If $featuresUsed <> '' Then $featuresUsed &= @CRLF
+				$featuresUsed &= '+ ' & $tmp_arr[0]
+
+			Case 'uses-feature-not-required'
+				$tmp_arr = _StringBetween($value, "'", "'")
+				If $featuresNotRequired <> '' Then $featuresNotRequired &= @CRLF
+				$featuresNotRequired &= '- ' & $tmp_arr[0]
+
+			Case 'uses-implied-feature'
+				$tmp_arr = _StringBetween($value, "'", "'")
+				If $featuresImplied <> '' Then $featuresImplied &= @CRLF
+				$featuresImplied &= '+` ' & $tmp_arr[0]
 
 			Case 'sdkVersion'
 				$tmp_arr = _StringBetween($value, "'", "'")
@@ -558,6 +571,15 @@ Func _parseLines($prmArrayLines)
 
 		EndSwitch
 	Next
+
+	$apk_Features = $featuresUsed
+	If $apk_Features <> '' Then $apk_Features &= @CRLF
+	$apk_Features &= $featuresImplied
+	If $apk_Features <> '' Then $apk_Features &= @CRLF
+	$apk_Features &= $featuresNotRequired
+
+	$apk_Permissions = StringReplace(StringLower($apk_Permissions), "android.permission.", "")
+	$apk_Features = StringReplace(StringLower($apk_Features), "android.hardware.", "")
 EndFunc   ;==>_parseLines
 
 Func _searchPng($res)
