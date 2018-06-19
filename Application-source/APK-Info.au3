@@ -116,6 +116,10 @@ $strDebug = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, 
 $strIcon = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Icon", "Icon")
 $strLoading = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Loading", "Loading")
 
+$strUses = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Uses", "uses")
+$strImplied = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Implied", "implied")
+$strNotRequired = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "NotRequired", "not required")
+
 $URLPlayStore = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
 
 $PlayStoreLanguage = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "PlayStoreLanguage", $Language_code)
@@ -213,7 +217,7 @@ $inpDensities = _makeField($strResolution, $apk_Densities, False, 0)
 $inpABIs = _makeField($strABIs, $apk_ABIs, False, 0)
 
 $edtPermissions = _makeField($strPermission, $apk_Permissions, True, 0)
-$edtFeatures = _makeField($strFeature & @CRLF & @CRLF & "+ = " & 'uses' & @CRLF & "# = " & 'implies' & @CRLF & "- = " & 'not required', $apk_Features, True, 0)
+$edtFeatures = _makeField($strFeature & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired, $apk_Features, True, 0)
 
 $chSignature = GUICtrlCreateCheckbox($strSignature, $labelStart, $offsetHeight + $labelTop, $labelWidth, $inputHeight)
 Local $tmpStyle = $globalStyle
