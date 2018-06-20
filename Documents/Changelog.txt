@@ -222,3 +222,15 @@ ShowLog enables to save in APK-Info-Log.ini many info about variable use interna
 
 - Improved load APK icons.
 - Add option FileNameWithBuild in .ini file.
+
+*** APK-Info 1.20 (20.06.2018)
+
+- Improved load APK icons.
+- Add option FileNamePattern for rename APK in .ini file.
+- Add support for unicode.
+- Fix load features.
+- Improved features list.
+- Improved GUI.
+- Show locales from the APK.
+- Show OpenGL ES version and textures formats.
+- Show support for TV, Watch, Auto.
