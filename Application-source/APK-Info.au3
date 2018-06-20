@@ -32,7 +32,7 @@ Opt("TrayIconHide", 1)
 Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_LeanbackIconPath, $apk_PkgName, $apk_Build, $apk_VersionName
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
-Global $apk_Locales
+Global $apk_Locales, $apk_OpenGLES
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
@@ -229,6 +229,8 @@ $inpTargetSDK = _makeField($strTargetSDK, False, 20)
 _makeLangLabel($Language_code)
 $inpScreens = _makeField($strScreens, False, 0)
 $inpDensities = _makeField($strResolution, False, 0)
+$lblOpenGL = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
+GUICtrlSetState(-1, $globalStyle)
 $inpABIs = _makeField($strABIs, False, 0)
 
 $edtPermissions = _makeField($strPermission, True, 0)
@@ -445,6 +447,7 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($inpName, $fileAPK)
 	GUICtrlSetData($inpNewName, $sNewFilenameAPK)
 	GUICtrlSetData($edtLocales, $apk_Locales)
+	GUICtrlSetData($lblOpenGL, $apk_OpenGLES)
 
 	_drawPNG()
 
@@ -502,6 +505,7 @@ Func _parseLines($prmArrayLines)
 	$apk_Densities = ''
 	$apk_ABIs = ''
 	$apk_Locales = ''
+	$apk_OpenGLES = 'OpenGL ES 1.0'
 
 	$featuresUsed = ''
 	$featuresNotRequired = ''
@@ -573,6 +577,20 @@ Func _parseLines($prmArrayLines)
 			Case 'locales'
 				$apk_Locales = StringReplace(StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING + $STR_STRIPSPACES), ' ', @CRLF)
 
+			Case 'uses-gl-es'
+				$ver = _StringBetween($value, "'", "'")[0]
+				Switch $ver
+					Case '0x20000'
+						$ver = '2.0'
+					Case '0x30000'
+						$ver = '3.0'
+					Case '0x30001'
+						$ver = '3.1'
+				EndSwitch
+				$apk_OpenGLES = 'OpenGL ES ' & $ver
+
+				If $featuresUsed <> '' Then $featuresUsed &= @CRLF
+				$featuresUsed &= '+ ' & $apk_OpenGLES
 		EndSwitch
 	Next
 
