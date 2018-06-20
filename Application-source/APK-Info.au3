@@ -658,10 +658,14 @@ Func _parseLines($prmArrayLines)
 	$apk_Icons &= $banners
 
 	$apk_Features = $featuresUsed
-	If $apk_Features <> '' Then $apk_Features &= @CRLF
-	$apk_Features &= $featuresImplied
-	If $apk_Features <> '' Then $apk_Features &= @CRLF
-	$apk_Features &= $featuresNotRequired
+	If $featuresImplied <> '' Then
+		If $apk_Features <> '' Then $apk_Features &= @CRLF
+		$apk_Features &= $featuresImplied
+	EndIf
+	If $featuresNotRequired <> '' Then
+		If $apk_Features <> '' Then $apk_Features &= @CRLF
+		$apk_Features &= $featuresNotRequired
+	EndIf
 
 	$apk_Permissions = StringReplace(StringLower($apk_Permissions), "android.permission.", "")
 	$apk_Features = StringReplace(StringReplace(StringLower($apk_Features), "android.hardware.", ""), "android.permission.", "")
