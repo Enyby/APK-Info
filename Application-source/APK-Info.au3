@@ -213,16 +213,20 @@ GUICtrlSetState(-1, $globalInputStyle)
 $inpLabel = _makeField($strLabel, False, 0)
 $inpVersion = _makeField($strVersion, False, 0)
 $inpBuild = _makeField($strBuild, False, 0)
+_makeLangLabel($strLangCode)
 $inpPkg = _makeField($strPkg, False, 0)
 
+_makeLangLabel($OSLanguageCode)
 $inpMinSDKStr = GUICtrlCreateInput($sMinAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 $inpMinSDK = _makeField($strMinSDK, False, 20)
 
+_makeLangLabel($strLangName)
 $inpTargetSDKStr = GUICtrlCreateInput($sTgtAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 $inpTargetSDK = _makeField($strTargetSDK, False, 20)
 
+_makeLangLabel($Language_code)
 $inpScreens = _makeField($strScreens, False, 0)
 $inpDensities = _makeField($strResolution, False, 0)
 $inpABIs = _makeField($strABIs, False, 0)
@@ -243,20 +247,6 @@ $edtSignature = _makeField(False, True, 0)
 
 $inpName = _makeField($strFilename, False, $editWidth)
 $inpNewName = _makeField($strNewFilename, False, $editWidth)
-
-; Show OS language and language code
-If $ShowLangCode = "1" Then
-	GUICtrlCreateLabel($strLangCode, $rightColumnStart, 84, $rightColumnWidth, $inputHeight, $SS_CENTER)
-	GUICtrlSetState(-1, $globalStyle)
-	GUICtrlCreateLabel($OSLanguageCode, $rightColumnStart, 108, $rightColumnWidth, $inputHeight, $SS_CENTER)
-	GUICtrlSetState(-1, $globalStyle)
-	GUICtrlCreateLabel($strLangName, $rightColumnStart, 156, $rightColumnWidth, $inputHeight, $SS_CENTER)
-	GUICtrlSetState(-1, $globalStyle)
-	GUICtrlCreateLabel($Language_code, $rightColumnStart, 180, $rightColumnWidth, $inputHeight, $SS_CENTER)
-	GUICtrlSetState(-1, $globalStyle)
-	;GUICtrlCreateLabel($sPadSpace,		 455, 228, 100,  20)
-	;GUICtrlSetState(-1, $globalStyle)
-EndIf
 
 $offsetHeight += 11 ; buttons row gap
 
@@ -320,6 +310,12 @@ While 1
 WEnd
 
 ;==================== End GUI =====================================
+
+Func _makeLangLabel($label)
+	If $ShowLangCode <> "1" Then Return
+	GUICtrlCreateLabel($label, $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
+	GUICtrlSetState(-1, $globalStyle)
+EndFunc   ;==>_makeLangLabel
 
 Func _makeButton($label)
 	$ret = GUICtrlCreateButton($label, $offsetWidth, $offsetHeight, $btnWidth)
