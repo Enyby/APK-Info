@@ -73,17 +73,14 @@ Else
 EndIf
 
 $CheckSignature = IniRead($Inidir & $IniProgramSettings, "Settings", "CheckSignature", "1")
-$FileNameWithBuild = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNameWithBuild", "1")
+$FileNamePattern = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNamePattern", "%label% %version%.%build%")
 
 $ShowLog = IniRead($Inidir & $IniProgramSettings, "Settings", "ShowLog", "0")
 $ShowLangCode = IniRead($Inidir & $IniProgramSettings, "Settings", "ShowLangCode", "1")
 ; $ShowCmdLine=Iniread($Inidir & $IniProgramSettings,"Settings","ShowCmdLine","1");
-$FileNamePrefix = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNamePrefix", "")
-If $FileNamePrefix = "" Then $FileNamePrefix = " "
-$FileNameSuffix = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNameSuffix", "")
-If $FileNameSuffix = "" Then $FileNameSuffix = "."
-$FileNameSpace = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNameSpace", "")
-If $FileNameSpace = "" Then $FileNameSpace = " "
+Local $space = 'space'
+$FileNameSpace = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNameSpace", $space)
+If $FileNameSpace == $space Then $FileNameSpace = ' '
 $Lastfolder = IniRead($Inidir & $IniLastFolderSettings, "Settings", "LastFolder", @WorkingDir)
 
 $strLabel = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Application", "Application")
@@ -147,10 +144,6 @@ If $ShowLog = "1" Then
 	IniWrite($Inidir & $IniLogReport, "IniFile", "IniFileFolderPath", $Inidir)
 	IniWrite($Inidir & $IniLogReport, "IniFile", "IniFileProgramSettings", $IniProgramSettings)
 	IniWrite($Inidir & $IniLogReport, "IniFile", "IniFileGuiSettings", $IniProgramSettings)
-	IniDelete($Inidir & $IniLogReport, "IniFile", "FileNamePrefix")
-	IniWrite($Inidir & $IniLogReport, "IniFile", "FileNamePrefix", $FileNamePrefix)
-	IniDelete($Inidir & $IniLogReport, "IniFile", "FileNameSuffix")
-	IniWrite($Inidir & $IniLogReport, "IniFile", "FileNameSuffix", $FileNameSuffix)
 	; Cleanup not defined variables
 	IniWrite($Inidir & $IniLogReport, "Icon", "TempFilePath", "")
 	IniWrite($Inidir & $IniLogReport, "Icon", "ApkIconeName", "")
@@ -429,11 +422,14 @@ Func _OpenNewFile($apk)
 	If $apk_MinSDKVer <> "" Then $sMinAndroidString = 'Android ' & $apk_MinSDKVer & ' (' & $apk_MinSDKName & ')'
 	If $apk_TargetSDKVer <> "" Then $sTgtAndroidString = 'Android ' & $apk_TargetSDKVer & ' (' & $apk_TargetSDKName & ')'
 
-	$sNewFilenameAPK = StringReplace($apk_Label, " ", $FileNameSpace) & $FileNamePrefix & StringReplace($apk_VersionName, " ", $FileNameSpace)
-	If $FileNameWithBuild == 1 Then
-		$sNewFilenameAPK &= $FileNameSuffix & StringReplace($apk_Build, " ", $FileNameSpace) & ".apk"
-	EndIf
-	$sNewFilenameAPK &= ".apk"
+
+
+	$sNewFilenameAPK = $FileNamePattern
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%label%', StringReplace($apk_Label, " ", $FileNameSpace))
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%version%', StringReplace($apk_VersionName, " ", $FileNameSpace))
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%build%', StringReplace($apk_Build, " ", $FileNameSpace))
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%package%', StringReplace($apk_PkgName, " ", $FileNameSpace))
+	$sNewFilenameAPK &= '.apk'
 
 	GUICtrlSetData($inpLabel, $apk_Label)
 	GUICtrlSetData($inpVersion, $apk_VersionName)
