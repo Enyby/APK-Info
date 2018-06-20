@@ -24,35 +24,34 @@ Then was updated by bovirus and this is the [reworked thread on XDA](https://for
 
 # API Level supported
 ```
-Level1 = Base
-Level2 = Base 1.1
-Level3 = CupCake
-Level4 = Donut
-Level5 = Eclair
-Level6 = Eclair 0.1
-Level7 = Eclair MR1
-Level8 = Froyo
-Level9 = Gingerbread
-Level10 = Gingerbread MR1
-Level11 = Honeycomb
-Level12 = Honeycomb MR1
-Level13 = Honeycomb MR2
-Level14 = IceCreamSandwich
-Level15 = IceCreamSandwich MR1
-Level16 = Jelly Bean
-Level17 = Jelly Bean MR1
-Level18 = Jelly Bean MR2
-Level19 = KitKat
-Level20 = KitKat Wear
-Level21 = Lollipop
-Level22 = Lollipop MR1
-Level23 = Marshmallow
-Level24 = Nougat
-Level25 = Nougat MR1
-Level 26 = Oreo (8.0.0)
-Level 27 = Oreo (8.1.0)
-Level P = Pistachio Ice Cream (9.0) Preview
-Level 28 = Pistachio Ice Cream (9.0) final
+Level  1 = Base
+Level  2 = Base 1.1
+Level  3 = CupCake
+Level  4 = Donut
+Level  5 = Eclair
+Level  6 = Eclair 0.1
+Level  7 = Eclair MR1
+Level  8 = Froyo
+Level  9 = Gingerbread
+Level 10 = Gingerbread MR1
+Level 11 = Honeycomb
+Level 12 = Honeycomb MR1
+Level 13 = Honeycomb MR2
+Level 14 = IceCreamSandwich
+Level 15 = IceCreamSandwich MR1
+Level 16 = Jelly Bean
+Level 17 = Jelly Bean MR1
+Level 18 = Jelly Bean MR2
+Level 19 = KitKat
+Level 20 = KitKat Wear
+Level 21 = Lollipop
+Level 22 = Lollipop MR1
+Level 23 = Marshmallow
+Level 24 = Nougat
+Level 25 = Nougat MR1
+Level 26 = Oreo
+Level 27 = Oreo MR1
+Level 28 = "TBD"
 ```
 
 # Additional info
