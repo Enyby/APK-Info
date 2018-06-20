@@ -29,7 +29,7 @@ Opt("TrayIconHide", 1)
 #AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
 
 
-Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_LeanbackIconPath, $apk_PkgName, $apk_Build, $apk_VersionName
+Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_LeanbackIconPath, $apk_PkgName, $apk_Build, $apk_Version
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
@@ -426,13 +426,13 @@ Func _OpenNewFile($apk)
 
 	$sNewFilenameAPK = $FileNamePattern
 	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%label%', StringReplace($apk_Label, " ", $FileNameSpace))
-	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%version%', StringReplace($apk_VersionName, " ", $FileNameSpace))
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%version%', StringReplace($apk_Version, " ", $FileNameSpace))
 	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%build%', StringReplace($apk_Build, " ", $FileNameSpace))
 	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%package%', StringReplace($apk_PkgName, " ", $FileNameSpace))
 	$sNewFilenameAPK &= '.apk'
 
 	GUICtrlSetData($inpLabel, $apk_Label)
-	GUICtrlSetData($inpVersion, $apk_VersionName)
+	GUICtrlSetData($inpVersion, $apk_Version)
 	GUICtrlSetData($inpBuild, $apk_Build)
 	GUICtrlSetData($inpPkg, $apk_PkgName)
 	GUICtrlSetData($inpMinSDK, $apk_MinSDK)
@@ -496,7 +496,7 @@ Func _parseLines($prmArrayLines)
 	$apk_IconPathBg = False
 	$apk_PkgName = ''
 	$apk_Build = ''
-	$apk_VersionName = ''
+	$apk_Version = ''
 	$apk_Permissions = ''
 	$apk_MinSDK = 0
 	$apk_MinSDKVer = 0
@@ -540,7 +540,7 @@ Func _parseLines($prmArrayLines)
 			Case 'package'
 				$apk_PkgName = _StringBetween($value, "name='", "'")[0]
 				$apk_Build = _StringBetween($value, "versionCode='", "'")[0]
-				$apk_VersionName = _StringBetween($value, "versionName='", "'")[0]
+				$apk_Version = _StringBetween($value, "versionName='", "'")[0]
 
 			Case 'uses-permission'
 				If $apk_Permissions <> '' Then $apk_Permissions &= @CRLF
