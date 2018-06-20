@@ -116,6 +116,7 @@ $strSignature = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_co
 $strDebug = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Debug", "Debug")
 $strIcon = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Icon", "Icon")
 $strLoading = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Loading", "Loading")
+$strTextures = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Textures", "Textures")
 
 $strUses = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Uses", "uses")
 $strImplied = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Implied", "implied")
@@ -189,7 +190,7 @@ $offsetHeight = 9
 $rightColumnStart = $inputStart + $inputWidth + 10
 
 $fullWidth = $rightColumnStart + $rightColumnWidth + 10
-$fullHeight = $offsetHeight + $fieldHeight * 10 + $bigFieldHeight * 3 + 40
+$fullHeight = $offsetHeight + $fieldHeight * 11 + $bigFieldHeight * 3 + 40
 
 $btnWidth = $fullWidth / 3 - 20
 
@@ -235,6 +236,7 @@ $inpDensities = _makeField($strResolution, False, 0)
 $lblOpenGL = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetState(-1, $globalStyle)
 $inpABIs = _makeField($strABIs, False, 0)
+$inpTextures = _makeField($strTextures, False, $editWidth)
 
 $edtPermissions = _makeField($strPermission, True, 0)
 $edtFeatures = _makeField($strFeature & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired, True, 0)
@@ -354,7 +356,7 @@ Func MY_WM_PAINT($hWnd, $Msg, $wParam, $lParam)
 	_WinAPI_RedrawWindow($hGUI, 0, 0, $RDW_UPDATENOW)
 	$s = 48
 	$x = $rightColumnStart + $rightColumnWidth / 2 - $s / 2
-	$y = 10
+	$y = 7
 	If $defBkColor == 0 Then
 		$hDC = _WinAPI_GetDC($hGUI)
 		$defBkColor = _WinAPI_GetPixel($hDC, $x + $s / 2, $y + $s / 2)
@@ -444,6 +446,7 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($inpScreens, $apk_Screens)
 	GUICtrlSetData($inpDensities, $apk_Densities)
 	GUICtrlSetData($inpABIs, $apk_ABIs)
+	GUICtrlSetData($inpTextures, $apk_Textures)
 	GUICtrlSetData($edtPermissions, $apk_Permissions)
 	GUICtrlSetData($edtFeatures, $apk_Features)
 	GUICtrlSetData($edtSignature, $apk_Signature)
@@ -598,8 +601,29 @@ Func _parseLines($prmArrayLines)
 				$featuresUsed &= '+ ' & $apk_OpenGLES
 
 			Case 'supports-gl-texture'
-				If $apk_Textures <> '' Then $apk_Textures &= @CRLF
-				$apk_Textures &= '+ ' & _StringBetween($value, "'", "'")[0]
+				If $apk_Textures <> '' Then $apk_Textures &= ' '
+				$val = _StringBetween($value, "'", "'")[0]
+				Switch $val
+					Case 'GL_OES_compressed_ETC1_RGB8_texture'
+						$val = 'ETC1'
+					Case 'GL_OES_compressed_paletted_texture'
+						$val = 'PAL'
+					Case 'GL_AMD_compressed_3DC_texture'
+						$val = '3DC'
+					Case 'GL_AMD_compressed_ATC_texture'
+						$val = 'ATC'
+					Case 'GL_ATI_texture_compression_atitc'
+						$val = 'ATI'
+					Case 'GL_EXT_texture_compression_latc'
+						$val = 'LATC'
+					Case 'GL_EXT_texture_compression_dxt1'
+						$val = 'DXT1'
+					Case 'GL_EXT_texture_compression_s3tc'
+						$val = 'S3TC'
+					Case 'GL_IMG_texture_compression_pvrtc'
+						$val = 'PVR'
+				EndSwitch
+				$apk_Textures &= $val
 		EndSwitch
 	Next
 
