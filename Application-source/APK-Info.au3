@@ -32,7 +32,7 @@ Opt("TrayIconHide", 1)
 Global $apk_Label, $apk_IconPath, $apk_IconPathBg, $apk_LeanbackIconPath, $apk_PkgName, $apk_Build, $apk_VersionName
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
-Global $apk_Locales, $apk_OpenGLES
+Global $apk_Locales, $apk_OpenGLES, $apk_Textures
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
@@ -189,7 +189,7 @@ $offsetHeight = 9
 $rightColumnStart = $inputStart + $inputWidth + 10
 
 $fullWidth = $rightColumnStart + $rightColumnWidth + 10
-$fullHeight = $offsetHeight + $fieldHeight * 11 + $bigFieldHeight * 3 + 50
+$fullHeight = $offsetHeight + $fieldHeight * 10 + $bigFieldHeight * 3 + 40
 
 $btnWidth = $fullWidth / 3 - 20
 
@@ -207,27 +207,30 @@ GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
 
-$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 20, $editFlags)
+$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 15, $editFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 
 $inpLabel = _makeField($strLabel, False, 0)
-$inpVersion = _makeField($strVersion, False, 0)
-$inpBuild = _makeField($strBuild, False, 0)
+$inpBuild = GUICtrlCreateInput('', 360, $offsetHeight, 65, $inputHeight, $inputFlags)
+GUICtrlSetState(-1, $globalInputStyle)
+$inpVersion = _makeField($strVersion & ' / ' & $strBuild, False, 230)
 _makeLangLabel($strLangCode)
 $inpPkg = _makeField($strPkg, False, 0)
 
 _makeLangLabel($OSLanguageCode)
-$inpMinSDKStr = GUICtrlCreateInput($sMinAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
+$inpMinSDKStr = GUICtrlCreateInput('', 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 $inpMinSDK = _makeField($strMinSDK, False, 20)
 
 _makeLangLabel($strLangName)
-$inpTargetSDKStr = GUICtrlCreateInput($sTgtAndroidString, 150, $offsetHeight, 275, $inputHeight, $inputFlags)
+$inpTargetSDKStr = GUICtrlCreateInput('', 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 $inpTargetSDK = _makeField($strTargetSDK, False, 20)
 
 _makeLangLabel($Language_code)
 $inpScreens = _makeField($strScreens, False, 0)
+$lblDebug = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
+GUICtrlSetState(-1, $globalStyle)
 $inpDensities = _makeField($strResolution, False, 0)
 $lblOpenGL = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetState(-1, $globalStyle)
@@ -250,7 +253,7 @@ $edtSignature = _makeField(False, True, 0)
 $inpName = _makeField($strFilename, False, $editWidth)
 $inpNewName = _makeField($strNewFilename, False, $editWidth)
 
-$offsetHeight += 11 ; buttons row gap
+$offsetHeight += 5 ; buttons row gap
 
 ; Button Play / Rename / Exit
 $offsetWidth = 10
@@ -432,7 +435,7 @@ Func _OpenNewFile($apk)
 
 	GUICtrlSetData($inpLabel, $apk_Label)
 	GUICtrlSetData($inpVersion, $apk_VersionName)
-	GUICtrlSetData($inpBuild, $apk_Build & $apk_Debug)
+	GUICtrlSetData($inpBuild, $apk_Build)
 	GUICtrlSetData($inpPkg, $apk_PkgName)
 	GUICtrlSetData($inpMinSDK, $apk_MinSDK)
 	GUICtrlSetData($inpMinSDKStr, $sMinAndroidString)
@@ -448,6 +451,7 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($inpNewName, $sNewFilenameAPK)
 	GUICtrlSetData($edtLocales, $apk_Locales)
 	GUICtrlSetData($lblOpenGL, $apk_OpenGLES)
+	GUICtrlSetData($lblDebug, $apk_Debug)
 
 	_drawPNG()
 
@@ -506,6 +510,7 @@ Func _parseLines($prmArrayLines)
 	$apk_ABIs = ''
 	$apk_Locales = ''
 	$apk_OpenGLES = 'OpenGL ES 1.0'
+	$apk_Textures = ''
 
 	$featuresUsed = ''
 	$featuresNotRequired = ''
@@ -514,7 +519,7 @@ Func _parseLines($prmArrayLines)
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 
 		If $line == 'application-debuggable' Then
-			$apk_Debug = ' ' & $strDebug
+			$apk_Debug = $strDebug
 		EndIf
 
 		$arraySplit = _StringExplode($line, ":", 1)
@@ -591,6 +596,10 @@ Func _parseLines($prmArrayLines)
 
 				If $featuresUsed <> '' Then $featuresUsed &= @CRLF
 				$featuresUsed &= '+ ' & $apk_OpenGLES
+
+			Case 'supports-gl-texture'
+				If $apk_Textures <> '' Then $apk_Textures &= @CRLF
+				$apk_Textures &= '+ ' & _StringBetween($value, "'", "'")[0]
 		EndSwitch
 	Next
 
