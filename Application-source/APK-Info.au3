@@ -29,7 +29,7 @@ Opt("TrayIconHide", 1)
 #AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
 
 
-Global $apk_Label, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version
+Global $apk_Label, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version, $apk_Devices
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
@@ -116,6 +116,9 @@ $strDebug = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, 
 $strIcon = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Icon", "Icon")
 $strLoading = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Loading", "Loading")
 $strTextures = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Textures", "Textures")
+$strTV = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "TV", "TV")
+$strWatch = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Watch", "Watch")
+$strAuto = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Auto", "Auto")
 
 $strUses = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Uses", "uses")
 $strImplied = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Implied", "implied")
@@ -218,12 +221,13 @@ $inpMinSDKStr = GUICtrlCreateInput('', 150, $offsetHeight, 275, $inputHeight, $i
 GUICtrlSetState(-1, $globalInputStyle)
 $inpMinSDK = _makeField($strMinSDK, False, 20)
 
-_makeLangLabel($strLangName)
+_makeLangLabel($strLangName & ': ' & $Language_code)
 $inpTargetSDKStr = GUICtrlCreateInput('', 150, $offsetHeight, 275, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 $inpTargetSDK = _makeField($strTargetSDK, False, 20)
 
-_makeLangLabel($Language_code)
+$lblDevices = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
+GUICtrlSetState(-1, $globalStyle)
 $inpScreens = _makeField($strScreens, False, 0)
 $lblDebug = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetState(-1, $globalStyle)
@@ -453,6 +457,7 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($edtLocales, $apk_Locales)
 	GUICtrlSetData($lblOpenGL, $apk_OpenGLES)
 	GUICtrlSetData($lblDebug, $apk_Debug)
+	GUICtrlSetData($lblDevices, $apk_Devices)
 
 	_drawPNG()
 
@@ -479,7 +484,7 @@ Func _getSignature($prmAPK)
 EndFunc   ;==>_getSignature
 
 Func _getBadge($prmAPK)
-	$foo = Run('aapt.exe d badging ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+	$foo = Run('aapt.exe d --include-meta-data badging ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 	$output = ''
 	While 1
 		$bin = StdoutRead($foo, False, True)
@@ -509,6 +514,7 @@ Func _parseLines($prmArrayLines)
 	$apk_Locales = ''
 	$apk_OpenGLES = 'OpenGL ES 1.0'
 	$apk_Textures = ''
+	$apk_Devices = ''
 
 	$icons = ''
 	$banners = ''
@@ -529,6 +535,11 @@ Func _parseLines($prmArrayLines)
 			$value = $arraySplit[1]
 		Else
 			ContinueLoop
+		EndIf
+
+		If $key == 'leanback-launchable-activity' Then
+			If $apk_Devices <> '' Then $apk_Devices &= ' '
+			$apk_Devices &= $strTV
 		EndIf
 
 		Switch $key
@@ -556,7 +567,13 @@ Func _parseLines($prmArrayLines)
 
 			Case 'uses-feature'
 				If $featuresUsed <> '' Then $featuresUsed &= @CRLF
-				$featuresUsed &= '+ ' & _StringBetween2($value, "'", "'")
+				$val = _StringBetween2($value, "'", "'")
+				$featuresUsed &= '+ ' & $val
+
+				If $val == 'android.hardware.type.watch' Then
+					If $apk_Devices <> '' Then $apk_Devices &= ' '
+					$apk_Devices &= $strWatch
+				EndIf
 
 			Case 'uses-feature-not-required'
 				If $featuresNotRequired <> '' Then $featuresNotRequired &= @CRLF
@@ -627,6 +644,12 @@ Func _parseLines($prmArrayLines)
 						$val = 'PVR'
 				EndSwitch
 				$apk_Textures &= $val
+
+			Case 'meta-data'
+				If _StringBetween2($value, "'", "'") == 'com.google.android.gms.car.application' Then
+					If $apk_Devices <> '' Then $apk_Devices &= ' '
+					$apk_Devices &= $strAuto
+				EndIf
 		EndSwitch
 	Next
 
