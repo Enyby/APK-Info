@@ -420,18 +420,18 @@ Func _OpenNewFile($apk)
 		EndIf
 	EndIf
 
-	ProgressOn($strLoading & "...", $fileAPK)
+	ProgressOn($strLoading & "...", '', $fileAPK)
 
-	ProgressSet(0, $strPkg & '...')
+	ProgressSet(0, $fileAPK, $strPkg & '...')
 
 	$tmpArrBadge = _getBadge($fullPathAPK)
 	_parseLines($tmpArrBadge)
 
-	ProgressSet(25, $strIcon & '...')
+	ProgressSet(25, $fileAPK, $strIcon & '...')
 
 	_extractIcon()
 
-	ProgressSet(75, $strSignature & '...')
+	ProgressSet(75, $fileAPK, $strSignature & '...')
 
 	_getSignature($fullPathAPK)
 
@@ -809,7 +809,7 @@ EndFunc   ;==>_loadIcon
 
 Func _setProgress($inc)
 	$progress += $inc
-	ProgressSet(25 + 40*$progress/$progressMax, $strIcon & '...')
+	ProgressSet(25 + 40*$progress/$progressMax, $fileAPK, $strIcon & '...')
 EndFunc   ;==>_setProgress
 
 Func _extractIcon()
@@ -825,7 +825,7 @@ Func _extractIcon()
 
 		_loadIcon($icon)
 	Next
-	ProgressSet(65, $strIcon & '...')
+	ProgressSet(65, $fileAPK, $strIcon & '...')
 
 	; extract icon
 	$files = $apk_IconPath
