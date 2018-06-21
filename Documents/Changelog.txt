@@ -235,7 +235,7 @@ ShowLog enables to save in APK-Info-Log.ini many info about variable use interna
 - Show OpenGL ES version and textures formats.
 - Show support for TV, Watch, Auto.
 
-*** APK-Info 1.21 (20.06.2018)
+*** APK-Info 1.21 (22.06.2018)
 
 - Add support for unicode in the APK filename.
 - Improved loading progress bar.
