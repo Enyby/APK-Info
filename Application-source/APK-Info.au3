@@ -5,10 +5,14 @@
 #AutoIt3Wrapper_UseX64=n
 #AutoIt3Wrapper_Res_Comment=Shows info about Android Package Files (APK)
 #AutoIt3Wrapper_Res_Description=APK-Info
-#AutoIt3Wrapper_Res_Fileversion=1.20.0.0
 #AutoIt3Wrapper_Res_LegalCopyright=zoster
+#AutoIt3Wrapper_Res_Fileversion=1.21.0.0
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #pragma compile(AutoItExecuteAllowed True)
+
+$ProgramVersion = "1.21"
+$ProgramReleaseDate = "22.06.2018"
+
 #include <Constants.au3>
 #include <EditConstants.au3>
 #include <GUIConstantsEx.au3>
@@ -21,7 +25,6 @@
 #include <String.au3>
 Opt("TrayMenuMode", 1)
 Opt("TrayIconHide", 1)
-
 
 ; Adding the directives below, will cause your program be compiled with the indexing
 ; of the original lines shown in SciTE:
@@ -57,12 +60,6 @@ Local $aCmdLine = _WinAPI_CommandLineToArgv($CmdLineRaw)
 ;_ArrayDisplay($aCmdLine)
 
 $Inidir = @ScriptDir & "\"
-
-;$ProgramVersion=Iniread ($Inidir & $IniProgramSettings, "Settings", "ProgramVersion", "0.7Q");
-;$ProgramReleaseDate=Iniread ($Inidir & $IniProgramSettings, "Settings", "ProgramReleaseDate", "01.06.2017");
-
-$ProgramVersion = "1.20"
-$ProgramReleaseDate = "20.06.2018"
 
 ; more info on country code
 ; https://www.autoitscript.com/autoit3/docs/appendix/OSLangCodes.htm
