@@ -34,6 +34,7 @@ Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_Min
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
+DirCreate($tempPath)
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
 Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK
@@ -375,7 +376,7 @@ Func MY_WM_PAINT($hWnd, $Msg, $wParam, $lParam)
 EndFunc   ;==>MY_WM_PAINT
 
 Func _renameAPK($prmNewFilenameAPK)
-	$result = FileMove($fullPathAPK, $dirAPK & "\" & $prmNewFilenameAPK)
+	$result = FileMove($dirAPK & "\" & $fileAPK, $dirAPK & "\" & $prmNewFilenameAPK)
 	; if result<> = error
 	If $result <> 1 Then MsgBox(0, $strError, $strRenameFail)
 EndFunc   ;==>_renameAPK
@@ -409,6 +410,15 @@ Func _OpenNewFile($apk)
 	$fullPathAPK = _checkFileParameter($apk)
 	$dirAPK = _SplitPath($fullPathAPK, True)
 	$fileAPK = _SplitPath($fullPathAPK, False)
+
+	$tmpAPK = False
+	If BinaryToString(StringToBinary($fullPathAPK, $SB_ANSI), $SB_ANSI) <> $fullPathAPK Then
+		$tmpAPK = $tempPath & 'base.apk'
+		If FileCopy($fullPathAPK, $tmpAPK, $FC_CREATEPATH + $FC_OVERWRITE) == 1 And FileExists($tmpAPK) Then
+			FileSetAttrib($tmpAPK, "-RASH")
+			$fullPathAPK = $tmpAPK
+		EndIf
+	EndIf
 
 	ProgressOn($strLoading & "...", $fileAPK)
 
@@ -462,6 +472,7 @@ Func _OpenNewFile($apk)
 	_drawPNG()
 
 	ProgressOff()
+	If $tmpAPK <> False Then FileDelete($tmpAPK)
 	$searchPngCache = False
 EndFunc   ;==>_OpenNewFile
 
@@ -817,7 +828,6 @@ Func _extractIcon()
 	ProgressSet(65, $strIcon & '...')
 
 	; extract icon
-	DirCreate($tempPath)
 	$files = $apk_IconPath
 	If $apk_IconPathBg Then
 		$files &= ' ' & $apk_IconPathBg
