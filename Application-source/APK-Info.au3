@@ -551,6 +551,12 @@ Func _parseLines($prmArrayLines)
 		EndIf
 
 		Switch $key
+			Case 'application-label'
+				If $apk_Label == '' Then $apk_Label = _StringBetween2($value, "'", "'")
+
+			Case 'application-label-' & $Language_code
+				$apk_Label = _StringBetween2($value, "'", "'")
+
 			Case 'application', 'launchable-activity', 'leanback-launchable-activity'
 				If $apk_Label == '' Then $apk_Label = _StringBetween2($value, "label='", "'")
 				$icon = _StringBetween2($value, "icon='", "'")
