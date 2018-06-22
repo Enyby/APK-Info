@@ -528,6 +528,7 @@ Func _parseLines($prmArrayLines)
 	$apk_Devices = ''
 
 	$icons = ''
+	$icons2 = ''
 	$banners = ''
 
 	$featuresUsed = ''
@@ -551,6 +552,12 @@ Func _parseLines($prmArrayLines)
 		If $key == 'leanback-launchable-activity' Then
 			If $apk_Devices <> '' Then $apk_Devices &= ' '
 			$apk_Devices &= $strTV
+		EndIf
+
+		If StringInStr($key, 'application-icon-') Then
+			If $icons2 <> '' Then $icons2 = @CRLF & $icons2
+			$icons2 = _StringBetween2($value, "'", "'") & $icons2
+			ContinueLoop
 		EndIf
 
 		Switch $key
@@ -671,8 +678,14 @@ Func _parseLines($prmArrayLines)
 	Next
 
 	$apk_Icons = $icons
-	If $apk_Icons <> '' Then $apk_Icons &= @CRLF
-	$apk_Icons &= $banners
+	If $banners <> '' Then
+		If $apk_Icons <> '' Then $apk_Icons &= @CRLF
+		$apk_Icons &= $banners
+	EndIf
+	If $icons2 <> '' Then
+		If $apk_Icons <> '' Then $apk_Icons &= @CRLF
+		$apk_Icons &= $icons2
+	EndIf
 
 	$apk_Features = $featuresUsed
 	If $featuresImplied <> '' Then
