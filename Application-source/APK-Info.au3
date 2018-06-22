@@ -42,7 +42,7 @@ DirCreate($tempPath)
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
 Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK
-Global $sNewFilenameAPK, $searchPngCache
+Global $sNewFilenameAPK, $searchPngCache, $hashCache
 Global $progress = 0
 Global $progressMax = 1
 
@@ -76,6 +76,7 @@ EndIf
 
 $CheckSignature = IniRead($IniFile, "Settings", "CheckSignature", "1")
 $FileNamePattern = IniRead($IniFile, "Settings", "FileNamePattern", "%label% %version%.%build%")
+$ShowHash = IniRead($IniFile, "Settings", "ShowHash", '')
 
 $ShowLog = IniRead($IniFile, "Settings", "ShowLog", "0")
 $ShowLangCode = IniRead($IniFile, "Settings", "ShowLangCode", "1")
@@ -121,6 +122,7 @@ $strTextures = IniRead($IniFile, $LangSection, "Textures", "Textures")
 $strTV = IniRead($IniFile, $LangSection, "TV", "TV")
 $strWatch = IniRead($IniFile, $LangSection, "Watch", "Watch")
 $strAuto = IniRead($IniFile, $LangSection, "Auto", "Auto")
+$strHash = IniRead($IniFile, $LangSection, "Hash", "Hash")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -189,8 +191,11 @@ $offsetHeight = 9
 
 $rightColumnStart = $inputStart + $inputWidth + 10
 
+Local $fields = 11
+If $ShowHash <> '' Then $fields += 1
+
 $fullWidth = $rightColumnStart + $rightColumnWidth + 10
-$fullHeight = $offsetHeight + $fieldHeight * 11 + $bigFieldHeight * 3 + 40
+$fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3 + 40
 
 $btnWidth = $fullWidth / 3 - 20
 
@@ -252,6 +257,9 @@ EndIf
 GUICtrlSetState(-1, $tmpStyle)
 
 $edtSignature = _makeField(False, True, 0)
+
+$inpHash = False
+If $ShowHash <> '' Then $inpHash = _makeField($strHash, False, $editWidth)
 
 $inpName = _makeField($strFilename, False, $editWidth)
 $inpNewName = _makeField($strNewFilename, False, $editWidth)
@@ -408,6 +416,7 @@ EndFunc   ;==>_checkFileParameter
 
 Func _OpenNewFile($apk)
 	$searchPngCache = False
+	$hashCache = False
 	$fullPathAPK = _checkFileParameter($apk)
 	$dirAPK = _SplitPath($fullPathAPK, True)
 	$fileAPK = _SplitPath($fullPathAPK, False)
@@ -440,6 +449,7 @@ Func _OpenNewFile($apk)
 	If $apk_TargetSDKVer <> "" Then $sTgtAndroidString = 'Android ' & $apk_TargetSDKVer & ' (' & $apk_TargetSDKName & ')'
 
 	$sNewFilenameAPK = _ReplacePlaceholders($FileNamePattern & '.apk')
+	$hash = _ReplacePlaceholders($ShowHash)
 
 	GUICtrlSetData($inpLabel, $apk_Label)
 	GUICtrlSetData($inpVersion, $apk_Version)
@@ -456,6 +466,7 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($edtPermissions, $apk_Permissions)
 	GUICtrlSetData($edtFeatures, $apk_Features)
 	GUICtrlSetData($edtSignature, $apk_Signature)
+	If $ShowHash <> '' Then GUICtrlSetData($inpHash, $hash)
 	GUICtrlSetData($inpName, $fileAPK)
 	GUICtrlSetData($inpNewName, $sNewFilenameAPK)
 	GUICtrlSetData($edtLocales, $apk_Locales)
@@ -468,6 +479,7 @@ Func _OpenNewFile($apk)
 	ProgressOff()
 	If $tmpAPK <> False Then FileDelete($tmpAPK)
 	$searchPngCache = False
+	$hashCache = False
 EndFunc   ;==>_OpenNewFile
 
 Func _ReplacePlaceholders($pattern)
@@ -481,11 +493,14 @@ Func _ReplacePlaceholders($pattern)
 	$names = _StringExplode($hashes, ',')
 	$ids = _StringExplode($CALG_MD2 & ',' & $CALG_MD4 & ',' & $CALG_MD5 & ',' & $CALG_SHA1 & ',' & $CALG_SHA_256 & ',' & $CALG_SHA_384 & ',' & $CALG_SHA_512, ',')
 
+	If Not $hashCache Then $hashCache = $ids
+
 	For $i = 0 To UBound($names) - 1
 		$pll = '%' & $names[$i] & '%'
 		$plu = '%' & StringUpper($names[$i]) & '%'
 		If Not StringInStr($out, $pll) And Not StringInStr($out, $plu) Then ContinueLoop
-		$hash = StringReplace(_Crypt_HashFile($fullPathAPK, $ids[$i]), '0x', '')
+		If $hashCache[$i] == $ids[$i] Then $hashCache[$i] = StringReplace(_Crypt_HashFile($fullPathAPK, $ids[$i]), '0x', '')
+		$hash = $hashCache[$i]
 		$out = StringReplace($out, $pll, StringLower($hash), 0, 1)
 		$out = StringReplace($out, $plu, StringUpper($hash), 0, 1)
 	Next
