@@ -23,6 +23,7 @@ $ProgramReleaseDate = "22.06.2018"
 #include <WinAPIShPath.au3>
 #include <Array.au3>
 #include <String.au3>
+#include <Crypt.au3>
 Opt("TrayMenuMode", 1)
 Opt("TrayIconHide", 1)
 
@@ -194,7 +195,7 @@ $fullHeight = $offsetHeight + $fieldHeight * 11 + $bigFieldHeight * 3 + 40
 $btnWidth = $fullWidth / 3 - 20
 
 $localesWidth = 60
-$localesStart = $fullWidth;
+$localesStart = $fullWidth ;
 
 $fullWidth += $localesWidth + 5
 
@@ -438,14 +439,7 @@ Func _OpenNewFile($apk)
 	If $apk_MinSDKVer <> "" Then $sMinAndroidString = 'Android ' & $apk_MinSDKVer & ' (' & $apk_MinSDKName & ')'
 	If $apk_TargetSDKVer <> "" Then $sTgtAndroidString = 'Android ' & $apk_TargetSDKVer & ' (' & $apk_TargetSDKName & ')'
 
-
-
-	$sNewFilenameAPK = $FileNamePattern
-	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%label%', StringReplace($apk_Label, " ", $FileNameSpace))
-	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%version%', StringReplace($apk_Version, " ", $FileNameSpace))
-	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%build%', StringReplace($apk_Build, " ", $FileNameSpace))
-	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '%package%', StringReplace($apk_PkgName, " ", $FileNameSpace))
-	$sNewFilenameAPK &= '.apk'
+	$sNewFilenameAPK = _ReplacePlaceholders($FileNamePattern & '.apk')
 
 	GUICtrlSetData($inpLabel, $apk_Label)
 	GUICtrlSetData($inpVersion, $apk_Version)
@@ -475,6 +469,26 @@ Func _OpenNewFile($apk)
 	If $tmpAPK <> False Then FileDelete($tmpAPK)
 	$searchPngCache = False
 EndFunc   ;==>_OpenNewFile
+
+Func _ReplacePlaceholders($pattern)
+	$out = $pattern
+	$out = StringReplace($out, '%label%', StringReplace($apk_Label, " ", $FileNameSpace))
+	$out = StringReplace($out, '%version%', StringReplace($apk_Version, " ", $FileNameSpace))
+	$out = StringReplace($out, '%build%', StringReplace($apk_Build, " ", $FileNameSpace))
+	$out = StringReplace($out, '%package%', StringReplace($apk_PkgName, " ", $FileNameSpace))
+
+	$names = _StringExplode('md2,md4,md5,sha1,sha256,sha384,sha512', ',')
+	$ids = _StringExplode($CALG_MD2 & ',' & $CALG_MD4 & ',' & $CALG_MD5 & ',' & $CALG_SHA1 & ',' & $CALG_SHA_256 & ',' & $CALG_SHA_384 & ',' & $CALG_SHA_512, ',')
+
+	For $i = 0 To UBound($names) - 1
+		$pl = '%' & $names[$i] & '%'
+		If Not StringInStr($out, $pl) Then ContinueLoop
+		$hash = _Crypt_HashFile($fullPathAPK, $ids[$i])
+		$out = StringReplace($out, $pl, StringLower(StringReplace($hash, "0x", '')))
+	Next
+
+	Return $out
+EndFunc   ;==>_ReplacePlaceholders
 
 Func _getSignature($prmAPK)
 	$output = ''
@@ -828,7 +842,7 @@ EndFunc   ;==>_loadIcon
 
 Func _setProgress($inc)
 	$progress += $inc
-	ProgressSet(25 + 40*$progress/$progressMax, $fileAPK, $strIcon & '...')
+	ProgressSet(25 + 40 * $progress / $progressMax, $fileAPK, $strIcon & '...')
 EndFunc   ;==>_setProgress
 
 Func _extractIcon()
@@ -929,4 +943,4 @@ Func _StringBetween2($text, $from, $to)
 	$var = _StringBetween($text, $from, $to)
 	If $var <> 0 Then Return $var[0]
 	Return ''
-EndFunc
+EndFunc   ;==>_StringBetween2
