@@ -477,14 +477,17 @@ Func _ReplacePlaceholders($pattern)
 	$out = StringReplace($out, '%build%', StringReplace($apk_Build, " ", $FileNameSpace))
 	$out = StringReplace($out, '%package%', StringReplace($apk_PkgName, " ", $FileNameSpace))
 
-	$names = _StringExplode('md2,md4,md5,sha1,sha256,sha384,sha512', ',')
+	$hashes = 'md2,md4,md5,sha1,sha256,sha384,sha512'
+	$names = _StringExplode($hashes, ',')
 	$ids = _StringExplode($CALG_MD2 & ',' & $CALG_MD4 & ',' & $CALG_MD5 & ',' & $CALG_SHA1 & ',' & $CALG_SHA_256 & ',' & $CALG_SHA_384 & ',' & $CALG_SHA_512, ',')
 
 	For $i = 0 To UBound($names) - 1
-		$pl = '%' & $names[$i] & '%'
-		If Not StringInStr($out, $pl) Then ContinueLoop
-		$hash = _Crypt_HashFile($fullPathAPK, $ids[$i])
-		$out = StringReplace($out, $pl, StringLower(StringReplace($hash, "0x", '')))
+		$pll = '%' & $names[$i] & '%'
+		$plu = '%' & StringUpper($names[$i]) & '%'
+		If Not StringInStr($out, $pll) And Not StringInStr($out, $plu) Then ContinueLoop
+		$hash = StringReplace(_Crypt_HashFile($fullPathAPK, $ids[$i]), '0x', '')
+		$out = StringReplace($out, $pll, StringLower($hash), 0, 1)
+		$out = StringReplace($out, $plu, StringUpper($hash), 0, 1)
 	Next
 
 	Return $out
