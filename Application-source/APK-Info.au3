@@ -60,71 +60,74 @@ Local $aCmdLine = _WinAPI_CommandLineToArgv($CmdLineRaw)
 ;_ArrayDisplay($aCmdLine)
 
 $Inidir = @ScriptDir & "\"
+$IniFile = $Inidir & $IniProgramSettings
 
 ; more info on country code
 ; https://www.autoitscript.com/autoit3/docs/appendix/OSLangCodes.htm
 
-$ForcedGUILanguage = IniRead($Inidir & $IniProgramSettings, "Settings", "ForcedGUILanguage", "auto")
+$ForcedGUILanguage = IniRead($IniFile, "Settings", "ForcedGUILanguage", "auto")
 $OSLanguageCode = @OSLang
 If $ForcedGUILanguage = "auto" Then
-	$Language_code = IniRead($Inidir & $IniProgramSettings, "OSLanguage", @OSLang, "en")
+	$Language_code = IniRead($IniFile, "OSLanguage", @OSLang, "en")
 Else
 	$Language_code = $ForcedGUILanguage
 EndIf
 
-$CheckSignature = IniRead($Inidir & $IniProgramSettings, "Settings", "CheckSignature", "1")
-$FileNamePattern = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNamePattern", "%label% %version%.%build%")
+$CheckSignature = IniRead($IniFile, "Settings", "CheckSignature", "1")
+$FileNamePattern = IniRead($IniFile, "Settings", "FileNamePattern", "%label% %version%.%build%")
 
-$ShowLog = IniRead($Inidir & $IniProgramSettings, "Settings", "ShowLog", "0")
-$ShowLangCode = IniRead($Inidir & $IniProgramSettings, "Settings", "ShowLangCode", "1")
-; $ShowCmdLine=Iniread($Inidir & $IniProgramSettings,"Settings","ShowCmdLine","1");
+$ShowLog = IniRead($IniFile, "Settings", "ShowLog", "0")
+$ShowLangCode = IniRead($IniFile, "Settings", "ShowLangCode", "1")
+; $ShowCmdLine=Iniread($IniFile,"Settings","ShowCmdLine","1");
 Local $space = 'space'
-$FileNameSpace = IniRead($Inidir & $IniProgramSettings, "Settings", "FileNameSpace", $space)
+$FileNameSpace = IniRead($IniFile, "Settings", "FileNameSpace", $space)
 If $FileNameSpace == $space Then $FileNameSpace = ' '
 $Lastfolder = IniRead($Inidir & $IniLastFolderSettings, "Settings", "LastFolder", @WorkingDir)
 
-$strLabel = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Application", "Application")
-$strVersion = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Version", "Version")
-$strBuild = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Build", "Build")
-$strPkg = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Package", "Package")
-$strMinSDK = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "MinSDK", "Min. SDK")
-$strTargetSDK = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "TargetSDK", "Target SDK")
-$strScreens = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "ScreenSize", "Screen Size")
-$strResolution = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Resolution", "Resolution")
-$strPermission = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Permission", "Permission")
-$strFeature = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Feature", "Feature")
-$strFilename = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "CurrentName", "Current name")
-$strNewFilename = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "NewName", "New name")
-$strPlayStore = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "PlayStore", "Play Store")
-$strRename = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "RenameFile", "Rename File")
-$strExit = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Exit", "Exit")
-$strRenameAPK = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "RenameAPKFile", "Rename APK File")
-$strNewName = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "NewAPKFilename", "New APK Filename")
-$strError = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Error", "Error!")
-$strRenameFail = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "RenameFail", "APK File could not be renamed.")
-$strSelectAPK = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "SelectAPKFile", "Select APK file")
-$strCurDev = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "CurDev", "Cur_Dev")
-$strCurDevBuild = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "CurDevBuild", "Current Dev. Build")
-$strUnknown = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Unknown", "Unknown")
-$strLangCode = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "LangCode", "OS Lang Code")
-$strLangName = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "LangName", "Lang Name")
-$strABIs = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "ABIs", "ABIs")
-$strSignature = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Signature", "Signature")
-$strDebug = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Debug", "Debug")
-$strIcon = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Icon", "Icon")
-$strLoading = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Loading", "Loading")
-$strTextures = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Textures", "Textures")
-$strTV = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "TV", "TV")
-$strWatch = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Watch", "Watch")
-$strAuto = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Auto", "Auto")
+Local $LangSection = "Strings-" & $Language_code
 
-$strUses = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Uses", "uses")
-$strImplied = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "Implied", "implied")
-$strNotRequired = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "NotRequired", "not required")
+$strLabel = IniRead($IniFile, $LangSection, "Application", "Application")
+$strVersion = IniRead($IniFile, $LangSection, "Version", "Version")
+$strBuild = IniRead($IniFile, $LangSection, "Build", "Build")
+$strPkg = IniRead($IniFile, $LangSection, "Package", "Package")
+$strMinSDK = IniRead($IniFile, $LangSection, "MinSDK", "Min. SDK")
+$strTargetSDK = IniRead($IniFile, $LangSection, "TargetSDK", "Target SDK")
+$strScreens = IniRead($IniFile, $LangSection, "ScreenSize", "Screen Size")
+$strResolution = IniRead($IniFile, $LangSection, "Resolution", "Resolution")
+$strPermission = IniRead($IniFile, $LangSection, "Permission", "Permission")
+$strFeature = IniRead($IniFile, $LangSection, "Feature", "Feature")
+$strFilename = IniRead($IniFile, $LangSection, "CurrentName", "Current name")
+$strNewFilename = IniRead($IniFile, $LangSection, "NewName", "New name")
+$strPlayStore = IniRead($IniFile, $LangSection, "PlayStore", "Play Store")
+$strRename = IniRead($IniFile, $LangSection, "RenameFile", "Rename File")
+$strExit = IniRead($IniFile, $LangSection, "Exit", "Exit")
+$strRenameAPK = IniRead($IniFile, $LangSection, "RenameAPKFile", "Rename APK File")
+$strNewName = IniRead($IniFile, $LangSection, "NewAPKFilename", "New APK Filename")
+$strError = IniRead($IniFile, $LangSection, "Error", "Error!")
+$strRenameFail = IniRead($IniFile, $LangSection, "RenameFail", "APK File could not be renamed.")
+$strSelectAPK = IniRead($IniFile, $LangSection, "SelectAPKFile", "Select APK file")
+$strCurDev = IniRead($IniFile, $LangSection, "CurDev", "Cur_Dev")
+$strCurDevBuild = IniRead($IniFile, $LangSection, "CurDevBuild", "Current Dev. Build")
+$strUnknown = IniRead($IniFile, $LangSection, "Unknown", "Unknown")
+$strLangCode = IniRead($IniFile, $LangSection, "LangCode", "OS Lang Code")
+$strLangName = IniRead($IniFile, $LangSection, "LangName", "Lang Name")
+$strABIs = IniRead($IniFile, $LangSection, "ABIs", "ABIs")
+$strSignature = IniRead($IniFile, $LangSection, "Signature", "Signature")
+$strDebug = IniRead($IniFile, $LangSection, "Debug", "Debug")
+$strIcon = IniRead($IniFile, $LangSection, "Icon", "Icon")
+$strLoading = IniRead($IniFile, $LangSection, "Loading", "Loading")
+$strTextures = IniRead($IniFile, $LangSection, "Textures", "Textures")
+$strTV = IniRead($IniFile, $LangSection, "TV", "TV")
+$strWatch = IniRead($IniFile, $LangSection, "Watch", "Watch")
+$strAuto = IniRead($IniFile, $LangSection, "Auto", "Auto")
 
-$URLPlayStore = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
+$strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
+$strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
+$strNotRequired = IniRead($IniFile, $LangSection, "NotRequired", "not required")
 
-$PlayStoreLanguage = IniRead($Inidir & $IniProgramSettings, "Strings-" & $Language_code, "PlayStoreLanguage", $Language_code)
+$URLPlayStore = IniRead($IniFile, $LangSection, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
+
+$PlayStoreLanguage = IniRead($IniFile, $LangSection, "PlayStoreLanguage", $Language_code)
 
 Dim $sMinAndroidString, $sTgtAndroidString
 
@@ -293,7 +296,7 @@ While 1
 			Else
 				$CheckSignature = 0
 			EndIf
-			IniWrite($Inidir & $IniProgramSettings, "Settings", "CheckSignature", $CheckSignature)
+			IniWrite($IniFile, "Settings", "CheckSignature", $CheckSignature)
 
 		Case $gBtn_Rename
 			$sNewNameInput = InputBox($strRenameAPK, $strNewName, $sNewFilenameAPK, "", 300, 130)
@@ -397,7 +400,7 @@ Func _checkFileParameter($prmFilename)
 		If @error Then Exit
 		$Lastfolder = _SplitPath($f_Sel, True)
 		IniWrite($Inidir & $IniLastFolderSettings, "Settings", "Lastfolder", $Lastfolder)
-		;		IniWrite($Inidir & $IniProgramSettings, "Settings", "Lastfile", $f_sel);
+		;		IniWrite($IniFile, "Settings", "Lastfile", $f_sel);
 		Return $f_Sel
 	EndIf
 EndFunc   ;==>_checkFileParameter
@@ -861,8 +864,8 @@ Func _translateSDKLevel($prmSDKLevel, $prmReturnCodeName = False)
 		$sVersion = $strCurDev
 		$sCodeName = $strCurDevBuild
 	Else
-		$sVersion = IniRead($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-Version", $strUnknown)
-		$sCodeName = IniRead($Inidir & $IniProgramSettings, "AndroidName", "SDK" & $prmSDKLevel & "-CodeName", $strUnknown)
+		$sVersion = IniRead($IniFile, "AndroidName", "SDK" & $prmSDKLevel & "-Version", $strUnknown)
+		$sCodeName = IniRead($IniFile, "AndroidName", "SDK" & $prmSDKLevel & "-CodeName", $strUnknown)
 	EndIf
 	Switch $prmReturnCodeName
 		Case True
