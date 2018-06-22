@@ -387,7 +387,12 @@ EndFunc   ;==>MY_WM_PAINT
 Func _renameAPK($prmNewFilenameAPK)
 	$result = FileMove($dirAPK & "\" & $fileAPK, $dirAPK & "\" & $prmNewFilenameAPK)
 	; if result<> = error
-	If $result <> 1 Then MsgBox(0, $strError, $strRenameFail)
+	If $result <> 1 Then
+		MsgBox(0, $strError, $strRenameFail)
+	Else
+		$fileAPK = $prmNewFilenameAPK
+		GUICtrlSetData($inpName, $fileAPK)
+	EndIf
 EndFunc   ;==>_renameAPK
 
 Func _SplitPath($prmFullPath, $prmReturnDir = False)
