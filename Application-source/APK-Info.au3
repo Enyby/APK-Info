@@ -128,6 +128,8 @@ $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
 $strNotRequired = IniRead($IniFile, $LangSection, "NotRequired", "not required")
 
+$strOpenGLES = 'OpenGL ES '
+
 $URLPlayStore = IniRead($IniFile, $LangSection, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
 
 $PlayStoreLanguage = IniRead($IniFile, $LangSection, "PlayStoreLanguage", $Language_code)
@@ -494,6 +496,12 @@ Func _ReplacePlaceholders($pattern)
 	$out = StringReplace($out, '%build%', StringReplace($apk_Build, " ", $FileNameSpace))
 	$out = StringReplace($out, '%package%', StringReplace($apk_PkgName, " ", $FileNameSpace))
 
+	$out = StringReplace($out, '%screens%', StringReplace($apk_Screens, " ", ','))
+	$out = StringReplace($out, '%dpis%', StringReplace($apk_Densities, " ", ','))
+	$out = StringReplace($out, '%abis%', StringReplace($apk_ABIs, " ", ','))
+	$out = StringReplace($out, '%textures%', StringReplace($apk_Textures, " ", ','))
+	$out = StringReplace($out, '%opengles%', StringReplace($apk_OpenGLES, $strOpenGLES, ''))
+
 	$hashes = 'md2,md4,md5,sha1,sha256,sha384,sha512'
 	$names = _StringExplode($hashes, ',')
 	$ids = _StringExplode($CALG_MD2 & ',' & $CALG_MD4 & ',' & $CALG_MD5 & ',' & $CALG_SHA1 & ',' & $CALG_SHA_256 & ',' & $CALG_SHA_384 & ',' & $CALG_SHA_512, ',')
@@ -560,7 +568,7 @@ Func _parseLines($prmArrayLines)
 	$apk_Densities = ''
 	$apk_ABIs = ''
 	$apk_Locales = ''
-	$apk_OpenGLES = 'OpenGL ES 1.0'
+	$apk_OpenGLES = $strOpenGLES & '1.0'
 	$apk_Textures = ''
 	$apk_Devices = ''
 
@@ -676,7 +684,7 @@ Func _parseLines($prmArrayLines)
 					Case '0x30001'
 						$ver = '3.1'
 				EndSwitch
-				$apk_OpenGLES = 'OpenGL ES ' & $ver
+				$apk_OpenGLES = $strOpenGLES & $ver
 
 				If $featuresUsed <> '' Then $featuresUsed &= @CRLF
 				$featuresUsed &= '+ ' & $apk_OpenGLES
