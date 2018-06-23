@@ -34,7 +34,7 @@ Opt("TrayIconHide", 1)
 
 Global $apk_Label, $apk_Labels, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version, $apk_Devices
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
-Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
+Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature, $apk_SignatureName
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 DirCreate($tempPath)
@@ -266,6 +266,9 @@ Else
 EndIf
 GUICtrlSetState(-1, $tmpStyle)
 
+$lblSignature = GUICtrlCreateLabel('', $labelStart, $offsetHeight + $labelTop + $fieldHeight, $labelWidth, $editHeight - $fieldHeight)
+GUICtrlSetState(-1, $globalStyle)
+
 $edtSignature = _makeField(False, True, 0)
 
 $inpHash = False
@@ -492,6 +495,7 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($edtPermissions, $apk_Permissions)
 	GUICtrlSetData($edtFeatures, $apk_Features)
 	GUICtrlSetData($edtSignature, $apk_Signature)
+	GUICtrlSetData($lblSignature, $apk_SignatureName)
 	If $ShowHash <> '' Then GUICtrlSetData($inpHash, $hash)
 	GUICtrlSetData($inpName, $fileAPK)
 	GUICtrlSetData($inpNewName, $sNewFilenameAPK)
@@ -556,7 +560,26 @@ Func _getSignature($prmAPK)
 		WEnd
 	EndIf
 	$apk_Signature = $output
+
+	_getSignatureName()
 EndFunc   ;==>_getSignature
+
+Func _getSignatureName()
+	$apk_SignatureName = ''
+	$names = ''
+	; 'name=SHA1' & @CRLF
+	$names &= 'testkey=61ed377e85d386a8dfee6b864bd85b0bfaa5af81' & @CRLF
+	$names &= 'shared=5b368cff2da2686996bc95eac190eaa4f5630fe5' & @CRLF
+	$names &= 'platform=27196e386b875e76adf700e7ea84e4c6eee33dfa' & @CRLF
+	$names &= 'media=b79df4a82e90b57ea76525ab7037ab238a42f5d3' & @CRLF
+	$names &= 'frame HTC=1052f733fa71da5c2803611cb336f064a8728b36' & @CRLF
+	$names &= 'frame HUAWEI=059e2480adf8c1c5b3d9ec007645ccfc442a23c5' & @CRLF
+	$names &= 'frame Android=27196e386b875e76adf700e7ea84e4c6eee33dfa' & @CRLF
+	For $item In _StringExplode(StringStripWS($names, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
+		$name = _StringExplode($item, '=')
+		If StringInStr($apk_Signature, $name[1]) Then $apk_SignatureName &= @CRLF & $name[0]
+	Next
+EndFunc   ;==>_getSignatureName
 
 Func _getBadge($prmAPK)
 	$foo = Run('aapt.exe d --include-meta-data badging ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
