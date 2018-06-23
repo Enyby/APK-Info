@@ -39,6 +39,7 @@ Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 DirCreate($tempPath)
+Global $toolsDir = @ScriptDir & '\tools'
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
 Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK, $tmpAPK
@@ -560,7 +561,7 @@ EndFunc   ;==>_ReplacePlaceholders
 Func _getSignature($prmAPK)
 	$output = ''
 	If $CheckSignature == 1 Then
-		$foo = Run('java -jar apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+		$foo = Run('java -jar apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		While 1
 			$bin = StderrRead($foo, False, True)
 			If @error Then ExitLoop
@@ -597,7 +598,7 @@ Func _getSignatureName()
 EndFunc   ;==>_getSignatureName
 
 Func _getBadge($prmAPK)
-	$foo = Run('aapt.exe d --include-meta-data badging ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+	$foo = Run('aapt.exe d --include-meta-data badging ' & '"' & $prmAPK & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 	$output = ''
 	While 1
 		$bin = StdoutRead($foo, False, True)
@@ -826,7 +827,7 @@ Func _searchPng($res)
 	$ret = $res
 
 	If Not $searchPngCache Then
-		$foo = Run('unzip.exe -l ' & '"' & $fullPathAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+		$foo = Run('unzip.exe -l ' & '"' & $fullPathAPK & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		$output = ''
 		While 1
 			$bin = StdoutRead($foo, False, True)
@@ -859,7 +860,7 @@ Func _searchPng($res)
 EndFunc   ;==>_searchPng
 
 Func _parseXmlIcon($icon)
-	$foo = Run('aapt.exe d xmltree ' & '"' & $fullPathAPK & '" "' & $icon & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+	$foo = Run('aapt.exe d xmltree ' & '"' & $fullPathAPK & '" "' & $icon & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 	$output = ''
 	While 1
 		$bin = StdoutRead($foo, False, True)
@@ -892,7 +893,7 @@ Func _parseXmlIcon($icon)
 	_setProgress(1)
 
 	If $ids[0] Or $ids[1] Then
-		$foo = Run('aapt.exe d resources ' & '"' & $fullPathAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+		$foo = Run('aapt.exe d resources ' & '"' & $fullPathAPK & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		$output = ''
 		While 1
 			$bin = StdoutRead($foo, False, True)
@@ -974,8 +975,7 @@ Func _extractIcon()
 	If $apk_IconPathBg Then
 		$files &= ' ' & $apk_IconPathBg
 	EndIf
-	$runCmd = "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"'
-	RunWait($runCmd, @ScriptDir, @SW_HIDE)
+	RunWait("unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"', $toolsDir, @SW_HIDE)
 EndFunc   ;==>_extractIcon
 
 Func _cleanUp()
@@ -1030,7 +1030,7 @@ Func _drawImg($path)
 	$filename = $tempPath & "\" & $apk_IconName
 	If StringRight($filename, 5) == '.webp' Then
 		$tmpFilename = StringTrimRight($filename, 5) & '.png'
-		RunWait('dwebp.exe "' & $filename & '" -o "' & $tmpFilename & '"', @ScriptDir, @SW_HIDE)
+		RunWait('dwebp.exe "' & $filename & '" -o "' & $tmpFilename & '"', $toolsDir, @SW_HIDE)
 		If FileExists($tmpFilename) Then
 			FileDelete($filename) ; no need - try delete
 			$filename = $tmpFilename
@@ -1088,9 +1088,9 @@ Func _showText($title, $message, $text)
 EndFunc
 
 Func _adbDevice($title)
-	RunWait('adb.exe start-server', @ScriptDir, @SW_HIDE)
+	RunWait('adb.exe start-server', $toolsDir, @SW_HIDE)
 
-	$foo = Run('adb.exe devices -l', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = Run('adb.exe devices -l', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	$output = ''
 	While 1
 		$bin = StdoutRead($foo, False, True)
@@ -1167,7 +1167,7 @@ Func _adb($install)
 		$cmd = 'adb.exe -s "' & $device & '" uninstall "' & $apk_PkgName & '"'
 	EndIf
 
-	$foo = Run($cmd, @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = Run($cmd, $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	$output = ''
 	$timer = TimerInit()
 	$timeout = TimerInit()
