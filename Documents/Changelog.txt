@@ -240,3 +240,14 @@ ShowLog enables to save in APK-Info-Log.ini many info about variable use interna
 - Add support for unicode in the APK filename.
 - Improved loading progress bar.
 - Improved translations.
+
+*** APK-Info 1.22 (23.06.2018)
+
+- Improved load label.
+- Improved load icon.
+- Load localized label.
+- Added many placeholders into rename pattern.
+- Added hash support - optional field and placeholders in rename pattern.
+- Improved rename.
+- Added install/uninstall via adb.
+- Bugs fixes.
