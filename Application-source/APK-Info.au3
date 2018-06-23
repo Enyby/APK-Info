@@ -79,6 +79,7 @@ $CheckSignature = IniRead($IniFile, "Settings", "CheckSignature", "1")
 $FileNamePattern = IniRead($IniFile, "Settings", "FileNamePattern", "%label% %version%.%build%")
 $ShowHash = IniRead($IniFile, "Settings", "ShowHash", '')
 $CustomStore = IniRead($IniFile, "Settings", "CustomStore", '')
+$SignatureNames = IniRead($IniFile, "Settings", "SignatureNames", '')
 
 $ShowLog = IniRead($IniFile, "Settings", "ShowLog", "0")
 $ShowLangCode = IniRead($IniFile, "Settings", "ShowLangCode", "1")
@@ -592,18 +593,20 @@ EndFunc   ;==>_getSignature
 Func _getSignatureName()
 	$apk_SignatureName = ''
 	$names = ''
-	; 'name=SHA1' & @CRLF
-	$names &= 'testkey=61ed377e85d386a8dfee6b864bd85b0bfaa5af81' & @CRLF
-	$names &= 'shared=5b368cff2da2686996bc95eac190eaa4f5630fe5' & @CRLF
-	$names &= 'platform=27196e386b875e76adf700e7ea84e4c6eee33dfa' & @CRLF
-	$names &= 'media=b79df4a82e90b57ea76525ab7037ab238a42f5d3' & @CRLF
-	$names &= 'frame HTC=1052f733fa71da5c2803611cb336f064a8728b36' & @CRLF
-	$names &= 'frame HUAWEI=059e2480adf8c1c5b3d9ec007645ccfc442a23c5' & @CRLF
-	$names &= 'frame Android=27196e386b875e76adf700e7ea84e4c6eee33dfa' & @CRLF
-	$names &= 'frame Android=736974b37123fa9007cf05cdc1fb43d915917622' & @CRLF
-	$names &= 'debug=da75ff38332859408959c7b3b5fee41ff82cac2e' & @CRLF
-	For $item In _StringExplode(StringStripWS($names, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
+	; Format: 'name=SHA1|'
+	$names &= 'testkey=61ed377e85d386a8dfee6b864bd85b0bfaa5af81|'
+	$names &= 'shared=5b368cff2da2686996bc95eac190eaa4f5630fe5|'
+	$names &= 'platform=27196e386b875e76adf700e7ea84e4c6eee33dfa|'
+	$names &= 'media=b79df4a82e90b57ea76525ab7037ab238a42f5d3|'
+	$names &= 'frame HTC=1052f733fa71da5c2803611cb336f064a8728b36|'
+	$names &= 'frame HUAWEI=059e2480adf8c1c5b3d9ec007645ccfc442a23c5|'
+	$names &= 'frame Android=27196e386b875e76adf700e7ea84e4c6eee33dfa|'
+	$names &= 'frame Android=736974b37123fa9007cf05cdc1fb43d915917622|'
+	$names &= 'debug=da75ff38332859408959c7b3b5fee41ff82cac2e|'
+	$names &= $SignatureNames
+	For $item In _StringExplode($names, '|')
 		$name = _StringExplode($item, '=')
+		If UBound($name) <> 2 Then ContinueLoop
 		If StringInStr($apk_Signature, $name[1]) Then $apk_SignatureName &= @CRLF & $name[0]
 	Next
 EndFunc   ;==>_getSignatureName
