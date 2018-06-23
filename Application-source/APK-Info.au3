@@ -195,7 +195,7 @@ $editWidth = $inputWidth + 10 + $rightColumnWidth
 $editHeight = 85
 $editFlags = BitOR($ES_READONLY, $ES_AUTOVSCROLL, $ES_AUTOHSCROLL, $WS_VSCROLL, $ES_WANTRETURN)
 
-$offsetHeight = 9
+$offsetHeight = 5
 
 $rightColumnStart = $inputStart + $inputWidth + 10
 
@@ -203,18 +203,18 @@ Local $fields = 11
 If $ShowHash <> '' Then $fields += 1
 
 $fullWidth = $rightColumnStart + $rightColumnWidth + 10
-$fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3 + 50
+$fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3 + 2
 
 $localesWidth = 60
 $localesStart = $fullWidth
 
+$fullWidth += $localesWidth + 10
+
 $btnIconSize = 40
 $btnGap = 10
-Local $btnText = 1
-Local $btnIcon = 4
-$btnWidth = ($fullWidth - $btnGap - $btnIcon*$btnGap - $btnIcon*$btnIconSize) / $btnText - $btnGap
+$btnStart = $fullWidth
 
-$fullWidth += $localesWidth + 5
+$fullWidth += $btnIconSize + 5
 
 $hGUI = GUICreate($ProgramTitle, $fullWidth, $fullHeight, -1, -1, -1, $WS_EX_ACCEPTFILES)
 
@@ -240,14 +240,10 @@ _makeLangLabel($strLangCode)
 $inpPkg = _makeField($strPkg, False, 0)
 
 _makeLangLabel($OSLanguageCode)
-$inpMinSDKStr = GUICtrlCreateInput('', 150, $offsetHeight, 275, $inputHeight, $inputFlags)
-GUICtrlSetState(-1, $globalInputStyle)
-$inpMinSDK = _makeField($strMinSDK, False, 20)
+$inpMinSDK = _makeField($strMinSDK, False, 0)
 
 _makeLangLabel($strLangName & ': ' & $Language_code)
-$inpTargetSDKStr = GUICtrlCreateInput('', 150, $offsetHeight, 275, $inputHeight, $inputFlags)
-GUICtrlSetState(-1, $globalInputStyle)
-$inpTargetSDK = _makeField($strTargetSDK, False, 20)
+$inpTargetSDK = _makeField($strTargetSDK, False, 0)
 
 $lblDevices = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetState(-1, $globalStyle)
@@ -283,13 +279,12 @@ If $ShowHash <> '' Then $inpHash = _makeField($strHash, False, $editWidth)
 $inpName = _makeField($strFilename, False, $editWidth)
 $inpNewName = _makeField($strNewFilename, False, $editWidth)
 
-$offsetHeight += 5 ; buttons row gap
+$offsetHeight = 5
 
-; Button Play / Rename / Exit
 $offsetWidth = $btnGap
 $gBtn_Play = _makeButton($strPlayStore, "play.bmp")
 $gBtn_Rename = _makeButton($strRename, "rename.bmp")
-$gBtn_Install = _makeButton($strInstall, False)
+$gBtn_Install = _makeButton($strInstall, "install.bmp")
 $gBtn_Uninstall = _makeButton($strUninstall, "delete.bmp")
 $gBtn_Exit = _makeButton($strExit, "exit.bmp")
 
@@ -357,17 +352,11 @@ Func _makeLangLabel($label)
 EndFunc   ;==>_makeLangLabel
 
 Func _makeButton($label, $icon)
-	If $icon Then
-		$width = $btnIconSize
-		$ret = GUICtrlCreateButton('', $offsetWidth, $offsetHeight, $width, $btnIconSize, $BS_BITMAP)
-		GUICtrlSetTip(-1, $label)
-		_GUICtrlButton_SetImage($ret, @ScriptDir & '\icons\' & $icon)
-	Else
-		$width = $btnWidth
-		$ret = GUICtrlCreateButton($label, $offsetWidth, $offsetHeight, $width, $btnIconSize)
-	EndIf
+	$ret = GUICtrlCreateButton('', $btnStart, $offsetHeight, $btnIconSize, $btnIconSize, $BS_BITMAP)
+	GUICtrlSetTip(-1, $label)
+	_GUICtrlButton_SetImage($ret, @ScriptDir & '\icons\' & $icon)
 	GUICtrlSetState(-1, $globalStyle)
-	$offsetWidth += $width + $btnGap
+	$offsetHeight += $btnIconSize + $btnGap
 	Return $ret
 EndFunc   ;==>_makeButton
 
@@ -498,10 +487,8 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($inpVersion, $apk_Version)
 	GUICtrlSetData($inpBuild, $apk_Build)
 	GUICtrlSetData($inpPkg, $apk_PkgName)
-	GUICtrlSetData($inpMinSDK, $apk_MinSDK)
-	GUICtrlSetData($inpMinSDKStr, $sMinAndroidString)
-	GUICtrlSetData($inpTargetSDK, $apk_TargetSDK)
-	GUICtrlSetData($inpTargetSDKStr, $sTgtAndroidString)
+	GUICtrlSetData($inpMinSDK, $apk_MinSDK & ': ' & $sMinAndroidString)
+	GUICtrlSetData($inpTargetSDK, $apk_TargetSDK & ': ' & $sTgtAndroidString)
 	GUICtrlSetData($inpScreens, $apk_Screens)
 	GUICtrlSetData($inpDensities, $apk_Densities)
 	GUICtrlSetData($inpABIs, $apk_ABIs)
