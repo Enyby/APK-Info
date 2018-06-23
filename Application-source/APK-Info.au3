@@ -24,6 +24,7 @@ $ProgramReleaseDate = "23.06.2018"
 #include <Array.au3>
 #include <String.au3>
 #include <Crypt.au3>
+#include <GuiButton.au3>
 Opt("TrayMenuMode", 1)
 Opt("TrayIconHide", 1)
 
@@ -201,14 +202,18 @@ Local $fields = 11
 If $ShowHash <> '' Then $fields += 1
 
 $fullWidth = $rightColumnStart + $rightColumnWidth + 10
-$fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3 + 40
+$fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3 + 50
 
 $localesWidth = 60
 $localesStart = $fullWidth
 
-$fullWidth += $localesWidth + 5
+$btnIconSize = 40
+$btnGap = 10
+Local $btnText = 1
+Local $btnIcon = 4
+$btnWidth = ($fullWidth - $btnGap - $btnIcon*$btnGap - $btnIcon*$btnIconSize) / $btnText - $btnGap
 
-$btnWidth = ($fullWidth - 10) / 5 - 10
+$fullWidth += $localesWidth + 5
 
 $hGUI = GUICreate($ProgramTitle, $fullWidth, $fullHeight, -1, -1, -1, $WS_EX_ACCEPTFILES)
 
@@ -219,7 +224,7 @@ GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
 
-$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 40 - $offsetHeight, $editFlags)
+$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 5 - $offsetHeight, $editFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strLocales)
 
@@ -280,12 +285,12 @@ $inpNewName = _makeField($strNewFilename, False, $editWidth)
 $offsetHeight += 5 ; buttons row gap
 
 ; Button Play / Rename / Exit
-$offsetWidth = 10
-$gBtn_Play = _makeButton($strPlayStore)
-$gBtn_Rename = _makeButton($strRename)
-$gBtn_Install = _makeButton($strInstall)
-$gBtn_Uninstall = _makeButton($strUninstall)
-$gBtn_Exit = _makeButton($strExit)
+$offsetWidth = $btnGap
+$gBtn_Play = _makeButton($strPlayStore, "play.bmp")
+$gBtn_Rename = _makeButton($strRename, "rename.bmp")
+$gBtn_Install = _makeButton($strInstall, False)
+$gBtn_Uninstall = _makeButton($strUninstall, "delete.bmp")
+$gBtn_Exit = _makeButton($strExit, "exit.bmp")
 
 _GDIPlus_Startup()
 $hGraphic = _GDIPlus_GraphicsCreateFromHWND($hGUI)
@@ -350,10 +355,18 @@ Func _makeLangLabel($label)
 	GUICtrlSetState(-1, $globalStyle)
 EndFunc   ;==>_makeLangLabel
 
-Func _makeButton($label)
-	$ret = GUICtrlCreateButton($label, $offsetWidth, $offsetHeight, $btnWidth)
+Func _makeButton($label, $icon)
+	If $icon Then
+		$width = $btnIconSize
+		$ret = GUICtrlCreateButton('', $offsetWidth, $offsetHeight, $width, $btnIconSize, $BS_BITMAP)
+		GUICtrlSetTip(-1, $label)
+		_GUICtrlButton_SetImage($ret, @ScriptDir & '\icons\' & $icon)
+	Else
+		$width = $btnWidth
+		$ret = GUICtrlCreateButton($label, $offsetWidth, $offsetHeight, $width, $btnIconSize)
+	EndIf
 	GUICtrlSetState(-1, $globalStyle)
-	$offsetWidth += $btnWidth + 10
+	$offsetWidth += $width + $btnGap
 	Return $ret
 EndFunc   ;==>_makeButton
 
