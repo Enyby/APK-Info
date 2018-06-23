@@ -126,6 +126,7 @@ $strInstall = IniRead($IniFile, $LangSection, "Install", "Install")
 $strUninstall = IniRead($IniFile, $LangSection, "Uninstall", "Uninstall")
 $strLocales = IniRead($IniFile, $LangSection, "Locales", "Locales")
 $strClose = IniRead($IniFile, $LangSection, "Close", "Close")
+$strNoAdbDevices = IniRead($IniFile, $LangSection, "NoAdbDevicesFound", "No ADB devices found.")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -1055,6 +1056,11 @@ Func _adbDevice($title)
 	WEnd
 
 	$output = StringStripWS(StringReplace($output, 'List of devices attached', ''), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+
+	If $output == '' Then
+		MsgBox(0, $title, $strNoAdbDevices)
+		Return ''
+	EndIf
 
 	$arrayLines = _StringExplode($output, @CRLF)
 	$cnt = UBound($arrayLines)
