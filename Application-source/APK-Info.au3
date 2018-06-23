@@ -41,7 +41,7 @@ Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 DirCreate($tempPath)
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
-Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK
+Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK, $tmpAPK
 Global $sNewFilenameAPK, $searchPngCache, $hashCache
 Global $progress = 0
 Global $progressMax = 1
@@ -123,6 +123,8 @@ $strTV = IniRead($IniFile, $LangSection, "TV", "TV")
 $strWatch = IniRead($IniFile, $LangSection, "Watch", "Watch")
 $strAuto = IniRead($IniFile, $LangSection, "Auto", "Auto")
 $strHash = IniRead($IniFile, $LangSection, "Hash", "Hash")
+$strInstall = IniRead($IniFile, $LangSection, "Install", "Install")
+$strUninstall = IniRead($IniFile, $LangSection, "Uninstall", "Uninstall")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -199,10 +201,10 @@ If $ShowHash <> '' Then $fields += 1
 $fullWidth = $rightColumnStart + $rightColumnWidth + 10
 $fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3 + 40
 
-$btnWidth = $fullWidth / 3 - 20
+$btnWidth = ($fullWidth - 10) / 5 - 10
 
 $localesWidth = 60
-$localesStart = $fullWidth ;
+$localesStart = $fullWidth
 
 $fullWidth += $localesWidth + 5
 
@@ -272,6 +274,8 @@ $offsetHeight += 5 ; buttons row gap
 $offsetWidth = 10
 $gBtn_Play = _makeButton($strPlayStore)
 $gBtn_Rename = _makeButton($strRename)
+$gBtn_Install = _makeButton($strInstall)
+$gBtn_Uninstall = _makeButton($strUninstall)
 $gBtn_Exit = _makeButton($strExit)
 
 _GDIPlus_Startup()
@@ -289,7 +293,7 @@ _OpenNewFile($tmp_Filename)
 
 GUIRegisterMsg($WM_PAINT, "MY_WM_PAINT")
 
-GUISetState(@SW_SHOW)
+GUISetState(@SW_SHOW, $hGUI)
 
 While 1
 	$nMsg = GUIGetMsg()
@@ -317,6 +321,12 @@ While 1
 			EndIf
 			If $sNewNameInput <> "" Then _renameAPK($sNewNameInput)
 
+		Case $gBtn_Install
+			_adb(True)
+
+		Case $gBtn_Uninstall
+			_adb(False)
+
 		Case $gBtn_Exit
 			_cleanUp()
 			Exit
@@ -338,7 +348,7 @@ EndFunc   ;==>_makeLangLabel
 Func _makeButton($label)
 	$ret = GUICtrlCreateButton($label, $offsetWidth, $offsetHeight, $btnWidth)
 	GUICtrlSetState(-1, $globalStyle)
-	$offsetWidth += $btnWidth + 20
+	$offsetWidth += $btnWidth + 10
 	Return $ret
 EndFunc   ;==>_makeButton
 
@@ -975,3 +985,116 @@ Func _StringBetween2($text, $from, $to)
 	If $var <> 0 Then Return $var[0]
 	Return ''
 EndFunc   ;==>_StringBetween2
+
+Func _adbDevice($title)
+	RunWait('adb.exe start-server', @ScriptDir, @SW_HIDE)
+
+	$foo = Run('adb.exe devices -l', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$output = ''
+	While 1
+		$bin = StdoutRead($foo, False, True)
+		If @error Then ExitLoop
+		$output &= BinaryToString($bin, $SB_UTF8)
+	WEnd
+
+	$output = StringStripWS(StringReplace($output, 'List of devices attached', ''), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+
+	$arrayLines = _StringExplode($output, @CRLF)
+	$cnt = UBound($arrayLines)
+
+	$top = 10
+	$btnHeight = 40
+	$height = $top + $cnt * $btnHeight
+
+	$gui = GUICreate($title, $fullWidth, $height)
+
+	For $line In $arrayLines
+		$btn = GUICtrlCreateButton(StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING), 10, $top, $fullWidth - 20)
+		$top += $btnHeight
+	Next
+
+	$device = ''
+
+	GUISetState(@SW_SHOW, $gui)
+	GUISetState(@SW_RESTORE, $gui)
+	GUISetState(@SW_HIDE, $hGUI)
+
+	While 1
+		$Msg = GUIGetMsg()
+		If $Msg == $GUI_EVENT_CLOSE Then ExitLoop
+		If $Msg > 0 Then
+			$val = GUICtrlRead($Msg)
+			If $val <> '0' Then
+				$device = _StringExplode($val, ' ')[0]
+				ExitLoop
+			EndIf
+		EndIf
+	WEnd
+	GUISetState(@SW_SHOW, $hGUI)
+	GUISetState(@SW_RESTORE, $hGUI)
+	GUISetState(@SW_HIDE, $gui)
+	GUIDelete($gui)
+
+	Return $device
+EndFunc   ;==>_adbDevice
+
+Func _adb($install)
+	If $install Then
+		$title = $strInstall
+	Else
+		$title = $strUninstall
+	EndIf
+	$device = _adbDevice($title)
+
+	If $device == '' Then Return
+
+	ProgressOn($title, $strLoading)
+
+	If $install Then
+		If $tmpAPK <> False Then
+			FileCopy($dirAPK & "\" & $fileAPK, $tmpAPK, $FC_CREATEPATH + $FC_OVERWRITE)
+			FileSetAttrib($tmpAPK, "-RASH")
+		EndIf
+
+		$cmd = 'adb.exe -s "' & $device & '" install -r "' & $fullPathAPK & '"'
+	Else
+		$cmd = 'adb.exe -s "' & $device & '" uninstall "' & $apk_PkgName & '"'
+	EndIf
+
+	$foo = Run($cmd, @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$output = ''
+	$timer = TimerInit()
+	$timeout = TimerInit()
+	$max = 30 * 1000
+	$last = 0
+	While 1
+		$time = TimerDiff($timeout)
+		If $time > $max Then ExitLoop
+		$bin = StdoutRead($foo, False, True)
+		If @error Then ExitLoop
+		If StringLen($bin) > 0 Then $timeout = TimerInit()
+		$output &= BinaryToString($bin, $SB_UTF8)
+		$check = Round(TimerDiff($timer) / 500)
+		If $check <> $last Then
+			$last = $check
+			$tmp = _StringExplode(StringStripWS($output, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
+			ProgressSet($time * 100 / $max, $tmp[UBound($tmp) - 1])
+		EndIf
+		If StringInStr($output, 'waiting for device') Then ExitLoop
+	WEnd
+	ProcessClose($foo)
+
+	ProgressOff()
+
+	$lines = _StringExplode(StringStripWS($output, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
+	$output = ''
+	For $line In $lines
+		If StringInStr($line, '%]') Then ContinueLoop
+		If $output <> '' Then $output &= @CRLF
+		$output &= $line
+	Next
+
+	MsgBox(0, $title, $output)
+
+	If $tmpAPK <> False Then FileDelete($tmpAPK)
+EndFunc   ;==>_adb
