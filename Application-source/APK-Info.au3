@@ -755,15 +755,20 @@ Func _parseLines($prmArrayLines)
 
 	If Not StringInStr($apk_Labels, @CRLF) Then $apk_Labels = ''
 
-	$apk_Icons = $icons
-	If $banners <> '' Then
-		If $apk_Icons <> '' Then $apk_Icons &= @CRLF
-		$apk_Icons &= $banners
-	EndIf
-	If $icons2 <> '' Then
-		If $apk_Icons <> '' Then $apk_Icons &= @CRLF
-		$apk_Icons &= $icons2
-	EndIf
+	$apk_Icons = ''
+	Local $src[3]
+	$src[0] = $icons
+	$src[1] = $banners
+	$src[2] = $icons2
+	For $list In $src
+		$list = StringStripWS($list, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+		If $list == '' Then ContinueLoop
+		For $icon In _StringExplode($list, @CRLF)
+			If $icon == '' Or StringInStr($apk_Icons, $icon) Then ContinueLoop
+			If $apk_Icons <> '' Then $apk_Icons &= @CRLF
+			$apk_Icons &= $icon
+		Next
+	Next
 
 	$apk_Features = $featuresUsed
 	If $featuresImplied <> '' Then
