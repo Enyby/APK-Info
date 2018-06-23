@@ -604,7 +604,7 @@ Func _parseLines($prmArrayLines)
 			ContinueLoop
 		EndIf
 
-		If $key == 'leanback-launchable-activity' Then
+		If $key == 'leanback-launchable-activity' And Not StringInStr($apk_Devices, $strTV) Then
 			If $apk_Devices <> '' Then $apk_Devices &= ' '
 			$apk_Devices &= $strTV
 		EndIf
@@ -649,7 +649,7 @@ Func _parseLines($prmArrayLines)
 				$val = _StringBetween2($value, "'", "'")
 				$featuresUsed &= '+ ' & $val
 
-				If $val == 'android.hardware.type.watch' Then
+				If $val == 'android.hardware.type.watch' And Not StringInStr($apk_Devices, $strWatch) Then
 					If $apk_Devices <> '' Then $apk_Devices &= ' '
 					$apk_Devices &= $strWatch
 				EndIf
@@ -725,7 +725,7 @@ Func _parseLines($prmArrayLines)
 				$apk_Textures &= $val
 
 			Case 'meta-data'
-				If _StringBetween2($value, "'", "'") == 'com.google.android.gms.car.application' Then
+				If _StringBetween2($value, "'", "'") == 'com.google.android.gms.car.application' And Not StringInStr($apk_Devices, $strAuto) Then
 					If $apk_Devices <> '' Then $apk_Devices &= ' '
 					$apk_Devices &= $strAuto
 				EndIf
