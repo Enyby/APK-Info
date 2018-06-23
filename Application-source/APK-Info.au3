@@ -868,18 +868,20 @@ Func _parseXmlIcon($icon)
 EndFunc   ;==>_parseXmlIcon
 
 Func _loadIcon($icon)
-	If StringRight($icon, 4) == '.xml' Then
+	If StringRight($icon, 4) <> '.png' Then
 		$icon = _searchPng($icon)
 	EndIf
 
 	_setProgress(1)
 
-	If StringRight($icon, 4) == '.xml' Then
-		_parseXmlIcon($icon)
-	Else
-		_setProgress(2)
-		$apk_IconPath = $icon
-	EndIf
+	Select
+		Case StringRight($icon, 4) == '.xml'
+			_parseXmlIcon($icon)
+
+		Case Else
+			_setProgress(2)
+			$apk_IconPath = $icon
+	EndSelect
 
 	_setProgress(1)
 EndFunc   ;==>_loadIcon
