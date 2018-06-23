@@ -654,7 +654,7 @@ Func _parseLines($prmArrayLines)
 			$add = StringReplace($line, 'application-label-', '')
 			$add = StringReplace($add, 'application-label', 'default')
 			If StringInStr($apk_Labels, $value) Then
-				$apk_Labels = StringReplace($apk_Labels, ':' & $value, ',' & $add)
+				$apk_Labels = StringReplace($apk_Labels, ':' & $value, ', ' & $add)
 			Else
 				If $apk_Labels <> '' Then $apk_Labels &= @CRLF
 				$apk_Labels &= $add
