@@ -32,8 +32,7 @@ Opt("TrayIconHide", 1)
 #AutoIt3Wrapper_Run_Before=ShowOriginalLine.exe %in%
 #AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
 
-
-Global $apk_Label, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version, $apk_Devices
+Global $apk_Label, $apk_Labels, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version, $apk_Devices
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
 Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
@@ -126,6 +125,7 @@ $strHash = IniRead($IniFile, $LangSection, "Hash", "Hash")
 $strInstall = IniRead($IniFile, $LangSection, "Install", "Install")
 $strUninstall = IniRead($IniFile, $LangSection, "Uninstall", "Uninstall")
 $strLocales = IniRead($IniFile, $LangSection, "Locales", "Locales")
+$strClose = IniRead($IniFile, $LangSection, "Close", "Close")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -222,6 +222,8 @@ $edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth,
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strLocales)
 
+$btnLabels = GUICtrlCreateButton('...', $rightColumnStart - 5, $offsetHeight - 2, 25)
+GUICtrlSetState(-1, $globalStyle)
 $inpLabel = _makeField($strLabel, False, 0)
 $inpBuild = GUICtrlCreateInput('', 360, $offsetHeight, 65, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
@@ -308,6 +310,9 @@ While 1
 			_OpenNewFile(@GUI_DragFile)
 			MY_WM_PAINT(0, 0, 0, 0)
 
+		Case $btnLabels
+			_showText($strLabel & ': ' & $fileAPK, '', $apk_Labels)
+
 		Case $chSignature
 			If BitAND(GUICtrlRead($chSignature), $GUI_CHECKED) = $GUI_CHECKED Then
 				$CheckSignature = 1
@@ -324,17 +329,10 @@ While 1
 			EndIf
 			If $sNewNameInput <> "" Then _renameAPK($sNewNameInput)
 
-		Case $gBtn_Install
-			_adb(True)
+		Case $gBtn_Install, $gBtn_Uninstall
+			_adb($nMsg == $gBtn_Install)
 
-		Case $gBtn_Uninstall
-			_adb(False)
-
-		Case $gBtn_Exit
-			_cleanUp()
-			Exit
-
-		Case $GUI_EVENT_CLOSE
+		Case $gBtn_Exit, $GUI_EVENT_CLOSE
 			_cleanUp()
 			Exit
 	EndSwitch
@@ -471,7 +469,14 @@ Func _OpenNewFile($apk)
 	$sNewFilenameAPK = _ReplacePlaceholders($FileNamePattern & '.apk')
 	$hash = _ReplacePlaceholders($ShowHash)
 
+	If $apk_Labels == '' Then
+		$labels = $GUI_HIDE
+	Else
+		$labels = $GUI_SHOW
+	EndIf
+
 	GUICtrlSetData($inpLabel, $apk_Label)
+	GUICtrlSetState($btnLabels, $labels)
 	GUICtrlSetData($inpVersion, $apk_Version)
 	GUICtrlSetData($inpBuild, $apk_Build)
 	GUICtrlSetData($inpPkg, $apk_PkgName)
@@ -567,6 +572,7 @@ EndFunc   ;==>_getBadge
 Func _parseLines($prmArrayLines)
 	$apk_Debug = ''
 	$apk_Label = ''
+	$apk_Labels = ''
 	$apk_PkgName = ''
 	$apk_Build = ''
 	$apk_Version = ''
@@ -616,6 +622,17 @@ Func _parseLines($prmArrayLines)
 			If $icons2 <> '' Then $icons2 = @CRLF & $icons2
 			$icons2 = _StringBetween2($value, "'", "'") & $icons2
 			ContinueLoop
+		EndIf
+
+		If StringInStr($key, 'application-label') Then
+			$add = StringReplace($line, 'application-label-', '')
+			$add = StringReplace($add, 'application-label', 'default')
+			If StringInStr($apk_Labels, $value) Then
+				$apk_Labels = StringReplace($apk_Labels, ':' & $value, ',' & $add)
+			Else
+				If $apk_Labels <> '' Then $apk_Labels &= @CRLF
+				$apk_Labels &= $add
+			EndIf
 		EndIf
 
 		Switch $key
@@ -734,6 +751,8 @@ Func _parseLines($prmArrayLines)
 				EndIf
 		EndSwitch
 	Next
+
+	If Not StringInStr($apk_Labels, @CRLF) Then $apk_Labels = ''
 
 	$apk_Icons = $icons
 	If $banners <> '' Then
@@ -998,6 +1017,31 @@ Func _StringBetween2($text, $from, $to)
 	If $var <> 0 Then Return $var[0]
 	Return ''
 EndFunc   ;==>_StringBetween2
+
+Func _showText($title, $message, $text)
+	$height = $fullHeight
+	$width = $fullWidth
+	$gui = GUICreate($title, $width, $height)
+
+	$offset = 5
+	GUICtrlCreateLabel($message, 5, $offset, $width - 10, $inputHeight)
+	$offset += $inputHeight + 5
+	GUICtrlCreateEdit($text, 5, $offset, $width - 10, $height - 35 - $offset, $editFlags)
+	$btnClose = GUICtrlCreateButton($strClose, $width/4, $height - 30, $width/2)
+
+	GUISetState(@SW_SHOW, $gui)
+	GUISetState(@SW_RESTORE, $gui)
+	GUISetState(@SW_HIDE, $hGUI)
+
+	While 1
+		$Msg = GUIGetMsg()
+		If $Msg == $GUI_EVENT_CLOSE Or $Msg == $btnClose Then ExitLoop
+	WEnd
+	GUISetState(@SW_SHOW, $hGUI)
+	GUISetState(@SW_RESTORE, $hGUI)
+	GUISetState(@SW_HIDE, $gui)
+	GUIDelete($gui)
+EndFunc
 
 Func _adbDevice($title)
 	RunWait('adb.exe start-server', @ScriptDir, @SW_HIDE)
