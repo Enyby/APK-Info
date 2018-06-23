@@ -965,6 +965,14 @@ EndFunc   ;==>_drawPNG
 Func _drawImg($path)
 	$apk_IconName = _lastPart($path, "/")
 	$filename = $tempPath & "\" & $apk_IconName
+	If StringRight($filename, 5) == '.webp' Then
+		$tmpFilename = StringTrimRight($filename, 5) & '.png'
+		RunWait('dwebp.exe "' & $filename & '" -o "' & $tmpFilename & '"', @ScriptDir, @SW_HIDE)
+		If FileExists($tmpFilename) Then
+			FileDelete($filename) ; no need - try delete
+			$filename = $tmpFilename
+		EndIf
+	EndIf
 	$hImage_original = _GDIPlus_ImageLoadFromFile($filename)
 	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $type = ' & VarGetType($hImage_original) & '; ' & $hImage_original & @CRLF & '>Error code: ' & @error & @CRLF)
 	If $ShowLog = "1" Then
