@@ -575,6 +575,8 @@ Func _getSignatureName()
 	$names &= 'frame HTC=1052f733fa71da5c2803611cb336f064a8728b36' & @CRLF
 	$names &= 'frame HUAWEI=059e2480adf8c1c5b3d9ec007645ccfc442a23c5' & @CRLF
 	$names &= 'frame Android=27196e386b875e76adf700e7ea84e4c6eee33dfa' & @CRLF
+	$names &= 'frame Android=736974b37123fa9007cf05cdc1fb43d915917622' & @CRLF
+	$names &= 'debug=da75ff38332859408959c7b3b5fee41ff82cac2e' & @CRLF
 	For $item In _StringExplode(StringStripWS($names, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
 		$name = _StringExplode($item, '=')
 		If StringInStr($apk_Signature, $name[1]) Then $apk_SignatureName &= @CRLF & $name[0]
