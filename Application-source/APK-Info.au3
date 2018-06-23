@@ -1027,7 +1027,7 @@ Func _showText($title, $message, $text)
 	$offset = 5
 	GUICtrlCreateLabel($message, 5, $offset, $width - 10, $inputHeight)
 	$offset += $inputHeight + 5
-	GUICtrlCreateEdit($text, 5, $offset, $width - 10, $height - 35 - $offset, $editFlags)
+	GUICtrlCreateEdit($text, 5, $offset, $width - 10, $height - 35 - $offset, BitOR($ES_READONLY, $ES_AUTOVSCROLL, $WS_VSCROLL, $ES_WANTRETURN))
 	$btnClose = GUICtrlCreateButton($strClose, $width/4, $height - 30, $width/2)
 
 	GUISetState(@SW_SHOW, $gui)
