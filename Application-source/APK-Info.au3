@@ -78,6 +78,7 @@ EndIf
 $CheckSignature = IniRead($IniFile, "Settings", "CheckSignature", "1")
 $FileNamePattern = IniRead($IniFile, "Settings", "FileNamePattern", "%label% %version%.%build%")
 $ShowHash = IniRead($IniFile, "Settings", "ShowHash", '')
+$CustomStore = IniRead($IniFile, "Settings", "CustomStore", '')
 
 $ShowLog = IniRead($IniFile, "Settings", "ShowLog", "0")
 $ShowLangCode = IniRead($IniFile, "Settings", "ShowLangCode", "1")
@@ -293,6 +294,15 @@ $offsetHeight = 5
 
 $offsetWidth = $btnGap
 $gBtn_Play = _makeButton($strPlayStore, "play.bmp")
+$gBtn_CustomStore = -1000
+If $CustomStore <> '' Then
+	$store = _StringExplode($CustomStore, '|', 2)
+	If UBound($store) == 2 Then
+		$gBtn_CustomStore = _makeButton($store[0], "web.bmp")
+	Else
+		$CustomStore = ''
+	EndIf
+EndIf
 $gBtn_Rename = _makeButton($strRename, "rename.bmp")
 $gBtn_Install = _makeButton($strInstall, "install.bmp")
 $gBtn_Uninstall = _makeButton($strUninstall, "delete.bmp")
@@ -319,7 +329,12 @@ While 1
 	$nMsg = GUIGetMsg()
 	Switch $nMsg
 		Case $gBtn_Play
-			_openPlay()
+			ShellExecute($URLPlayStore & $apk_PkgName & '&hl=' & $PlayStoreLanguage)
+
+		Case $gBtn_CustomStore
+			If $CustomStore <> '' Then
+				ShellExecute(StringReplace(StringReplace(_StringExplode($CustomStore, '|', 2)[1], '%package%', $apk_PkgName), '%lang%', $Language_code))
+			EndIf
 
 		Case $GUI_EVENT_DROPPED
 			_OpenNewFile(@GUI_DragFile)
@@ -983,11 +998,6 @@ Func _cleanUp()
 	DirRemove($tempPath, 1) ; clean own dir
 	DirRemove(@TempDir & "\APK-Info", 1) ; clean files from previous runs
 EndFunc   ;==>_cleanUp
-
-Func _openPlay()
-	$url = $URLPlayStore & $apk_PkgName & '&hl=' & $PlayStoreLanguage
-	ShellExecute($url)
-EndFunc   ;==>_openPlay
 
 Func _translateSDKLevel($sdk)
 	If $sdk == '' Then Return ''
