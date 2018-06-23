@@ -34,12 +34,12 @@ Opt("TrayIconHide", 1)
 #AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
 
 Global $apk_Label, $apk_Labels, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version, $apk_Devices
-Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MinSDKVer, $apk_MinSDKName
-Global $apk_TargetSDK, $apk_TargetSDKVer, $apk_TargetSDKName, $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature, $apk_SignatureName
+Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MaxSDK, $apk_TargetSDK, $apk_CompileSDK
+Global $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature, $apk_SignatureName
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 DirCreate($tempPath)
-Global $toolsDir = @ScriptDir & '\tools'
+Global $toolsDir = 'tools/'
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
 Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK, $tmpAPK
@@ -93,8 +93,6 @@ $strLabel = IniRead($IniFile, $LangSection, "Application", "Application")
 $strVersion = IniRead($IniFile, $LangSection, "Version", "Version")
 $strBuild = IniRead($IniFile, $LangSection, "Build", "Build")
 $strPkg = IniRead($IniFile, $LangSection, "Package", "Package")
-$strMinSDK = IniRead($IniFile, $LangSection, "MinSDK", "Min. SDK")
-$strTargetSDK = IniRead($IniFile, $LangSection, "TargetSDK", "Target SDK")
 $strScreens = IniRead($IniFile, $LangSection, "ScreenSize", "Screen Size")
 $strResolution = IniRead($IniFile, $LangSection, "Resolution", "Resolution")
 $strPermission = IniRead($IniFile, $LangSection, "Permission", "Permission")
@@ -129,6 +127,10 @@ $strUninstall = IniRead($IniFile, $LangSection, "Uninstall", "Uninstall")
 $strLocales = IniRead($IniFile, $LangSection, "Locales", "Locales")
 $strClose = IniRead($IniFile, $LangSection, "Close", "Close")
 $strNoAdbDevices = IniRead($IniFile, $LangSection, "NoAdbDevicesFound", "No ADB devices found.")
+$strMinMaxSDK = IniRead($IniFile, $LangSection, "MinMaxSDK", "Min. / Max. SDK")
+$strMaxSDK = IniRead($IniFile, $LangSection, "MaxSDK", "Max. SDK")
+$strTargetCompileSDK = IniRead($IniFile, $LangSection, "TargetComipleSDK", "Target / Compile SDK")
+$strCompileSDK = IniRead($IniFile, $LangSection, "ComipleSDK", "Compile SDK")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -180,35 +182,35 @@ EndIf
 $rightColumnWidth = 100
 
 $fieldHeight = 24
-$bigFieldHeight = 93
+$bigFieldHeight = 89
 
-$labelStart = 8
-$labelWidth = 100
+$labelStart = 5
+$labelWidth = 126
 $labelTop = 3
 
-$inputStart = 125
-$inputWidth = 300
+$inputStart = $labelStart + $labelWidth + 5
+$inputWidth = 445
 $inputHeight = 20
 $inputFlags = BitOR($GUI_SS_DEFAULT_INPUT, $ES_READONLY)
 
-$editWidth = $inputWidth + 10 + $rightColumnWidth
+$editWidth = $inputWidth + 5 + $rightColumnWidth
 $editHeight = 85
 $editFlags = BitOR($ES_READONLY, $ES_AUTOVSCROLL, $ES_AUTOHSCROLL, $WS_VSCROLL, $ES_WANTRETURN)
 
 $offsetHeight = 5
 
-$rightColumnStart = $inputStart + $inputWidth + 10
+$rightColumnStart = $inputStart + $inputWidth + 5
 
 Local $fields = 11
 If $ShowHash <> '' Then $fields += 1
 
-$fullWidth = $rightColumnStart + $rightColumnWidth + 10
-$fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3 + 2
+$fullWidth = $rightColumnStart + $rightColumnWidth + 5
+$fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3
 
 $localesWidth = 60
 $localesStart = $fullWidth
 
-$fullWidth += $localesWidth + 10
+$fullWidth += $localesWidth + 5
 
 $btnIconSize = 40
 $btnGap = 10
@@ -229,21 +231,29 @@ $edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth,
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strLocales)
 
-$btnLabels = GUICtrlCreateButton('...', $rightColumnStart - 5, $offsetHeight - 2, 25)
+$btnLabels = GUICtrlCreateButton('...', $rightColumnStart - 5, $offsetHeight, $inputHeight, $inputHeight)
 GUICtrlSetState(-1, $globalStyle)
 $inpLabel = _makeField($strLabel, False, 0)
-$inpBuild = GUICtrlCreateInput('', 360, $offsetHeight, 65, $inputHeight, $inputFlags)
+Local $buildWidth = 65
+$inpBuild = GUICtrlCreateInput('', $inputStart + $inputWidth - $buildWidth, $offsetHeight, $buildWidth, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strBuild)
-$inpVersion = _makeField($strVersion & ' / ' & $strBuild, False, 230)
+$inpVersion = _makeField($strVersion & ' / ' & $strBuild, False, $inputWidth - 5 - $buildWidth)
 _makeLangLabel($strLangCode)
 $inpPkg = _makeField($strPkg, False, 0)
 
 _makeLangLabel($OSLanguageCode)
-$inpMinSDK = _makeField($strMinSDK, False, 0)
+Local $maxWidth = 220
+$inpMaxSDK = GUICtrlCreateInput('', $inputStart + $inputWidth - $maxWidth, $offsetHeight, $maxWidth, $inputHeight, $inputFlags)
+GUICtrlSetState(-1, $globalInputStyle)
+GUICtrlSetTip(-1, $strMaxSDK)
+$inpMinSDK = _makeField($strMinMaxSDK, False, $inputWidth - 5 - $maxWidth)
 
 _makeLangLabel($strLangName & ': ' & $Language_code)
-$inpTargetSDK = _makeField($strTargetSDK, False, 0)
+$inpCompileSDK = GUICtrlCreateInput('', $inputStart + $inputWidth - $maxWidth, $offsetHeight, $maxWidth, $inputHeight, $inputFlags)
+GUICtrlSetState(-1, $globalInputStyle)
+GUICtrlSetTip(-1, $strCompileSDK)
+$inpTargetSDK = _makeField($strTargetCompileSDK, False, $inputWidth - 5 - $maxWidth)
 
 $lblDevices = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetState(-1, $globalStyle)
@@ -470,9 +480,6 @@ Func _OpenNewFile($apk)
 
 	_getSignature($fullPathAPK)
 
-	If $apk_MinSDKVer <> "" Then $sMinAndroidString = 'Android ' & $apk_MinSDKVer & ' (' & $apk_MinSDKName & ')'
-	If $apk_TargetSDKVer <> "" Then $sTgtAndroidString = 'Android ' & $apk_TargetSDKVer & ' (' & $apk_TargetSDKName & ')'
-
 	$sNewFilenameAPK = _ReplacePlaceholders($FileNamePattern & '.apk')
 	$hash = _ReplacePlaceholders($ShowHash)
 
@@ -487,8 +494,10 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($inpVersion, $apk_Version)
 	GUICtrlSetData($inpBuild, $apk_Build)
 	GUICtrlSetData($inpPkg, $apk_PkgName)
-	GUICtrlSetData($inpMinSDK, $apk_MinSDK & ': ' & $sMinAndroidString)
-	GUICtrlSetData($inpTargetSDK, $apk_TargetSDK & ': ' & $sTgtAndroidString)
+	GUICtrlSetData($inpMinSDK, _translateSDKLevel($apk_MinSDK))
+	GUICtrlSetData($inpMaxSDK, _translateSDKLevel($apk_MaxSDK))
+	GUICtrlSetData($inpTargetSDK, _translateSDKLevel($apk_TargetSDK))
+	GUICtrlSetData($inpCompileSDK, _translateSDKLevel($apk_CompileSDK))
 	GUICtrlSetData($inpScreens, $apk_Screens)
 	GUICtrlSetData($inpDensities, $apk_Densities)
 	GUICtrlSetData($inpABIs, $apk_ABIs)
@@ -548,7 +557,7 @@ EndFunc   ;==>_ReplacePlaceholders
 Func _getSignature($prmAPK)
 	$output = ''
 	If $CheckSignature == 1 Then
-		$foo = Run('java -jar apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+		$foo = Run('java -jar ' & $toolsDir & 'apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		While 1
 			$bin = StderrRead($foo, False, True)
 			If @error Then ExitLoop
@@ -585,7 +594,7 @@ Func _getSignatureName()
 EndFunc   ;==>_getSignatureName
 
 Func _getBadge($prmAPK)
-	$foo = Run('aapt.exe d --include-meta-data badging ' & '"' & $prmAPK & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+	$foo = Run($toolsDir & 'aapt.exe d --include-meta-data badging ' & '"' & $prmAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 	$output = ''
 	While 1
 		$bin = StdoutRead($foo, False, True)
@@ -604,12 +613,10 @@ Func _parseLines($prmArrayLines)
 	$apk_Build = ''
 	$apk_Version = ''
 	$apk_Permissions = ''
-	$apk_MinSDK = 0
-	$apk_MinSDKVer = 0
-	$apk_MinSDKName = ''
-	$apk_TargetSDK = 0
-	$apk_TargetSDKVer = 0
-	$apk_TargetSDKName = ''
+	$apk_MinSDK = ''
+	$apk_MaxSDK = ''
+	$apk_TargetSDK = ''
+	$apk_CompileSDK = ''
 	$apk_Screens = ''
 	$apk_Densities = ''
 	$apk_ABIs = ''
@@ -686,6 +693,7 @@ Func _parseLines($prmArrayLines)
 				$apk_PkgName = _StringBetween2($value, "name='", "'")
 				$apk_Build = _StringBetween2($value, "versionCode='", "'")
 				$apk_Version = _StringBetween2($value, "versionName='", "'")
+				$apk_CompileSDK = _StringBetween2($value, "compileSdkVersion='", "'")
 
 			Case 'uses-permission'
 				If $apk_Permissions <> '' Then $apk_Permissions &= @CRLF
@@ -711,13 +719,12 @@ Func _parseLines($prmArrayLines)
 
 			Case 'sdkVersion'
 				$apk_MinSDK = _StringBetween2($value, "'", "'")
-				$apk_MinSDKVer = _translateSDKLevel($apk_MinSDK)
-				$apk_MinSDKName = _translateSDKLevel($apk_MinSDK, True)
+
+			Case 'maxSdkVersion'
+				$apk_MaxSDK = _StringBetween2($value, "'", "'")
 
 			Case 'targetSdkVersion'
 				$apk_TargetSDK = _StringBetween2($value, "'", "'")
-				$apk_TargetSDKVer = _translateSDKLevel($apk_TargetSDK)
-				$apk_TargetSDKName = _translateSDKLevel($apk_TargetSDK, True)
 
 			Case 'supports-screens'
 				$apk_Screens = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
@@ -814,7 +821,7 @@ Func _searchPng($res)
 	$ret = $res
 
 	If Not $searchPngCache Then
-		$foo = Run('unzip.exe -l ' & '"' & $fullPathAPK & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+		$foo = Run($toolsDir & 'unzip.exe -l ' & '"' & $fullPathAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		$output = ''
 		While 1
 			$bin = StdoutRead($foo, False, True)
@@ -847,7 +854,7 @@ Func _searchPng($res)
 EndFunc   ;==>_searchPng
 
 Func _parseXmlIcon($icon)
-	$foo = Run('aapt.exe d xmltree ' & '"' & $fullPathAPK & '" "' & $icon & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+	$foo = Run($toolsDir & 'aapt.exe d xmltree ' & '"' & $fullPathAPK & '" "' & $icon & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 	$output = ''
 	While 1
 		$bin = StdoutRead($foo, False, True)
@@ -880,7 +887,7 @@ Func _parseXmlIcon($icon)
 	_setProgress(1)
 
 	If $ids[0] Or $ids[1] Then
-		$foo = Run('aapt.exe d resources ' & '"' & $fullPathAPK & '"', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
+		$foo = Run($toolsDir & 'aapt.exe d resources ' & '"' & $fullPathAPK & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD)
 		$output = ''
 		While 1
 			$bin = StdoutRead($foo, False, True)
@@ -962,7 +969,7 @@ Func _extractIcon()
 	If $apk_IconPathBg Then
 		$files &= ' ' & $apk_IconPathBg
 	EndIf
-	RunWait("unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"', $toolsDir, @SW_HIDE)
+	RunWait("unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"', @ScriptDir, @SW_HIDE)
 EndFunc   ;==>_extractIcon
 
 Func _cleanUp()
@@ -982,20 +989,16 @@ Func _openPlay()
 	ShellExecute($url)
 EndFunc   ;==>_openPlay
 
-Func _translateSDKLevel($prmSDKLevel, $prmReturnCodeName = False)
-	If $prmSDKLevel = "1000" Then
-		$sVersion = $strCurDev
-		$sCodeName = $strCurDevBuild
+Func _translateSDKLevel($sdk)
+	If $sdk == '' Then Return ''
+	If $sdk == "1000" Then
+		$name = $strCurDev & '|' & $strCurDevBuild
 	Else
-		$sVersion = IniRead($IniFile, "AndroidName", "SDK" & $prmSDKLevel & "-Version", $strUnknown)
-		$sCodeName = IniRead($IniFile, "AndroidName", "SDK" & $prmSDKLevel & "-CodeName", $strUnknown)
+		$name = IniRead($IniFile, "AndroidName", "SDK-" & $sdk, '??|' & $strUnknown)
 	EndIf
-	Switch $prmReturnCodeName
-		Case True
-			Return $sCodeName
-		Case Else
-			Return $sVersion
-	EndSwitch
+	$tmp = _StringExplode($name, '|')
+	If UBound($tmp) < 2 Then Return 'INI error: SDK-' & $sdk & ' must contain char "|"'
+	Return $sdk & ': Android ' & $tmp[0] & ' (' & $tmp[1] & ')'
 EndFunc   ;==>_translateSDKLevel
 
 Func _drawPNG()
@@ -1017,7 +1020,7 @@ Func _drawImg($path)
 	$filename = $tempPath & "\" & $apk_IconName
 	If StringRight($filename, 5) == '.webp' Then
 		$tmpFilename = StringTrimRight($filename, 5) & '.png'
-		RunWait('dwebp.exe "' & $filename & '" -o "' & $tmpFilename & '"', $toolsDir, @SW_HIDE)
+		RunWait('dwebp.exe "' & $filename & '" -o "' & $tmpFilename & '"', @ScriptDir, @SW_HIDE)
 		If FileExists($tmpFilename) Then
 			FileDelete($filename) ; no need - try delete
 			$filename = $tmpFilename
@@ -1075,9 +1078,9 @@ Func _showText($title, $message, $text)
 EndFunc
 
 Func _adbDevice($title)
-	RunWait('adb.exe start-server', $toolsDir, @SW_HIDE)
+	RunWait('adb.exe start-server', @ScriptDir, @SW_HIDE)
 
-	$foo = Run('adb.exe devices -l', $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = Run($toolsDir & 'adb.exe devices -l', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	$output = ''
 	While 1
 		$bin = StdoutRead($foo, False, True)
@@ -1154,7 +1157,7 @@ Func _adb($install)
 		$cmd = 'adb.exe -s "' & $device & '" uninstall "' & $apk_PkgName & '"'
 	EndIf
 
-	$foo = Run($cmd, $toolsDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = Run($toolsDir & $cmd, @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	$output = ''
 	$timer = TimerInit()
 	$timeout = TimerInit()
