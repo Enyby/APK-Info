@@ -1047,7 +1047,7 @@ Func _adb($install)
 	Else
 		$title = $strUninstall
 	EndIf
-	$device = _adbDevice($title)
+	$device = _adbDevice($title & ': ' & $apk_Label & ' [' & $apk_PkgName & ']')
 
 	If $device == '' Then Return
 
