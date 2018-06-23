@@ -221,12 +221,12 @@ ShowLog enables to save in APK-Info-Log.ini many info about variable use interna
 *** APK-Info 1.19 (19.06.2018)
 
 - Improved load APK icons.
-- Add option FileNameWithBuild in .ini file.
+- Add in APK.Info.ini a FileNameWithBuild option to switch off adding build number to new file name of apk, default value is 0 (do not add).
 
 *** APK-Info 1.20 (20.06.2018)
 
 - Improved load APK icons.
-- Add option FileNamePattern for rename APK in .ini file.
+- Add in APK-Info.ini a FileNamePattern option for rename APK.
 - Add support for unicode.
 - Fix load features.
 - Improved features list.
