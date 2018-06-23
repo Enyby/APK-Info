@@ -201,12 +201,12 @@ If $ShowHash <> '' Then $fields += 1
 $fullWidth = $rightColumnStart + $rightColumnWidth + 10
 $fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3 + 40
 
-$btnWidth = ($fullWidth - 10) / 5 - 10
-
 $localesWidth = 60
 $localesStart = $fullWidth
 
 $fullWidth += $localesWidth + 5
+
+$btnWidth = ($fullWidth - 10) / 5 - 10
 
 $hGUI = GUICreate($ProgramTitle, $fullWidth, $fullHeight, -1, -1, -1, $WS_EX_ACCEPTFILES)
 
@@ -217,7 +217,7 @@ GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
 
-$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 15, $editFlags)
+$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 40 - $offsetHeight, $editFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 
 $inpLabel = _makeField($strLabel, False, 0)
