@@ -125,6 +125,7 @@ $strAuto = IniRead($IniFile, $LangSection, "Auto", "Auto")
 $strHash = IniRead($IniFile, $LangSection, "Hash", "Hash")
 $strInstall = IniRead($IniFile, $LangSection, "Install", "Install")
 $strUninstall = IniRead($IniFile, $LangSection, "Uninstall", "Uninstall")
+$strLocales = IniRead($IniFile, $LangSection, "Locales", "Locales")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -219,10 +220,12 @@ $globalInputStyle = $GUI_ONTOP
 
 $edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 40 - $offsetHeight, $editFlags)
 GUICtrlSetState(-1, $globalInputStyle)
+GUICtrlSetTip(-1, $strLocales)
 
 $inpLabel = _makeField($strLabel, False, 0)
 $inpBuild = GUICtrlCreateInput('', 360, $offsetHeight, 65, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
+GUICtrlSetTip(-1, $strBuild)
 $inpVersion = _makeField($strVersion & ' / ' & $strBuild, False, 230)
 _makeLangLabel($strLangCode)
 $inpPkg = _makeField($strPkg, False, 0)
