@@ -81,6 +81,9 @@ $ShowHash = IniRead($IniFile, "Settings", "ShowHash", '')
 $CustomStore = IniRead($IniFile, "Settings", "CustomStore", '')
 $SignatureNames = IniRead($IniFile, "Settings", "SignatureNames", '')
 
+$AdbInit = IniRead($IniFile, "Settings", "AdbInit", '')
+$AdbKill = IniRead($IniFile, "Settings", "AdbKill", '0')
+
 $ShowLog = IniRead($IniFile, "Settings", "ShowLog", "0")
 $ShowLangCode = IniRead($IniFile, "Settings", "ShowLangCode", "1")
 ; $ShowCmdLine=Iniread($IniFile,"Settings","ShowCmdLine","1");
@@ -987,7 +990,7 @@ Func _extractIcon()
 	If $apk_IconPathBg Then
 		$files &= ' ' & $apk_IconPathBg
 	EndIf
-	RunWait("unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"', @ScriptDir, @SW_HIDE)
+	RunWait($toolsDir & "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"', @ScriptDir, @SW_HIDE)
 EndFunc   ;==>_extractIcon
 
 Func _cleanUp()
@@ -1000,6 +1003,7 @@ Func _cleanUp()
 
 	DirRemove($tempPath, 1) ; clean own dir
 	DirRemove(@TempDir & "\APK-Info", 1) ; clean files from previous runs
+	If $AdbKill == '2' Then RunWait($toolsDir & 'adb.exe kill-server', @ScriptDir, @SW_HIDE)
 EndFunc   ;==>_cleanUp
 
 Func _translateSDKLevel($sdk)
@@ -1033,7 +1037,7 @@ Func _drawImg($path)
 	$filename = $tempPath & "\" & $apk_IconName
 	If StringRight($filename, 5) == '.webp' Then
 		$tmpFilename = StringTrimRight($filename, 5) & '.png'
-		RunWait('dwebp.exe "' & $filename & '" -o "' & $tmpFilename & '"', @ScriptDir, @SW_HIDE)
+		RunWait($toolsDir & 'dwebp.exe "' & $filename & '" -o "' & $tmpFilename & '"', @ScriptDir, @SW_HIDE)
 		If FileExists($tmpFilename) Then
 			FileDelete($filename) ; no need - try delete
 			$filename = $tmpFilename
@@ -1091,7 +1095,12 @@ Func _showText($title, $message, $text)
 EndFunc
 
 Func _adbDevice($title)
-	RunWait('adb.exe start-server', @ScriptDir, @SW_HIDE)
+	RunWait($toolsDir & 'adb.exe start-server', @ScriptDir, @SW_HIDE)
+
+	For $cmd In _StringExplode($AdbInit, '|')
+		If $cmd == '' Then ContinueLoop
+		RunWait($toolsDir & 'adb.exe ' & $cmd, @ScriptDir, @SW_HIDE)
+	Next
 
 	$foo = Run($toolsDir & 'adb.exe devices -l', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	$output = ''
@@ -1206,4 +1215,6 @@ Func _adb($install)
 	MsgBox(0, $title, $output)
 
 	If $tmpAPK <> False Then FileDelete($tmpAPK)
+
+	If $AdbKill == '1' Then RunWait($toolsDir & 'adb.exe kill-server', @ScriptDir, @SW_HIDE)
 EndFunc   ;==>_adb
