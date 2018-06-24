@@ -1078,7 +1078,7 @@ Func _showText($title, $message, $text)
 	GUICtrlCreateLabel($message, 5, $offset, $width - 10, $inputHeight)
 	$offset += $inputHeight + 5
 	GUICtrlCreateEdit($text, 5, $offset, $width - 10, $height - 35 - $offset, BitOR($ES_READONLY, $ES_AUTOVSCROLL, $WS_VSCROLL, $ES_WANTRETURN))
-	$btnClose = GUICtrlCreateButton($strClose, $width/4, $height - 30, $width/2)
+	$btnClose = GUICtrlCreateButton($strClose, $width / 4, $height - 30, $width / 2)
 
 	GUISetState(@SW_SHOW, $gui)
 	GUISetState(@SW_RESTORE, $gui)
@@ -1092,7 +1092,7 @@ Func _showText($title, $message, $text)
 	GUISetState(@SW_RESTORE, $hGUI)
 	GUISetState(@SW_HIDE, $gui)
 	GUIDelete($gui)
-EndFunc
+EndFunc   ;==>_showText
 
 Func _adbDevice($title)
 	RunWait($toolsDir & 'adb.exe start-server', @ScriptDir, @SW_HIDE)
