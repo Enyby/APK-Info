@@ -251,3 +251,19 @@ ShowLog enables to save in APK-Info-Log.ini many info about variable use interna
 - Improved rename.
 - Added install/uninstall via adb.
 - Bugs fixes.
+
+*** APK-Info 1.23 (24.06.2018)
+
+- Improved GUI.
+- Improved select ADB device.
+- Improved load APK icon.
+- Add support for webp icons.
+- Show all different labels for locales from APK.
+- Show names for most famous signatures. Thanks to @tilks.
+- Add icons for buttons.
+- Move tools to subdir.
+- Remove unused files.
+- Improved support low screens like 800*600.
+- Reworked SDK levels in config.
+- Add Max SDK and Compile SDK.
+- Add options: CustomStore, SignatureNames, AdbInit, AdbKill. Read config for details.
