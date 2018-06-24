@@ -51,7 +51,7 @@ Level 24 = Nougat
 Level 25 = Nougat MR1
 Level 26 = Oreo
 Level 27 = Oreo MR1
-Level 28 = "TBD"
+Level 28 = Android P
 ```
 
 # Additional info
