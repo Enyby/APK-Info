@@ -603,7 +603,6 @@ Func _getSignatureName()
 	$names &= 'media=b79df4a82e90b57ea76525ab7037ab238a42f5d3|'
 	$names &= 'frame HTC=1052f733fa71da5c2803611cb336f064a8728b36|'
 	$names &= 'frame HUAWEI=059e2480adf8c1c5b3d9ec007645ccfc442a23c5|'
-	$names &= 'frame Android=27196e386b875e76adf700e7ea84e4c6eee33dfa|'
 	$names &= 'frame Android=736974b37123fa9007cf05cdc1fb43d915917622|'
 	$names &= 'debug=da75ff38332859408959c7b3b5fee41ff82cac2e|'
 	$names &= $SignatureNames
