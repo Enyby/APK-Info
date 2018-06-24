@@ -234,7 +234,10 @@ GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
 
-$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 5 - $offsetHeight, $editFlags + $ES_NOHIDESEL)
+GUICtrlCreateLabel($strLocales & ':', $localesStart, $offsetHeight, $localesWidth, $inputHeight)
+GUICtrlSetState(-1, $globalStyle)
+Local $top = $offsetHeight + $inputHeight
+$edtLocales = GUICtrlCreateEdit('', $localesStart, $top, $localesWidth, $fullHeight - 5 - $top, $editFlags + $ES_NOHIDESEL)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strLocales)
 
