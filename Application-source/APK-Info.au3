@@ -25,6 +25,8 @@ $ProgramReleaseDate = "24.06.2018"
 #include <String.au3>
 #include <Crypt.au3>
 #include <GuiButton.au3>
+#include <GuiEdit.au3>
+#include <ScrollBarsConstants.au3>
 Opt("TrayMenuMode", 1)
 Opt("TrayIconHide", 1)
 
@@ -232,7 +234,7 @@ GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
 
-$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 5 - $offsetHeight, $editFlags)
+$edtLocales = GUICtrlCreateEdit('', $localesStart, $offsetHeight, $localesWidth, $fullHeight - 5 - $offsetHeight, $editFlags + $ES_NOHIDESEL)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strLocales)
 
@@ -328,6 +330,7 @@ _OpenNewFile($tmp_Filename)
 GUIRegisterMsg($WM_PAINT, "MY_WM_PAINT")
 
 GUISetState(@SW_SHOW, $hGUI)
+OnShow()
 
 While 1
 	$nMsg = GUIGetMsg()
@@ -534,12 +537,21 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($lblDevices, $apk_Devices)
 
 	_drawPNG()
+	OnShow()
 
 	ProgressOff()
 	If $tmpAPK <> False Then FileDelete($tmpAPK)
 	$searchPngCache = False
 	$hashCache = False
 EndFunc   ;==>_OpenNewFile
+
+Func OnShow()
+	$pos = StringInStr($apk_Locales & @CRLF, @CRLF & $Language_code & @CRLF)
+	If $pos Then
+		_GUICtrlEdit_SetSel($edtLocales, $pos, $pos + StringLen($Language_code) + 1)
+		_GUICtrlEdit_Scroll($edtLocales, $SB_SCROLLCARET)
+	EndIf
+EndFunc
 
 Func _ReplacePlaceholders($pattern)
 	$out = $pattern
