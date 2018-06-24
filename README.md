@@ -26,7 +26,7 @@ Then was updated by bovirus and this is the [reworked thread on XDA](https://for
 ```
 Level  1 = Base
 Level  2 = Base 1.1
-Level  3 = CupCake
+Level  3 = Cupcake
 Level  4 = Donut
 Level  5 = Eclair
 Level  6 = Eclair 0.1
@@ -37,13 +37,13 @@ Level 10 = Gingerbread MR1
 Level 11 = Honeycomb
 Level 12 = Honeycomb MR1
 Level 13 = Honeycomb MR2
-Level 14 = IceCreamSandwich
-Level 15 = IceCreamSandwich MR1
+Level 14 = Ice Cream Sandwich
+Level 15 = Ice Cream Sandwich MR1
 Level 16 = Jelly Bean
 Level 17 = Jelly Bean MR1
 Level 18 = Jelly Bean MR2
 Level 19 = KitKat
-Level 20 = KitKat Wear
+Level 20 = KitKat Watch
 Level 21 = Lollipop
 Level 22 = Lollipop MR1
 Level 23 = Marshmallow
