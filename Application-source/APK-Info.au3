@@ -35,9 +35,9 @@ Opt("TrayIconHide", 1)
 #AutoIt3Wrapper_Run_Before=ShowOriginalLine.exe %in%
 #AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
 
-Global $apk_Label, $apk_Labels, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version, $apk_Devices
+Global $apk_Label, $apk_Labels, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version, $apk_Support
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MaxSDK, $apk_TargetSDK, $apk_CompileSDK
-Global $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature, $apk_SignatureName
+Global $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature, $apk_SignatureName, $apk_Debuggable
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 DirCreate($tempPath)
@@ -117,17 +117,11 @@ $strSelectAPK = IniRead($IniFile, $LangSection, "SelectAPKFile", "Select APK fil
 $strCurDev = IniRead($IniFile, $LangSection, "CurDev", "Cur_Dev")
 $strCurDevBuild = IniRead($IniFile, $LangSection, "CurDevBuild", "Current Dev. Build")
 $strUnknown = IniRead($IniFile, $LangSection, "Unknown", "Unknown")
-$strLangCode = IniRead($IniFile, $LangSection, "LangCode", "OS Lang Code")
-$strLangName = IniRead($IniFile, $LangSection, "LangName", "Lang Name")
 $strABIs = IniRead($IniFile, $LangSection, "ABIs", "ABIs")
 $strSignature = IniRead($IniFile, $LangSection, "Signature", "Signature")
-$strDebug = IniRead($IniFile, $LangSection, "Debug", "Debug")
 $strIcon = IniRead($IniFile, $LangSection, "Icon", "Icon")
 $strLoading = IniRead($IniFile, $LangSection, "Loading", "Loading")
 $strTextures = IniRead($IniFile, $LangSection, "Textures", "Textures")
-$strTV = IniRead($IniFile, $LangSection, "TV", "TV")
-$strWatch = IniRead($IniFile, $LangSection, "Watch", "Watch")
-$strAuto = IniRead($IniFile, $LangSection, "Auto", "Auto")
 $strHash = IniRead($IniFile, $LangSection, "Hash", "Hash")
 $strInstall = IniRead($IniFile, $LangSection, "Install", "Install")
 $strUninstall = IniRead($IniFile, $LangSection, "Uninstall", "Uninstall")
@@ -138,12 +132,20 @@ $strMinMaxSDK = IniRead($IniFile, $LangSection, "MinMaxSDK", "Min. / Max. SDK")
 $strMaxSDK = IniRead($IniFile, $LangSection, "MaxSDK", "Max. SDK")
 $strTargetCompileSDK = IniRead($IniFile, $LangSection, "TargetComipleSDK", "Target / Compile SDK")
 $strCompileSDK = IniRead($IniFile, $LangSection, "ComipleSDK", "Compile SDK")
+$strLanguage = IniRead($IniFile, $LangSection, "Language", "Language")
+$strSupport = IniRead($IniFile, $LangSection, "Support", "Support")
+$strDebuggable = IniRead($IniFile, $LangSection, "Debuggable", "Debuggable")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
 $strNotRequired = IniRead($IniFile, $LangSection, "NotRequired", "not required")
 
+$strWinCode = 'WinCode'
 $strOpenGLES = 'OpenGL ES '
+$strTV = 'Android TV'
+$strWatch = 'Wear OS'
+$strAuto = 'Android Auto'
+$strAndroid = 'Android'
 
 $URLPlayStore = IniRead($IniFile, $LangSection, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
 
@@ -151,7 +153,6 @@ $PlayStoreLanguage = IniRead($IniFile, $LangSection, "PlayStoreLanguage", $Langu
 
 Dim $sMinAndroidString, $sTgtAndroidString
 
-Global $apk_Debug = ''
 Global $iconProgress = 5
 
 ;================== GUI ===========================
@@ -195,6 +196,7 @@ $labelStart = 5
 $labelWidth = 126
 $labelTop = 3
 
+Local $halfWidth = 220
 $inputStart = $labelStart + $labelWidth + 5
 $inputWidth = 445
 $inputHeight = 20
@@ -249,21 +251,19 @@ $inpBuild = GUICtrlCreateInput('', $inputStart + $inputWidth - $buildWidth, $off
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strBuild)
 $inpVersion = _makeField($strVersion & ' / ' & $strBuild, False, $inputWidth - 5 - $buildWidth)
-_makeLangLabel($strLangCode)
 $inpPkg = _makeField($strPkg, False, 0)
 
-_makeLangLabel($OSLanguageCode)
-Local $maxWidth = 220
-$inpMaxSDK = GUICtrlCreateInput('', $inputStart + $inputWidth - $maxWidth, $offsetHeight, $maxWidth, $inputHeight, $inputFlags)
+_makeLangLabel($strWinCode & ': ' & $OSLanguageCode)
+$inpMaxSDK = GUICtrlCreateInput('', $inputStart + $inputWidth - $halfWidth, $offsetHeight, $halfWidth, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strMaxSDK)
-$inpMinSDK = _makeField($strMinMaxSDK, False, $inputWidth - 5 - $maxWidth)
+$inpMinSDK = _makeField($strMinMaxSDK, False, $inputWidth - 5 - $halfWidth)
 
-_makeLangLabel($strLangName & ': ' & $Language_code)
-$inpCompileSDK = GUICtrlCreateInput('', $inputStart + $inputWidth - $maxWidth, $offsetHeight, $maxWidth, $inputHeight, $inputFlags)
+_makeLangLabel($strLanguage & ': ' & $Language_code)
+$inpCompileSDK = GUICtrlCreateInput('', $inputStart + $inputWidth - $halfWidth, $offsetHeight, $halfWidth, $inputHeight, $inputFlags)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strCompileSDK)
-$inpTargetSDK = _makeField($strTargetCompileSDK, False, $inputWidth - 5 - $maxWidth)
+$inpTargetSDK = _makeField($strTargetCompileSDK, False, $inputWidth - 5 - $halfWidth)
 
 $lblDevices = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetState(-1, $globalStyle)
@@ -271,9 +271,11 @@ $inpScreens = _makeField($strScreens, False, 0)
 $lblDebug = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetState(-1, $globalStyle)
 $inpDensities = _makeField($strResolution, False, 0)
+$lblSupport = GUICtrlCreateLabel('', $inputStart + $inputWidth - $halfWidth, $offsetHeight + $labelTop, $halfWidth, $inputHeight)
+GUICtrlSetState(-1, $globalStyle)
 $lblOpenGL = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetState(-1, $globalStyle)
-$inpABIs = _makeField($strABIs, False, 0)
+$inpABIs = _makeField($strABIs, False, $halfWidth)
 $inpTextures = _makeField($strTextures, False, $editWidth)
 
 $edtPermissions = _makeField($strPermission, True, 0)
@@ -420,7 +422,7 @@ Func MY_WM_PAINT($hWnd, $Msg, $wParam, $lParam)
 	_WinAPI_RedrawWindow($hGUI, 0, 0, $RDW_UPDATENOW)
 	$s = 48
 	$x = $rightColumnStart + $rightColumnWidth / 2 - $s / 2
-	$y = 7
+	$y = 4
 	If $defBkColor == 0 Then
 		$hDC = _WinAPI_GetDC($hGUI)
 		$defBkColor = _WinAPI_GetPixel($hDC, $x + $s / 2, $y + $s / 2)
@@ -535,9 +537,9 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($inpName, $fileAPK)
 	GUICtrlSetData($inpNewName, $sNewFilenameAPK)
 	GUICtrlSetData($edtLocales, $apk_Locales)
+	GUICtrlSetData($lblSupport, $strSupport & ': ' & $apk_Support)
 	GUICtrlSetData($lblOpenGL, $apk_OpenGLES)
-	GUICtrlSetData($lblDebug, $apk_Debug)
-	GUICtrlSetData($lblDevices, $apk_Devices)
+	GUICtrlSetData($lblDebug, $apk_Debuggable)
 
 	_drawPNG()
 	OnShow()
@@ -641,7 +643,7 @@ Func _getBadge($prmAPK)
 EndFunc   ;==>_getBadge
 
 Func _parseLines($prmArrayLines)
-	$apk_Debug = ''
+	$apk_Debuggable = ''
 	$apk_Label = ''
 	$apk_Labels = ''
 	$apk_PkgName = ''
@@ -658,7 +660,7 @@ Func _parseLines($prmArrayLines)
 	$apk_Locales = ''
 	$apk_OpenGLES = $strOpenGLES & '1.0'
 	$apk_Textures = ''
-	$apk_Devices = ''
+	$apk_Support = $strAndroid
 
 	$icons = ''
 	$icons2 = ''
@@ -671,7 +673,7 @@ Func _parseLines($prmArrayLines)
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 
 		If $line == 'application-debuggable' Then
-			$apk_Debug = $strDebug
+			$apk_Debuggable = $strDebuggable
 		EndIf
 
 		$arraySplit = _StringExplode($line, ":", 1)
@@ -682,9 +684,8 @@ Func _parseLines($prmArrayLines)
 			ContinueLoop
 		EndIf
 
-		If $key == 'leanback-launchable-activity' And Not StringInStr($apk_Devices, $strTV) Then
-			If $apk_Devices <> '' Then $apk_Devices &= ' '
-			$apk_Devices &= $strTV
+		If $key == 'leanback-launchable-activity' And Not StringInStr($apk_Support, $strTV) Then
+			$apk_Support &= ', ' & $strTV
 		EndIf
 
 		If StringInStr($key, 'application-icon-') Then
@@ -739,9 +740,8 @@ Func _parseLines($prmArrayLines)
 				$val = _StringBetween2($value, "'", "'")
 				$featuresUsed &= '+ ' & $val
 
-				If $val == 'android.hardware.type.watch' And Not StringInStr($apk_Devices, $strWatch) Then
-					If $apk_Devices <> '' Then $apk_Devices &= ' '
-					$apk_Devices &= $strWatch
+				If $val == 'android.hardware.type.watch' And Not StringInStr($apk_Support, $strWatch) Then
+					$apk_Support &= ', ' & $strWatch
 				EndIf
 
 			Case 'uses-feature-not-required'
@@ -814,9 +814,8 @@ Func _parseLines($prmArrayLines)
 				$apk_Textures &= $val
 
 			Case 'meta-data'
-				If _StringBetween2($value, "'", "'") == 'com.google.android.gms.car.application' And Not StringInStr($apk_Devices, $strAuto) Then
-					If $apk_Devices <> '' Then $apk_Devices &= ' '
-					$apk_Devices &= $strAuto
+				If _StringBetween2($value, "'", "'") == 'com.google.android.gms.car.application' And Not StringInStr($apk_Support, $strAuto) Then
+					$apk_Support &= ', ' & $strAuto
 				EndIf
 		EndSwitch
 	Next
