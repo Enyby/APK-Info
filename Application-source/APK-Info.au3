@@ -364,9 +364,9 @@ If $RestoreGUI <> '0' And $LastWidth And $LastHeight Then
 	Local $repos = True
 	If BitAND($RestoreGUI, 0x1) == 0 Then
 		$LastLeft = $minSize[0] - ($LastWidth - $minSize[2]) / 2
-		If $LastWidth <= $minSize[2] Then $repos = False
+		If $LastWidth < $minSize[2] Then $repos = False
 		$LastTop = $minSize[1] - ($LastHeight - $minSize[3]) / 2
-		If $LastHeight <= $minSize[3] Then $repos = False
+		If $LastHeight < $minSize[3] Then $repos = False
 	EndIf
 
 	Local $gap = 200
