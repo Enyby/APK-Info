@@ -361,19 +361,40 @@ GUIRegisterMsg($WM_GETMINMAXINFO, "MY_WM_GETMINMAXINFO")
 $minSize = WinGetPos($hGUI)
 
 If $RestoreGUI <> '0' And $LastWidth And $LastHeight Then
-	$repos = True
+	Local $repos = True
 	If BitAND($RestoreGUI, 0x1) == 0 Then
 		$LastLeft = $minSize[0] - ($LastWidth - $minSize[2]) / 2
 		If $LastWidth <= $minSize[2] Then $repos = False
 		$LastTop = $minSize[1] - ($LastHeight - $minSize[3]) / 2
 		If $LastHeight <= $minSize[3] Then $repos = False
 	EndIf
-	If $repos Then WinMove($hGUI, '', $LastLeft, $LastTop)
+
+	Local $gap = 200
+	Local $desktopWidth = _WinAPI_GetSystemMetrics(78) ; SM_CXVIRTUALSCREEN
+	Local $desktopHeight = _WinAPI_GetSystemMetrics(79) ; SM_CYVIRTUALSCREEN
+
+	If $repos Then
+		Local $min = -$minSize[2] + $gap
+		If $LastLeft < $min Then $LastLeft = $min
+		Local $max = $desktopWidth - $gap
+		If $LastLeft > $max Then $LastLeft = $max
+
+		Local $min = -$minSize[3] + $gap
+		If $LastTop < $min Then $LastTop = $min
+		Local $max = $desktopHeight - $gap
+		If $LastTop > $max Then $LastTop = $max
+
+		WinMove($hGUI, '', $LastLeft, $LastTop)
+	EndIf
 	GUISetState(@SW_SHOW, $hGUI)
 	If BitAND($RestoreGUI, 0x2) <> 0 Then
 		If $LastWidth == 1 Then
 			GUISetState(@SW_MAXIMIZE, $hGUI)
 		Else
+			Local $max = $desktopWidth + $gap
+			If $LastLeft > $max Then $LastLeft = $max
+			Local $max = $desktopHeight + $gap
+			If $LastTop > $max Then $LastTop = $max
 			WinMove($hGUI, '', Default, Default, $LastWidth, $LastHeight)
 		EndIf
 		_OnResize()
@@ -570,7 +591,7 @@ Func _saveGUIPos()
 	IniWrite($IniLast, "Settings", "LastTop", $pos[1])
 	IniWrite($IniLast, "Settings", "LastWidth", $pos[2])
 	IniWrite($IniLast, "Settings", "LastHeight", $pos[3])
-EndFunc
+EndFunc   ;==>_saveGUIPos
 
 Func _renameAPK($prmNewFilenameAPK)
 	$result = FileMove($dirAPK & "\" & $fileAPK, $dirAPK & "\" & $prmNewFilenameAPK)
