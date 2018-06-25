@@ -923,7 +923,11 @@ Func _parseLines($prmArrayLines)
 				$apk_Densities = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 			Case 'native-code'
-				$apk_ABIs = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+				For $abi in _StringExplode('armeabi,armeabi-v7a,arm64-v8a,x86,x86_64,mips,mips64', ',')
+					If Not StringInStr($value, "'" & $abi & "'") Then ContinueLoop
+					If $apk_ABIs <> '' Then $apk_ABIs &= ' '
+					$apk_ABIs &= $abi
+				Next
 
 			Case 'locales'
 				$apk_Locales = StringReplace(StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING + $STR_STRIPSPACES), ' ', @CRLF)
