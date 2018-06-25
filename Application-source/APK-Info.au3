@@ -43,28 +43,26 @@ Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 DirCreate($tempPath)
 Global $toolsDir = 'tools/'
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
-Global $IniProgramSettings, $IniLogReport, $IniLastFolderSettings
+Global $IniLogReport, $IniLast
 Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK, $tmpAPK
 Global $sNewFilenameAPK, $searchPngCache, $hashCache
 Global $progress = 0
 Global $progressMax = 1
 
-$IniProgramSettings = "APK-Info.ini"
-$IniLastFolderSettings = "APK-Info.LastFolder.ini"
-$IniLogReport = "APK-Info.log.txt"
+$Inidir = @ScriptDir & "\"
+
+$IniFile = $Inidir & "APK-Info.ini"
+$IniLast = $Inidir & "APK-Info.LastFolder.ini"
+$IniLogReport = $Inidir & "APK-Info.log.txt"
 
 ; $aCmdLine[0] = number of parametrs passed to exe file
 ; $aCmdLine[1] = first parameter (optional) passed to exe file (apk file name)
-
 
 ; https://www.autoitscript.com/autoit3/docs/intro/running.htm
 ; An alternative to the limitation of $CmdLine[] only being able to return a maximum of 63 parameters.
 Local $aCmdLine = _WinAPI_CommandLineToArgv($CmdLineRaw)
 ; Uncomment it to Show all cmdline parameters
 ;_ArrayDisplay($aCmdLine)
-
-$Inidir = @ScriptDir & "\"
-$IniFile = $Inidir & $IniProgramSettings
 
 ; more info on country code
 ; https://www.autoitscript.com/autoit3/docs/appendix/OSLangCodes.htm
@@ -86,13 +84,20 @@ $SignatureNames = IniRead($IniFile, "Settings", "SignatureNames", '')
 $AdbInit = IniRead($IniFile, "Settings", "AdbInit", '')
 $AdbKill = IniRead($IniFile, "Settings", "AdbKill", '0')
 
+$RestoreGUI = IniRead($IniFile, "Settings", "RestoreGUI", '0')
+
 $ShowLog = IniRead($IniFile, "Settings", "ShowLog", "0")
 $ShowLangCode = IniRead($IniFile, "Settings", "ShowLangCode", "1")
 ; $ShowCmdLine=Iniread($IniFile,"Settings","ShowCmdLine","1");
 Local $space = 'space'
 $FileNameSpace = IniRead($IniFile, "Settings", "FileNameSpace", $space)
 If $FileNameSpace == $space Then $FileNameSpace = ' '
-$Lastfolder = IniRead($Inidir & $IniLastFolderSettings, "Settings", "LastFolder", @WorkingDir)
+$LastFolder = IniRead($IniLast, "Settings", "LastFolder", @WorkingDir)
+
+Local $LastTop = IniRead($IniLast, "Settings", "LastTop", 0)
+Local $LastLeft = IniRead($IniLast, "Settings", "LastLeft", 0)
+Local $LastWidth = IniRead($IniLast, "Settings", "LastWidth", 0)
+Local $LastHeight = IniRead($IniLast, "Settings", "LastHeight", 0)
 
 Local $LangSection = "Strings-" & $Language_code
 
@@ -162,29 +167,29 @@ $ProgramTitle = "APK-Info " & $ProgramVersion & " (" & $ProgramReleaseDate & ")"
 ; $ProgramTitle=$ProgramTitle & "- OSLangCode = " & $OSLanguageCode & " - Lang = " & $Language_code
 ; Endif
 If $ShowLog = "1" Then
-	IniWrite($Inidir & $IniLogReport, "APK_Info Version", "Program version", $ProgramVersion)
-	IniWrite($Inidir & $IniLogReport, "APK_Info Version", "Program release date", $ProgramReleaseDate)
-	IniWrite($Inidir & $IniLogReport, "Language", "OSLanguage", @OSLang)
-	IniWrite($Inidir & $IniLogReport, "Language", "OSLanguage", @OSLang)
-	IniWrite($Inidir & $IniLogReport, "Language", "OSLanguage", @OSLang)
-	IniWrite($Inidir & $IniLogReport, "Language", "ForcedLanguage", $ForcedGUILanguage)
-	IniWrite($Inidir & $IniLogReport, "IniFile", "IniFileFolderPath", $Inidir)
-	IniWrite($Inidir & $IniLogReport, "IniFile", "IniFileProgramSettings", $IniProgramSettings)
-	IniWrite($Inidir & $IniLogReport, "IniFile", "IniFileGuiSettings", $IniProgramSettings)
+	IniWrite($IniLogReport, "APK_Info Version", "Program version", $ProgramVersion)
+	IniWrite($IniLogReport, "APK_Info Version", "Program release date", $ProgramReleaseDate)
+	IniWrite($IniLogReport, "Language", "OSLanguage", @OSLang)
+	IniWrite($IniLogReport, "Language", "OSLanguage", @OSLang)
+	IniWrite($IniLogReport, "Language", "OSLanguage", @OSLang)
+	IniWrite($IniLogReport, "Language", "ForcedLanguage", $ForcedGUILanguage)
+	IniWrite($IniLogReport, "IniFile", "IniFileFolderPath", $Inidir)
+	IniWrite($IniLogReport, "IniFile", "IniFile", $IniFile)
+	IniWrite($IniLogReport, "IniFile", "IniFile", $IniFile)
 	; Cleanup not defined variables
-	IniWrite($Inidir & $IniLogReport, "Icon", "TempFilePath", "")
-	IniWrite($Inidir & $IniLogReport, "Icon", "ApkIconeName", "")
-	IniWrite($Inidir & $IniLogReport, "NewFile", "NewFilenameAPK", "")
-	IniWrite($Inidir & $IniLogReport, "NewFile", "NewNameInput", "")
-	IniWrite($Inidir & $IniLogReport, "OpenNewFile", "LastFileName", "")
-	IniWrite($Inidir & $IniLogReport, "OpenNewFile", "TempFileName", "")
+	IniWrite($IniLogReport, "Icon", "TempFilePath", "")
+	IniWrite($IniLogReport, "Icon", "ApkIconeName", "")
+	IniWrite($IniLogReport, "NewFile", "NewFilenameAPK", "")
+	IniWrite($IniLogReport, "NewFile", "NewNameInput", "")
+	IniWrite($IniLogReport, "OpenNewFile", "LastFileName", "")
+	IniWrite($IniLogReport, "OpenNewFile", "TempFileName", "")
 EndIf
 If $aCmdLine[0] = 0 And $ShowLog = "1" Then
-	IniWrite($Inidir & $IniLogReport, "CommandLine", "Parameter1", $aCmdLine[0])
-	IniWrite($Inidir & $IniLogReport, "CommandLine", "Parameter2", "")
+	IniWrite($IniLogReport, "CommandLine", "Parameter1", $aCmdLine[0])
+	IniWrite($IniLogReport, "CommandLine", "Parameter2", "")
 	; Else
-	;	IniWrite($Inidir & $IniLogReport, "CommandLine", "Parameter1", $aCmdLine[0]);
-	;	IniWrite($Inidir & $IniLogReport, "CommandLine", "Parameter2", $aCmdLine[1]);
+	;	IniWrite($IniLogReport, "CommandLine", "Parameter1", $aCmdLine[0]);
+	;	IniWrite($IniLogReport, "CommandLine", "Parameter2", $aCmdLine[1]);
 EndIf
 
 $rightColumnWidth = 100
@@ -355,11 +360,30 @@ GUIRegisterMsg($WM_GETMINMAXINFO, "MY_WM_GETMINMAXINFO")
 
 $minSize = WinGetPos($hGUI)
 
-; resize here and redraw icon
-; MY_WM_PAINT(0, 0, 0, 0)
+If $RestoreGUI <> '0' And $LastWidth And $LastHeight Then
+	$repos = True
+	If BitAND($RestoreGUI, 0x1) == 0 Then
+		$LastLeft = $minSize[0] - ($LastWidth - $minSize[2]) / 2
+		If $LastWidth <= $minSize[2] Then $repos = False
+		$LastTop = $minSize[1] - ($LastHeight - $minSize[3]) / 2
+		If $LastHeight <= $minSize[3] Then $repos = False
+	EndIf
+	If $repos Then WinMove($hGUI, '', $LastLeft, $LastTop)
+	GUISetState(@SW_SHOW, $hGUI)
+	If BitAND($RestoreGUI, 0x2) <> 0 Then
+		If $LastWidth == 1 Then
+			GUISetState(@SW_MAXIMIZE, $hGUI)
+		Else
+			WinMove($hGUI, '', Default, Default, $LastWidth, $LastHeight)
+		EndIf
+		_OnResize()
+	EndIf
+Else
+	GUISetState(@SW_SHOW, $hGUI)
+EndIf
 
-GUISetState(@SW_SHOW, $hGUI)
 _OnShow()
+_saveGUIPos()
 
 While 1
 	$nMsg = GUIGetMsg()
@@ -390,8 +414,8 @@ While 1
 		Case $gBtn_Rename
 			$sNewNameInput = InputBox($strRenameAPK, $strNewName, $sNewFilenameAPK, "", 300, 130)
 			If $ShowLog = "1" Then
-				IniWrite($Inidir & $IniLogReport, "NewFile", "NewFilenameAPK", $sNewFilenameAPK)
-				IniWrite($Inidir & $IniLogReport, "NewFile", "NewNameInput", $sNewNameInput)
+				IniWrite($IniLogReport, "NewFile", "NewFilenameAPK", $sNewFilenameAPK)
+				IniWrite($IniLogReport, "NewFile", "NewNameInput", $sNewNameInput)
 			EndIf
 			If $sNewNameInput <> "" Then _renameAPK($sNewNameInput)
 
@@ -534,7 +558,19 @@ Func _OnResize()
 	_GDIPlus_GraphicsDispose($hGraphic)
 	$hGraphic = _GDIPlus_GraphicsCreateFromHWND($hGUI)
 	MY_WM_PAINT(0, 0, 0, 0)
+
+	_saveGUIPos()
 EndFunc   ;==>_OnResize
+
+Func _saveGUIPos()
+	If $RestoreGUI == '0' Then Return
+	$pos = WinGetPos($hGUI)
+	If BitAND(WinGetState($hGUI), $WIN_STATE_MAXIMIZED) <> 0 Then $pos[2] = 1
+	IniWrite($IniLast, "Settings", "LastLeft", $pos[0])
+	IniWrite($IniLast, "Settings", "LastTop", $pos[1])
+	IniWrite($IniLast, "Settings", "LastWidth", $pos[2])
+	IniWrite($IniLast, "Settings", "LastHeight", $pos[3])
+EndFunc
 
 Func _renameAPK($prmNewFilenameAPK)
 	$result = FileMove($dirAPK & "\" & $fileAPK, $dirAPK & "\" & $prmNewFilenameAPK)
@@ -562,10 +598,10 @@ Func _checkFileParameter($prmFilename)
 	If FileExists($prmFilename) Then
 		Return $prmFilename
 	Else
-		$f_Sel = FileOpenDialog($strSelectAPK, $Lastfolder, "(*.apk)", 1, "")
+		$f_Sel = FileOpenDialog($strSelectAPK, $LastFolder, "(*.apk)", 1, "")
 		If @error Then Exit
-		$Lastfolder = _SplitPath($f_Sel, True)
-		IniWrite($Inidir & $IniLastFolderSettings, "Settings", "Lastfolder", $Lastfolder)
+		$LastFolder = _SplitPath($f_Sel, True)
+		IniWrite($IniLast, "Settings", "LastFolder", $LastFolder)
 		;		IniWrite($IniFile, "Settings", "Lastfile", $f_sel);
 		Return $f_Sel
 	EndIf
@@ -1102,6 +1138,8 @@ Func _extractIcon()
 EndFunc   ;==>_extractIcon
 
 Func _cleanUp()
+	_saveGUIPos()
+
 	If $hImage_bg Then
 		_GDIPlus_ImageDispose($hImage_bg)
 	EndIf
@@ -1154,8 +1192,8 @@ Func _drawImg($path)
 	$hImage_original = _GDIPlus_ImageLoadFromFile($filename)
 	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $type = ' & VarGetType($hImage_original) & '; ' & $hImage_original & @CRLF & '>Error code: ' & @error & @CRLF)
 	If $ShowLog = "1" Then
-		IniWrite($Inidir & $IniLogReport, "Icon", "TempFilePath", $tempPath)
-		IniWrite($Inidir & $IniLogReport, "Icon", "ApkIconeName", $apk_IconName)
+		IniWrite($IniLogReport, "Icon", "TempFilePath", $tempPath)
+		IniWrite($IniLogReport, "Icon", "ApkIconeName", $apk_IconName)
 	EndIf
 	; resize always the bigger icon to 48x48 pixels
 	$hImage_ret = _GDIPlus_ImageResize($hImage_original, 48, 48)
