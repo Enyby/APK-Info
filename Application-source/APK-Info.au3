@@ -433,7 +433,10 @@ While 1
 			IniWrite($IniFile, "Settings", "CheckSignature", $CheckSignature)
 
 		Case $gBtn_Rename
-			$sNewNameInput = InputBox($strRenameAPK, $strNewName, $sNewFilenameAPK, "", 300, 130)
+			$pos = WinGetPos($hGUI)
+			$width = $minSize[2]
+			$height = 130
+			$sNewNameInput = InputBox($strRenameAPK, $strNewName, $sNewFilenameAPK, "", $width, $height, $pos[0] + ($pos[2] - $width)/2, $pos[1] + ($pos[3] - $height)/2, $hGUI)
 			If $ShowLog = "1" Then
 				IniWrite($IniLogReport, "NewFile", "NewFilenameAPK", $sNewFilenameAPK)
 				IniWrite($IniLogReport, "NewFile", "NewNameInput", $sNewNameInput)
@@ -1237,15 +1240,19 @@ Func _StringBetween2($text, $from, $to)
 EndFunc   ;==>_StringBetween2
 
 Func _showText($title, $message, $text)
-	$height = $fullHeight
-	$width = $fullWidth
-	$gui = GUICreate($title, $width, $height)
+	$pos = WinGetPos($hGUI)
+	$width = $pos[2]
+	$height = $pos[3]
+	$gui = GUICreate($title, $width, $height, $pos[0], $pos[1], BitOR($GUI_SS_DEFAULT_GUI, $WS_SIZEBOX, $WS_MAXIMIZEBOX))
 
 	$offset = 5
 	GUICtrlCreateLabel($message, 5, $offset, $width - 10, $inputHeight)
+	GUICtrlSetResizing(-1, $GUI_DOCKLEFT + $GUI_DOCKRIGHT + $GUI_DOCKHEIGHT + $GUI_DOCKTOP)
 	$offset += $inputHeight + 5
 	GUICtrlCreateEdit($text, 5, $offset, $width - 10, $height - 35 - $offset, BitOR($ES_READONLY, $ES_AUTOVSCROLL, $WS_VSCROLL, $ES_WANTRETURN))
+	GUICtrlSetResizing(-1, $GUI_DOCKBORDERS)
 	$btnClose = GUICtrlCreateButton($strClose, $width / 4, $height - 30, $width / 2)
+	GUICtrlSetResizing(-1, $GUI_DOCKHCENTER + $GUI_DOCKBOTTOM + $GUI_DOCKHEIGHT)
 
 	GUISetState(@SW_SHOW, $gui)
 	GUISetState(@SW_RESTORE, $gui)
@@ -1291,10 +1298,13 @@ Func _adbDevice($title)
 	$btnHeight = 40
 	$height = $top + $cnt * $btnHeight
 
-	$gui = GUICreate($title, $fullWidth, $height)
+	$pos = WinGetPos($hGUI)
+	$width = $minSize[2]
+
+	$gui = GUICreate($title, $width, $height, $pos[0] + ($pos[2] - $width)/2, $pos[1] + ($pos[3] - $height)/2)
 
 	For $line In $arrayLines
-		$btn = GUICtrlCreateButton(StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING), 10, $top, $fullWidth - 20)
+		$btn = GUICtrlCreateButton(StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING), 10, $top, $width - 20)
 		$top += $btnHeight
 	Next
 
