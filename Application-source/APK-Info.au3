@@ -213,8 +213,11 @@ $rightColumnStart = $inputStart + $inputWidth + 5
 Local $fields = 11
 If $ShowHash <> '' Then $fields += 1
 
+$edits = 3
+Global $edtLabels[$edits]
+
 $fullWidth = $rightColumnStart + $rightColumnWidth + 5
-$fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * 3
+$fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * $edits
 
 $localesWidth = 60
 $localesStart = $fullWidth
@@ -227,61 +230,75 @@ $btnStart = $fullWidth
 
 $fullWidth += $btnIconSize + 5
 
-$hGUI = GUICreate($ProgramTitle, $fullWidth, $fullHeight, -1, -1, -1, $WS_EX_ACCEPTFILES)
+$hGUI = GUICreate($ProgramTitle, $fullWidth, $fullHeight, -1, -1, BitOR($GUI_SS_DEFAULT_GUI, $WS_SIZEBOX, $WS_MAXIMIZEBOX), $WS_EX_ACCEPTFILES)
 
 GUICtrlCreateLabel("", 0, 0, $fullWidth, $fullHeight, $WS_CLIPSIBLINGS) ; for accept drag & drop
+GUICtrlSetResizing(-1, $GUI_DOCKBORDERS)
 GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 ;GUICtrlSetBkColor(-1, $COLOR_RED)
 
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
 
+$iconSize = 48
+Local $placeHeight = 5 + $fieldHeight * 2
+$lblIcon = GUICtrlCreateLabel('', $rightColumnStart + ($rightColumnWidth - $iconSize) / 2, ($placeHeight - $iconSize) / 2, $iconSize, $iconSize)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
+
 GUICtrlCreateLabel($strLocales & ':', $localesStart, $offsetHeight, $localesWidth, $inputHeight)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
 Local $top = $offsetHeight + $inputHeight
 $edtLocales = GUICtrlCreateEdit('', $localesStart, $top, $localesWidth, $fullHeight - 5 - $top, $editFlags + $ES_NOHIDESEL)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKBOTTOM + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strLocales)
 
 $btnLabels = GUICtrlCreateButton('...', $rightColumnStart - 5, $offsetHeight, $inputHeight, $inputHeight)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
-$inpLabel = _makeField($strLabel, False, 0)
+$inpLabel = _makeField($strLabel, 0, 0)
 Local $buildWidth = 65
 $inpBuild = GUICtrlCreateInput('', $inputStart + $inputWidth - $buildWidth, $offsetHeight, $buildWidth, $inputHeight, $inputFlags)
+GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strBuild)
-$inpVersion = _makeField($strVersion & ' / ' & $strBuild, False, $inputWidth - 5 - $buildWidth)
-$inpPkg = _makeField($strPkg, False, 0)
+$inpVersion = _makeField($strVersion & ' / ' & $strBuild, 0, $inputWidth - 5 - $buildWidth)
+$inpPkg = _makeField($strPkg, 0, 0)
 
 _makeLangLabel($strWinCode & ': ' & $OSLanguageCode)
 $inpMaxSDK = GUICtrlCreateInput('', $inputStart + $inputWidth - $halfWidth, $offsetHeight, $halfWidth, $inputHeight, $inputFlags)
+GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strMaxSDK)
-$inpMinSDK = _makeField($strMinMaxSDK, False, $inputWidth - 5 - $halfWidth)
+$inpMinSDK = _makeField($strMinMaxSDK, 0, $inputWidth - 5 - $halfWidth)
 
 _makeLangLabel($strLanguage & ': ' & $Language_code)
 $inpCompileSDK = GUICtrlCreateInput('', $inputStart + $inputWidth - $halfWidth, $offsetHeight, $halfWidth, $inputHeight, $inputFlags)
+GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strCompileSDK)
-$inpTargetSDK = _makeField($strTargetCompileSDK, False, $inputWidth - 5 - $halfWidth)
+$inpTargetSDK = _makeField($strTargetCompileSDK, 0, $inputWidth - 5 - $halfWidth)
 
-$lblDevices = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
-GUICtrlSetState(-1, $globalStyle)
-$inpScreens = _makeField($strScreens, False, 0)
+$inpScreens = _makeField($strScreens, 0, 0)
 $lblDebug = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
-$inpDensities = _makeField($strResolution, False, 0)
+$inpDensities = _makeField($strResolution, 0, 0)
 $lblSupport = GUICtrlCreateLabel('', $inputStart + $inputWidth - $halfWidth, $offsetHeight + $labelTop, $halfWidth, $inputHeight)
+GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
 $lblOpenGL = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
-$inpABIs = _makeField($strABIs, False, $halfWidth)
-$inpTextures = _makeField($strTextures, False, $editWidth)
+$inpABIs = _makeField($strABIs, 0, $halfWidth)
+$inpTextures = _makeField($strTextures, 0, $editWidth)
 
-$edtPermissions = _makeField($strPermission, True, 0)
-$edtFeatures = _makeField($strFeature & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired, True, 0)
+$edtPermissions = _makeField($strPermission, 1, 0)
+$edtFeatures = _makeField($strFeature & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired, 2, 0)
 
 $chSignature = GUICtrlCreateCheckbox($strSignature, $labelStart, $offsetHeight + $labelTop, $labelWidth, $inputHeight)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT)
 Local $tmpStyle = $globalStyle
 If $CheckSignature == 1 Then
 	$tmpStyle = $tmpStyle + $GUI_CHECKED
@@ -291,15 +308,16 @@ EndIf
 GUICtrlSetState(-1, $tmpStyle)
 
 $lblSignature = GUICtrlCreateLabel('', $labelStart, $offsetHeight + $labelTop + $fieldHeight, $labelWidth, $editHeight - $fieldHeight)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT)
 GUICtrlSetState(-1, $globalStyle)
 
-$edtSignature = _makeField(False, True, 0)
+$edtSignature = _makeField(False, 3, 0)
 
 $inpHash = False
-If $ShowHash <> '' Then $inpHash = _makeField($strHash, False, $editWidth)
+If $ShowHash <> '' Then $inpHash = _makeField($strHash, 0, $editWidth, $GUI_DOCKBOTTOM)
 
-$inpName = _makeField($strFilename, False, $editWidth)
-$inpNewName = _makeField($strNewFilename, False, $editWidth)
+$inpName = _makeField($strFilename, 0, $editWidth, $GUI_DOCKBOTTOM)
+$inpNewName = _makeField($strNewFilename, 0, $editWidth, $GUI_DOCKBOTTOM)
 
 $offsetHeight = 5
 
@@ -333,9 +351,15 @@ EndIf
 _OpenNewFile($tmp_Filename)
 
 GUIRegisterMsg($WM_PAINT, "MY_WM_PAINT")
+GUIRegisterMsg($WM_GETMINMAXINFO, "MY_WM_GETMINMAXINFO")
+
+$minSize = WinGetPos($hGUI)
+
+; resize here and redraw icon
+; MY_WM_PAINT(0, 0, 0, 0)
 
 GUISetState(@SW_SHOW, $hGUI)
-OnShow()
+_OnShow()
 
 While 1
 	$nMsg = GUIGetMsg()
@@ -377,6 +401,9 @@ While 1
 		Case $gBtn_Exit, $GUI_EVENT_CLOSE
 			_cleanUp()
 			Exit
+
+		Case $GUI_EVENT_RESIZED, $GUI_EVENT_RESTORE, $GUI_EVENT_MAXIMIZE
+			_OnResize()
 	EndSwitch
 WEnd
 
@@ -385,11 +412,13 @@ WEnd
 Func _makeLangLabel($label)
 	If $ShowLangCode <> "1" Then Return
 	GUICtrlCreateLabel($label, $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
+	GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 	GUICtrlSetState(-1, $globalStyle)
 EndFunc   ;==>_makeLangLabel
 
 Func _makeButton($label, $icon)
 	$ret = GUICtrlCreateButton('', $btnStart, $offsetHeight, $btnIconSize, $btnIconSize, $BS_BITMAP)
+	GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 	GUICtrlSetTip(-1, $label)
 	_GUICtrlButton_SetImage($ret, @ScriptDir & '\icons\' & $icon)
 	GUICtrlSetState(-1, $globalStyle)
@@ -397,20 +426,25 @@ Func _makeButton($label, $icon)
 	Return $ret
 EndFunc   ;==>_makeButton
 
-Func _makeField($label, $isEdit, $width)
+Func _makeField($label, $edtNum, $width, $dock = $GUI_DOCKTOP)
 	If $width == 0 Then $width = $inputWidth
 	$labelHeight = $inputHeight
-	If $isEdit Then $labelHeight = $editHeight
+	If $edtNum Then $labelHeight = $editHeight
 	If $label Then
-		GUICtrlCreateLabel($label, $labelStart, $offsetHeight + $labelTop, $labelWidth, $labelHeight)
+		$label = GUICtrlCreateLabel($label, $labelStart, $offsetHeight + $labelTop, $labelWidth, $labelHeight)
 		GUICtrlSetState(-1, $globalStyle)
 	EndIf
-	If $isEdit Then
+	If $edtNum Then
+		$edtLabels[$edtNum - 1] = $label
+		GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKLEFT)
 		$ret = GUICtrlCreateEdit('', $inputStart, $offsetHeight, $editWidth, $editHeight, $editFlags)
+		GUICtrlSetResizing(-1, $GUI_DOCKLEFT + $GUI_DOCKRIGHT)
 		GUICtrlSetState(-1, $globalInputStyle)
 		$offsetHeight += $bigFieldHeight
 	Else
+		GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT + $dock)
 		$ret = GUICtrlCreateInput('', $inputStart, $offsetHeight, $width, $inputHeight, $inputFlags)
+		GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKLEFT + $GUI_DOCKRIGHT + $dock)
 		GUICtrlSetState(-1, $globalInputStyle)
 		$offsetHeight += $fieldHeight
 	EndIf
@@ -420,26 +454,87 @@ EndFunc   ;==>_makeField
 ; Draw PNG image
 Func MY_WM_PAINT($hWnd, $Msg, $wParam, $lParam)
 	_WinAPI_RedrawWindow($hGUI, 0, 0, $RDW_UPDATENOW)
-	$s = 48
-	$x = $rightColumnStart + $rightColumnWidth / 2 - $s / 2
-	$y = 4
+	$pos = ControlGetPos(GUICtrlGetHandle($lblIcon), "", 0)
 	If $defBkColor == 0 Then
 		$hDC = _WinAPI_GetDC($hGUI)
-		$defBkColor = _WinAPI_GetPixel($hDC, $x + $s / 2, $y + $s / 2)
+		$defBkColor = _WinAPI_GetPixel($hDC, $pos[0] + $pos[2] / 2, $pos[1] + $pos[3] / 2)
 		_WinAPI_ReleaseDC($hGUI, $hDC)
 		;$defBkColor = $COLOR_RED
 		$defBkColor = BitOR($defBkColor, 0xFF000000)
 	EndIf
 	$hBrush = _GDIPlus_BrushCreateSolid($defBkColor)
-	_GDIPlus_GraphicsFillRect($hGraphic, $x, $y, $s, $s, $hBrush)
+	_GDIPlus_GraphicsFillRect($hGraphic, $pos[0], $pos[1], $pos[2], $pos[3], $hBrush)
 	_GDIPlus_BrushDispose($hBrush)
 	If $hImage_bg Then
-		_GDIPlus_GraphicsDrawImage($hGraphic, $hImage_bg, $x, $y)
+		_GDIPlus_GraphicsDrawImage($hGraphic, $hImage_bg, $pos[0], $pos[1])
 	EndIf
-	_GDIPlus_GraphicsDrawImage($hGraphic, $hImage, $x, $y)
+	_GDIPlus_GraphicsDrawImage($hGraphic, $hImage, $pos[0], $pos[1])
 	_WinAPI_RedrawWindow($hGUI, 0, 0, $RDW_VALIDATE)
 	Return $GUI_RUNDEFMSG
 EndFunc   ;==>MY_WM_PAINT
+
+#cs
+	typedef struct {
+	POINT ptReserved;
+	POINT ptMaxSize;
+	POINT ptMaxPosition;
+	POINT ptMinTrackSize;
+	POINT ptMaxTrackSize;
+	} MINMAXINFO;
+#ce
+
+Func MY_WM_GETMINMAXINFO($hWnd, $Msg, $wParam, $lParam)
+	$minmaxinfo = DllStructCreate("int;int;int;int;int;int;int;int;int;int", $lParam)
+	DllStructSetData($minmaxinfo, 7, $minSize[2]) ; min X
+	DllStructSetData($minmaxinfo, 8, $minSize[3]) ; min Y
+	Return 0
+EndFunc   ;==>MY_WM_GETMINMAXINFO
+
+Func _OnResize()
+	; move halfs
+	$full = ControlGetPos(GUICtrlGetHandle($inpPkg), "", 0)
+	$half = ($full[2] - 5) / 2
+	$halfStart = $inputStart + $half + 5
+
+	GUICtrlSetPos($inpMinSDK, Default, Default, $half, Default)
+	GUICtrlSetPos($inpMaxSDK, $halfStart, Default, $half, Default)
+
+	GUICtrlSetPos($inpTargetSDK, Default, Default, $half, Default)
+	GUICtrlSetPos($inpCompileSDK, $halfStart, Default, $half, Default)
+
+	GUICtrlSetPos($inpABIs, Default, Default, $half, Default)
+	GUICtrlSetPos($lblSupport, $halfStart, Default, $half, Default)
+
+	; move edits
+	$start = ControlGetPos(GUICtrlGetHandle($inpTextures), "", 0)
+	If $inpHash Then
+		$end = $inpHash
+	Else
+		$end = $inpName
+	EndIf
+	$end = ControlGetPos(GUICtrlGetHandle($end), "", 0)
+	$height = ($end[1] - $start[1] - $fieldHeight) / $edits
+	$gap = $bigFieldHeight - $editHeight
+
+	$offsetHeight = $start[1] + $fieldHeight
+
+	GUICtrlSetPos($edtPermissions, Default, $offsetHeight, Default, $height - $gap)
+	GUICtrlSetPos($edtLabels[0], Default, $offsetHeight + $labelTop)
+	$offsetHeight += $height
+
+	GUICtrlSetPos($edtFeatures, Default, $offsetHeight, Default, $height - $gap)
+	GUICtrlSetPos($edtLabels[1], Default, $offsetHeight + $labelTop)
+	$offsetHeight += $height
+
+	GUICtrlSetPos($edtSignature, Default, $offsetHeight, Default, $height - $gap)
+	GUICtrlSetPos($chSignature, Default, $offsetHeight + $labelTop)
+	GUICtrlSetPos($lblSignature, Default, $offsetHeight + $labelTop + $fieldHeight)
+	$offsetHeight += $height
+
+	_GDIPlus_GraphicsDispose($hGraphic)
+	$hGraphic = _GDIPlus_GraphicsCreateFromHWND($hGUI)
+	MY_WM_PAINT(0, 0, 0, 0)
+EndFunc   ;==>_OnResize
 
 Func _renameAPK($prmNewFilenameAPK)
 	$result = FileMove($dirAPK & "\" & $fileAPK, $dirAPK & "\" & $prmNewFilenameAPK)
@@ -542,7 +637,7 @@ Func _OpenNewFile($apk)
 	GUICtrlSetData($lblDebug, $apk_Debuggable)
 
 	_drawPNG()
-	OnShow()
+	_OnShow()
 
 	ProgressOff()
 	If $tmpAPK <> False Then FileDelete($tmpAPK)
@@ -550,13 +645,13 @@ Func _OpenNewFile($apk)
 	$hashCache = False
 EndFunc   ;==>_OpenNewFile
 
-Func OnShow()
+Func _OnShow()
 	$pos = StringInStr($apk_Locales & @CRLF, @CRLF & $Language_code & @CRLF)
 	If $pos Then
 		_GUICtrlEdit_SetSel($edtLocales, $pos, $pos + StringLen($Language_code) + 1)
 		_GUICtrlEdit_Scroll($edtLocales, $SB_SCROLLCARET)
 	EndIf
-EndFunc
+EndFunc   ;==>_OnShow
 
 Func _ReplacePlaceholders($pattern)
 	$out = $pattern
