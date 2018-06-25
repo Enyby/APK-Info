@@ -1,3 +1,14 @@
+*** APK-Info 1.24 (25.06.2018)
+
+- Fix Android names. Thanks to @Displax
+- Remove duplicate signature name. Thanks to @tilks
+- Select current locale in the list and scroll to it.
+- Improved GUI.
+- Updated translations. Thanks to @bovirus
+- Improved changelog. Thanks to @Displax
+- Allow resize GUI.
+- Add option RestoreGUI.
+
 *** APK-Info 1.23 (24.06.2018)
 
 - Improved GUI.
