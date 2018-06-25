@@ -201,11 +201,13 @@ $labelStart = 5
 $labelWidth = 126
 $labelTop = 3
 
-Local $halfWidth = 220
 $inputStart = $labelStart + $labelWidth + 5
 $inputWidth = 445
 $inputHeight = 20
 $inputFlags = BitOR($GUI_SS_DEFAULT_INPUT, $ES_READONLY)
+$abiRatio = 1.25
+Local $halfWidth = ($inputWidth - 5) / 2
+Local $abiWidth = $halfWidth * $abiRatio
 
 $editWidth = $inputWidth + 5 + $rightColumnWidth
 $editHeight = 85
@@ -285,18 +287,18 @@ GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strCompileSDK)
 $inpTargetSDK = _makeField($strTargetCompileSDK, 0, $inputWidth - 5 - $halfWidth)
 
-$inpScreens = _makeField($strScreens, 0, 0)
 $lblDebug = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
-$inpDensities = _makeField($strResolution, 0, 0)
-$lblSupport = GUICtrlCreateLabel('', $inputStart + $inputWidth - $halfWidth, $offsetHeight + $labelTop, $halfWidth, $inputHeight)
-GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
-GUICtrlSetState(-1, $globalStyle)
+$inpScreens = _makeField($strScreens, 0, 0)
 $lblOpenGL = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
-$inpABIs = _makeField($strABIs, 0, $halfWidth)
+$inpDensities = _makeField($strResolution, 0, 0)
+$lblSupport = GUICtrlCreateLabel('', $inputStart + $abiWidth + 5, $offsetHeight + $labelTop, $inputWidth - $abiWidth - 5 + 5 + $rightColumnWidth, $inputHeight)
+GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
+GUICtrlSetState(-1, $globalStyle)
+$inpABIs = _makeField($strABIs, 0, $abiWidth)
 $inpTextures = _makeField($strTextures, 0, $editWidth)
 
 $edtPermissions = _makeField($strPermission, 1, 0)
@@ -550,8 +552,9 @@ Func _OnResize()
 	GUICtrlSetPos($inpTargetSDK, Default, Default, $half, Default)
 	GUICtrlSetPos($inpCompileSDK, $halfStart, Default, $half, Default)
 
+	$half *= $abiRatio
 	GUICtrlSetPos($inpABIs, Default, Default, $half, Default)
-	GUICtrlSetPos($lblSupport, $halfStart, Default, $half, Default)
+	GUICtrlSetPos($lblSupport, $inputStart + $half + 5, Default, $full[2] - $half - 5 + 5 + $rightColumnWidth, Default)
 
 	; move edits
 	$start = ControlGetPos(GUICtrlGetHandle($inpTextures), "", 0)
