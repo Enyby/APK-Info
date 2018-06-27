@@ -763,7 +763,7 @@ Func _getSignature($prmAPK)
 			$output &= BinaryToString($bin, $SB_UTF8)
 		WEnd
 	EndIf
-	$apk_Signature = $output
+	$apk_Signature = StringStripWS($output, $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 	_getSignatureName()
 EndFunc   ;==>_getSignature
