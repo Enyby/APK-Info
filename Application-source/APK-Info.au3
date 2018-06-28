@@ -247,8 +247,8 @@ GUICtrlSetState(-1, $GUI_DROPACCEPTED)
 $globalStyle = $GUI_DROPACCEPTED + $GUI_ONTOP
 $globalInputStyle = $GUI_ONTOP
 
-$iconSize = 48
-Local $placeHeight = 5 + $fieldHeight * 2
+$iconSize = 72
+Local $placeHeight = 5 + $fieldHeight * 3
 $lblIcon = GUICtrlCreateLabel('', $rightColumnStart + ($rightColumnWidth - $iconSize) / 2, ($placeHeight - $iconSize) / 2, $iconSize, $iconSize)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 
@@ -1232,7 +1232,7 @@ Func _drawImg($path)
 		IniWrite($IniLogReport, "Icon", "ApkIconeName", $apk_IconName)
 	EndIf
 	; resize always the bigger icon to 48x48 pixels
-	$hImage_ret = _GDIPlus_ImageResize($hImage_original, 48, 48)
+	$hImage_ret = _GDIPlus_ImageResize($hImage_original, $iconSize, $iconSize)
 	_GDIPlus_ImageDispose($hImage_original)
 	FileDelete($filename) ; no need - try delete
 	$type = VarGetType($hImage_ret)
