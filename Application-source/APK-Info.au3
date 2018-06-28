@@ -723,6 +723,11 @@ Func _ReplacePlaceholders($pattern)
 	$out = StringReplace($out, '%build%', StringReplace($apk_Build, " ", $FileNameSpace))
 	$out = StringReplace($out, '%package%', StringReplace($apk_PkgName, " ", $FileNameSpace))
 
+	$out = StringReplace($out, '%min%', $apk_MinSDK)
+	$out = StringReplace($out, '%max%', $apk_MaxSDK)
+	$out = StringReplace($out, '%target%', $apk_TargetSDK)
+	$out = StringReplace($out, '%compile%', $apk_CompileSDK)
+
 	$out = StringReplace($out, '%screens%', StringReplace($apk_Screens, " ", ','))
 	$out = StringReplace($out, '%dpis%', StringReplace($apk_Densities, " ", ','))
 	$out = StringReplace($out, '%abis%', StringReplace($apk_ABIs, " ", ','))
