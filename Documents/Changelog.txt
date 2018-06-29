@@ -8,9 +8,9 @@
 - Add placeholders for rename.
 - Increased APK icon size.
 - Improved quality of APK icon in some cases.
-- Add VirusToatal button and OldVirusTotal option.
+- Add VirusTotal button and OldVirusTotal option.
 - Improved placeholders for CustomStore.
-- Updated adb binaries.
+- Updated ADB binaries.
 
 *** APK-Info 1.24 (25.06.2018)
 
