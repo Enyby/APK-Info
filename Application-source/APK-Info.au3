@@ -420,6 +420,8 @@ EndIf
 _OnShow()
 _saveGUIPos()
 
+Local $whGap = '            '
+
 While 1
 	$nMsg = GUIGetMsg()
 	Switch $nMsg
@@ -487,10 +489,10 @@ While 1
 			_showText($strLabel & ': ' & $fileAPK, $strPermissions, $apk_Permissions)
 
 		Case $edtInfo[1][$INFO_BTN]
-			_showText($strLabel & ': ' & $fileAPK, $strFeatures, $apk_Features)
+			_showText($strLabel & ': ' & $fileAPK, $strFeatures & $whGap & "+ = " & $strUses & $whGap & "# = " & $strImplied & $whGap & "- = " & $strNotRequired, $apk_Features)
 
 		Case $edtInfo[2][$INFO_BTN]
-			_showText($strLabel & ': ' & $fileAPK, $strSignature, $apk_Signature)
+			_showText($strLabel & ': ' & $fileAPK, $strSignature & $whGap & StringReplace($apk_SignatureName, @CRLF, $whGap), $apk_Signature)
 	EndSwitch
 WEnd
 
