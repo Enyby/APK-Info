@@ -1350,7 +1350,7 @@ Func _showText($title, $message, $text)
 	$selAll = _initSelAll($gui)
 
 	GUISetState(@SW_SHOW, $gui)
-	GUISetState(@SW_RESTORE, $gui)
+	GUISetState(@SW_SHOWNORMAL, $gui)
 	GUISetState(@SW_HIDE, $hGUI)
 
 	GUICtrlSetState($edit, $GUI_FOCUS)
@@ -1365,7 +1365,7 @@ Func _showText($title, $message, $text)
 		EndSwitch
 	WEnd
 	GUISetState(@SW_SHOW, $hGUI)
-	GUISetState(@SW_RESTORE, $hGUI)
+	GUISetState(@SW_SHOWNORMAL, $hGUI)
 	GUISetState(@SW_HIDE, $gui)
 	GUIDelete($gui)
 
@@ -1415,7 +1415,7 @@ Func _adbDevice($title)
 	$device = ''
 
 	GUISetState(@SW_SHOW, $gui)
-	GUISetState(@SW_RESTORE, $gui)
+	GUISetState(@SW_SHOWNORMAL, $gui)
 	GUISetState(@SW_HIDE, $hGUI)
 
 	While 1
@@ -1430,7 +1430,7 @@ Func _adbDevice($title)
 		EndIf
 	WEnd
 	GUISetState(@SW_SHOW, $hGUI)
-	GUISetState(@SW_RESTORE, $hGUI)
+	GUISetState(@SW_SHOWNORMAL, $hGUI)
 	GUISetState(@SW_HIDE, $gui)
 	GUIDelete($gui)
 
