@@ -224,8 +224,11 @@ $rightColumnStart = $inputStart + $inputWidth + 5
 Local $fields = 11
 If $ShowHash <> '' Then $fields += 1
 
+$INFO_LBL = 0
+$INFO_BTN = 1
+
 $edits = 3
-Global $edtLabels[$edits]
+Global $edtInfo[$edits][2]
 
 $fullWidth = $rightColumnStart + $rightColumnWidth + 5
 $fullHeight = $offsetHeight + $fieldHeight * $fields + $bigFieldHeight * $edits
@@ -307,7 +310,7 @@ $inpABIs = _makeField($strABIs, 0, $abiWidth)
 $inpTextures = _makeField($strTextures, 0, $editWidth)
 
 $edtPermissions = _makeField($strPermissions, 1, 0)
-$edtFeatures = _makeField($strFeatures & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired, 2, 0)
+$edtFeatures = _makeField($strFeatures & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired, 2, 0, 0, $strFeatures)
 
 $chSignature = GUICtrlCreateCheckbox($strSignature, $labelStart, $offsetHeight + $labelTop, $labelWidth, $inputHeight)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT)
@@ -322,8 +325,9 @@ GUICtrlSetState(-1, $tmpStyle)
 $lblSignature = GUICtrlCreateLabel('', $labelStart, $offsetHeight + $labelTop + $fieldHeight, $labelWidth, $editHeight - $fieldHeight)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT)
 GUICtrlSetState(-1, $globalStyle)
+GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 
-$edtSignature = _makeField(False, 3, 0)
+$edtSignature = _makeField(False, 3, 0, 0, $strSignature)
 
 $inpHash = False
 If $ShowHash <> '' Then $inpHash = _makeField($strHash, 0, $editWidth, $GUI_DOCKBOTTOM)
@@ -478,6 +482,15 @@ While 1
 
 		Case $GUI_EVENT_RESIZED, $GUI_EVENT_RESTORE, $GUI_EVENT_MAXIMIZE
 			_OnResize()
+
+		Case $edtInfo[0][$INFO_BTN]
+			_showText($strLabel & ': ' & $fileAPK, $strPermissions, $apk_Permissions)
+
+		Case $edtInfo[1][$INFO_BTN]
+			_showText($strLabel & ': ' & $fileAPK, $strFeatures, $apk_Features)
+
+		Case $edtInfo[2][$INFO_BTN]
+			_showText($strLabel & ': ' & $fileAPK, $strSignature, $apk_Signature)
 	EndSwitch
 WEnd
 
@@ -520,17 +533,28 @@ Func _makeButton($label, $icon)
 	Return $ret
 EndFunc   ;==>_makeButton
 
-Func _makeField($label, $edtNum, $width, $dock = $GUI_DOCKTOP)
+Func _makeField($label, $edtNum, $width, $dock = $GUI_DOCKTOP, $btnTip = False)
+	If Not $btnTip Then $btnTip = $label
 	If $width == 0 Then $width = $inputWidth
 	$labelHeight = $inputHeight
 	If $edtNum Then $labelHeight = $editHeight
 	If $label Then
 		$label = GUICtrlCreateLabel($label, $labelStart, $offsetHeight + $labelTop, $labelWidth, $labelHeight)
 		GUICtrlSetState(-1, $globalStyle)
+		GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 	EndIf
 	If $edtNum Then
-		$edtLabels[$edtNum - 1] = $label
+		$num = $edtNum - 1
+
 		GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKLEFT)
+		$edtInfo[$num][$INFO_LBL] = $label
+
+		$btn = GUICtrlCreateButton('...', $inputStart - $inputHeight, $offsetHeight + $editHeight - $inputHeight, $inputHeight, $inputHeight)
+		GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT)
+		GUICtrlSetState(-1, $globalStyle)
+		GUICtrlSetTip(-1, $btnTip)
+		$edtInfo[$num][$INFO_BTN] = $btn
+
 		$ret = GUICtrlCreateEdit('', $inputStart, $offsetHeight, $editWidth, $editHeight, $editFlags)
 		GUICtrlSetResizing(-1, $GUI_DOCKLEFT + $GUI_DOCKRIGHT)
 		GUICtrlSetState(-1, $globalInputStyle)
@@ -610,20 +634,24 @@ Func _OnResize()
 	$end = ControlGetPos(GUICtrlGetHandle($end), "", 0)
 	$height = ($end[1] - $start[1] - $fieldHeight) / $edits
 	$gap = $bigFieldHeight - $editHeight
+	$edH = $height - $gap
 
 	$offsetHeight = $start[1] + $fieldHeight
 
-	GUICtrlSetPos($edtPermissions, Default, $offsetHeight, Default, $height - $gap)
-	GUICtrlSetPos($edtLabels[0], Default, $offsetHeight + $labelTop)
+	GUICtrlSetPos($edtPermissions, Default, $offsetHeight, Default, $edH)
+	GUICtrlSetPos($edtInfo[0][$INFO_LBL], Default, $offsetHeight + $labelTop)
+	GUICtrlSetPos($edtInfo[0][$INFO_BTN], Default, $offsetHeight + $edH - $inputHeight)
 	$offsetHeight += $height
 
-	GUICtrlSetPos($edtFeatures, Default, $offsetHeight, Default, $height - $gap)
-	GUICtrlSetPos($edtLabels[1], Default, $offsetHeight + $labelTop)
+	GUICtrlSetPos($edtFeatures, Default, $offsetHeight, Default, $edH)
+	GUICtrlSetPos($edtInfo[1][$INFO_LBL], Default, $offsetHeight + $labelTop)
+	GUICtrlSetPos($edtInfo[1][$INFO_BTN], Default, $offsetHeight + $edH - $inputHeight)
 	$offsetHeight += $height
 
-	GUICtrlSetPos($edtSignature, Default, $offsetHeight, Default, $height - $gap)
+	GUICtrlSetPos($edtSignature, Default, $offsetHeight, Default, $edH)
 	GUICtrlSetPos($chSignature, Default, $offsetHeight + $labelTop)
 	GUICtrlSetPos($lblSignature, Default, $offsetHeight + $labelTop + $fieldHeight)
+	GUICtrlSetPos($edtInfo[2][$INFO_BTN], Default, $offsetHeight + $edH - $inputHeight)
 	$offsetHeight += $height
 
 	_GDIPlus_GraphicsDispose($hGraphic)
