@@ -1340,7 +1340,7 @@ Func _showText($title, $message, $text)
 	GUICtrlCreateLabel($message, 5, $offset, $width - 10, $inputHeight)
 	GUICtrlSetResizing(-1, $GUI_DOCKLEFT + $GUI_DOCKRIGHT + $GUI_DOCKHEIGHT + $GUI_DOCKTOP)
 	$offset += $inputHeight + 5
-	GUICtrlCreateEdit($text, 5, $offset, $width - 10, $height - 35 - $offset, BitOR($ES_READONLY, $ES_AUTOVSCROLL, $WS_VSCROLL, $ES_WANTRETURN))
+	$edit = GUICtrlCreateEdit($text, 5, $offset, $width - 10, $height - 35 - $offset, BitOR($ES_READONLY, $ES_AUTOVSCROLL, $WS_VSCROLL, $ES_WANTRETURN))
 	GUICtrlSetResizing(-1, $GUI_DOCKBORDERS)
 	$btnClose = GUICtrlCreateButton($strClose, $width / 4, $height - 30, $width / 2)
 	GUICtrlSetResizing(-1, $GUI_DOCKHCENTER + $GUI_DOCKBOTTOM + $GUI_DOCKHEIGHT)
@@ -1350,6 +1350,8 @@ Func _showText($title, $message, $text)
 	GUISetState(@SW_SHOW, $gui)
 	GUISetState(@SW_RESTORE, $gui)
 	GUISetState(@SW_HIDE, $hGUI)
+
+	GUICtrlSetState($edit, $GUI_FOCUS)
 
 	While 1
 		$Msg = GUIGetMsg()
