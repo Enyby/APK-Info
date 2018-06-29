@@ -1,3 +1,17 @@
+*** APK-Info 1.25 (29.06.2018)
+
+- Fix dialogs position and size.
+- Fix the main windows position bug.
+- Improved ABIs list.
+- Improved GUI layout.
+- Updated translations.
+- Add placeholders for rename.
+- Increased APK icon size.
+- Improved quality of APK icon in some cases.
+- Add VirusToatal button and OldVirusTotal option.
+- Improved placeholders for CustomStore.
+- Updated adb binaries.
+
 *** APK-Info 1.24 (25.06.2018)
 
 - Fix Android names. Thanks to @Displax
