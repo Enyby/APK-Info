@@ -847,6 +847,8 @@ Func _parseLines($prmArrayLines)
 	$apk_Textures = ''
 	$apk_Support = $strAndroid
 
+	$anyDensity = False
+
 	$icons = ''
 	$icons2 = ''
 	$banners = ''
@@ -949,8 +951,12 @@ Func _parseLines($prmArrayLines)
 			Case 'supports-screens'
 				$apk_Screens = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
+			Case 'supports-any-density'
+				If _StringBetween2($value, "'", "'") == 'true' Then $anyDensity = True
+
 			Case 'densities'
 				$apk_Densities = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+				If $anyDensity Then $apk_Densities = StringStripWS($apk_Densities & ' any', $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 			Case 'native-code'
 				For $abi in _StringExplode('armeabi,armeabi-v7a,arm64-v8a,x86,x86_64,mips,mips64', ',')
