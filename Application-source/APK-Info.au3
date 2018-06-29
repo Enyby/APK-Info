@@ -86,6 +86,8 @@ $AdbKill = IniRead($IniFile, "Settings", "AdbKill", '0')
 
 $RestoreGUI = IniRead($IniFile, "Settings", "RestoreGUI", '0')
 
+$OldVirusTotal = IniRead($IniFile, "Settings", "OldVirusTotal", '0')
+
 $ShowLog = IniRead($IniFile, "Settings", "ShowLog", "0")
 $ShowLangCode = IniRead($IniFile, "Settings", "ShowLangCode", "1")
 ; $ShowCmdLine=Iniread($IniFile,"Settings","ShowCmdLine","1");
@@ -151,6 +153,7 @@ $strTV = 'Android TV'
 $strWatch = 'Wear OS'
 $strAuto = 'Android Auto'
 $strAndroid = 'Android'
+$strVirusTotal = 'VirusTotal'
 
 $URLPlayStore = IniRead($IniFile, $LangSection, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
 
@@ -339,6 +342,7 @@ If $CustomStore <> '' Then
 		$CustomStore = ''
 	EndIf
 EndIf
+$gBtn_VirusTotal = _makeButton($strVirusTotal, "virustotal.bmp")
 $gBtn_Rename = _makeButton($strRename, "rename.bmp")
 $gBtn_Install = _makeButton($strInstall, "install.bmp")
 $gBtn_Uninstall = _makeButton($strUninstall, "delete.bmp")
@@ -416,8 +420,21 @@ While 1
 
 		Case $gBtn_CustomStore
 			If $CustomStore <> '' Then
-				ShellExecute(StringReplace(StringReplace(_StringExplode($CustomStore, '|', 2)[1], '%package%', $apk_PkgName), '%lang%', $Language_code))
+				ShellExecute(_ReplacePlaceholders(_StringExplode($CustomStore, '|', 2)[1]))
 			EndIf
+
+		Case $gBtn_VirusTotal
+			If $OldVirusTotal == '0' Then
+				$url = 'https://www.virustotal.com/#/file/%sha256%/detection'
+			Else
+				If StringInStr(',ca,da,de,en,es,fr,hr,it,hu,nl,nb,pt,pl,sk,uk,vi,tr,ru,sr,bg,he,ka,ar,fa,zh-CN,zh-TW,ja,ko,', ',' & $Language_code & ',') Then
+					$lang = $Language_code
+				Else
+					$lang = 'en'
+				EndIf
+				$url = 'https://www.virustotal.com/' & $lang & '/file/%sha256%/analysis/'
+			EndIf
+			ShellExecute(_ReplacePlaceholders($url))
 
 		Case $GUI_EVENT_DROPPED
 			_OpenNewFile(@GUI_DragFile)
@@ -705,7 +722,6 @@ Func _OpenNewFile($apk)
 	ProgressOff()
 	If $tmpAPK <> False Then FileDelete($tmpAPK)
 	$searchPngCache = False
-	$hashCache = False
 EndFunc   ;==>_OpenNewFile
 
 Func _OnShow()
@@ -734,17 +750,21 @@ Func _ReplacePlaceholders($pattern)
 	$out = StringReplace($out, '%textures%', StringReplace($apk_Textures, " ", ','))
 	$out = StringReplace($out, '%opengles%', StringReplace($apk_OpenGLES, $strOpenGLES, ''))
 
+	$out = StringReplace($out, '%lang%', $Language_code)
+
 	$hashes = 'md2,md4,md5,sha1,sha256,sha384,sha512'
 	$names = _StringExplode($hashes, ',')
 	$ids = _StringExplode($CALG_MD2 & ',' & $CALG_MD4 & ',' & $CALG_MD5 & ',' & $CALG_SHA1 & ',' & $CALG_SHA_256 & ',' & $CALG_SHA_384 & ',' & $CALG_SHA_512, ',')
 
 	If Not $hashCache Then $hashCache = $ids
 
+	$apk = $dirAPK & "\" & $fileAPK
+	;$apk = $fullPathAPK
 	For $i = 0 To UBound($names) - 1
 		$pll = '%' & $names[$i] & '%'
 		$plu = '%' & StringUpper($names[$i]) & '%'
 		If Not StringInStr($out, $pll) And Not StringInStr($out, $plu) Then ContinueLoop
-		If $hashCache[$i] == $ids[$i] Then $hashCache[$i] = StringReplace(_Crypt_HashFile($fullPathAPK, $ids[$i]), '0x', '')
+		If $hashCache[$i] == $ids[$i] Then $hashCache[$i] = StringReplace(_Crypt_HashFile($apk, $ids[$i]), '0x', '')
 		$hash = $hashCache[$i]
 		$out = StringReplace($out, $pll, StringLower($hash), 0, 1)
 		$out = StringReplace($out, $plu, StringUpper($hash), 0, 1)
