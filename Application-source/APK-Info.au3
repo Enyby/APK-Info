@@ -1334,8 +1334,8 @@ EndFunc   ;==>_StringBetween2
 
 Func _showText($title, $message, $text)
 	$pos = WinGetPos($hGUI)
-	$width = $pos[2]
-	$height = $pos[3]
+	$width = $pos[2] - ($minSize[2] - $fullWidth)
+	$height = $pos[3] - ($minSize[3] - $fullHeight)
 	$gui = GUICreate($title, $width, $height, $pos[0], $pos[1], BitOR($GUI_SS_DEFAULT_GUI, $WS_SIZEBOX, $WS_MAXIMIZEBOX))
 
 	$offset = 5
