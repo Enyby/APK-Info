@@ -142,6 +142,7 @@ $strCompileSDK = IniRead($IniFile, $LangSection, "CompileSDK", "Compile SDK")
 $strLanguage = IniRead($IniFile, $LangSection, "Language", "Language")
 $strSupport = IniRead($IniFile, $LangSection, "Support", "Support")
 $strDebuggable = IniRead($IniFile, $LangSection, "Debuggable", "Debuggable")
+$strLabelInLocales = IniRead($IniFile, $LangSection, "LabelInLocales", "Application name in different locales")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -267,6 +268,7 @@ GUICtrlSetTip(-1, $strLocales)
 $btnLabels = GUICtrlCreateButton('...', $rightColumnStart - 5 - $inputHeight, $offsetHeight, $inputHeight, $inputHeight)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
+GUICtrlSetTip(-1, $strLabelInLocales)
 $inpLabel = _makeField($strLabel, 0, $inputWidth - $inputHeight)
 Local $buildWidth = 65
 $inpBuild = GUICtrlCreateInput('', $inputStart + $inputWidth - $buildWidth, $offsetHeight, $buildWidth, $inputHeight, $inputFlags)
@@ -441,7 +443,7 @@ While 1
 			MY_WM_PAINT(0, 0, 0, 0)
 
 		Case $btnLabels
-			_showText($strLabel & ': ' & $fileAPK, '', $apk_Labels)
+			_showText($strLabel & ': ' & $fileAPK, $strLabelInLocales, $apk_Labels)
 
 		Case $chSignature
 			If BitAND(GUICtrlRead($chSignature), $GUI_CHECKED) = $GUI_CHECKED Then
