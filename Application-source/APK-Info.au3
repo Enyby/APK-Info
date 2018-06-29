@@ -1042,8 +1042,8 @@ Func _parseLines($prmArrayLines)
 		$apk_Features &= $featuresNotRequired
 	EndIf
 
-	$apk_Permissions = StringReplace(StringLower($apk_Permissions), "android.permission.", "")
-	$apk_Features = StringReplace(StringReplace(StringLower($apk_Features), "android.hardware.", ""), "android.permission.", "")
+	;$apk_Permissions = StringReplace(StringLower($apk_Permissions), "android.permission.", "")
+	;$apk_Features = StringReplace(StringReplace(StringLower($apk_Features), "android.hardware.", ""), "android.permission.", "")
 EndFunc   ;==>_parseLines
 
 Func _searchPng($res)
