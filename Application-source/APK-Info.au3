@@ -272,14 +272,14 @@ $btnLabels = GUICtrlCreateButton('...', $inputStart - $inputHeight, $offsetHeigh
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
 GUICtrlSetTip(-1, $strLabelInLocales)
-$inpLabel = _makeField($strLabel, 0, 0)
+$inpLabel = _makeField($strLabel)
 Local $buildWidth = 65
 $inpBuild = GUICtrlCreateInput('', $inputStart + $inputWidth - $buildWidth, $offsetHeight, $buildWidth, $inputHeight, $inputFlags)
 GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strBuild)
 $inpVersion = _makeField($strVersion & ' / ' & $strBuild, 0, $inputWidth - 5 - $buildWidth)
-$inpPkg = _makeField($strPkg, 0, 0)
+$inpPkg = _makeField($strPkg)
 
 _makeLangLabel($strWinCode & ': ' & $OSLanguageCode)
 $inpMaxSDK = GUICtrlCreateInput('', $inputStart + $inputWidth - $halfWidth, $offsetHeight, $halfWidth, $inputHeight, $inputFlags)
@@ -298,11 +298,11 @@ $inpTargetSDK = _makeField($strTargetCompileSDK, 0, $inputWidth - 5 - $halfWidth
 $lblDebug = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
-$inpScreens = _makeField($strScreens, 0, 0)
+$inpScreens = _makeField($strScreens)
 $lblOpenGL = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
-$inpDensities = _makeField($strDensities, 0, 0)
+$inpDensities = _makeField($strDensities)
 $lblSupport = GUICtrlCreateLabel('', $inputStart + $abiWidth + 5, $offsetHeight + $labelTop, $inputWidth - $abiWidth - 5 + 5 + $rightColumnWidth, $inputHeight)
 GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
@@ -535,7 +535,7 @@ Func _makeButton($label, $icon)
 	Return $ret
 EndFunc   ;==>_makeButton
 
-Func _makeField($label, $edtNum, $width, $dock = $GUI_DOCKTOP, $btnTip = False)
+Func _makeField($label, $edtNum = 0, $width = 0, $dock = $GUI_DOCKTOP, $btnTip = False)
 	If Not $btnTip Then $btnTip = $label
 	If $width == 0 Then $width = $inputWidth
 	$labelHeight = $inputHeight
