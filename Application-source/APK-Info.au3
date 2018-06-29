@@ -268,11 +268,11 @@ GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKBOTTOM + $GUI_DOCKRIGHT + $GUI_
 GUICtrlSetState(-1, $globalInputStyle)
 GUICtrlSetTip(-1, $strLocales)
 
-$btnLabels = GUICtrlCreateButton('...', $rightColumnStart - 5 - $inputHeight, $offsetHeight, $inputHeight, $inputHeight)
-GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
+$btnLabels = GUICtrlCreateButton('...', $inputStart - $inputHeight, $offsetHeight, $inputHeight, $inputHeight)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
 GUICtrlSetTip(-1, $strLabelInLocales)
-$inpLabel = _makeField($strLabel, 0, $inputWidth - $inputHeight)
+$inpLabel = _makeField($strLabel, 0, 0)
 Local $buildWidth = 65
 $inpBuild = GUICtrlCreateInput('', $inputStart + $inputWidth - $buildWidth, $offsetHeight, $buildWidth, $inputHeight, $inputFlags)
 GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
