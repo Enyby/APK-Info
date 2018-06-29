@@ -22,6 +22,14 @@ Then was updated by bovirus and this is the [reworked thread on XDA](https://for
 
 [Library of old APK-Info versions](https://mega.nz/#F!DNZxjaAb!2Xx8Y_CO6PYwGDnLRgS5_g)
 
+# How to build the latest version
+
+1. Download [the latest release](https://github.com/Enyby/APK-Info/releases/latest).
+2. Download [the source from github](https://github.com/Enyby/APK-Info/archive/master.zip).
+3. Unpack the source on top of the release.
+4. Open the `Application-source\APK-Info.au3` file in the [SciTE4AutoIt3 editor](https://www.autoitscript.com/site/autoit-script-editor/downloads/).
+5. Press F7. The `Apk-Info.exe` file will be updated.
+
 # API Level supported
 ```
 Level  1 = Base
