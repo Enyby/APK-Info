@@ -350,6 +350,8 @@ $gBtn_Install = _makeButton($strInstall, "install.bmp")
 $gBtn_Uninstall = _makeButton($strUninstall, "delete.bmp")
 $gBtn_Exit = _makeButton($strExit, "exit.bmp")
 
+$gSelAll = _initSelAll($hGUI)
+
 _GDIPlus_Startup()
 $hGraphic = _GDIPlus_GraphicsCreateFromHWND($hGUI)
 
@@ -417,6 +419,9 @@ _saveGUIPos()
 While 1
 	$nMsg = GUIGetMsg()
 	Switch $nMsg
+		Case $gSelAll
+			_SelAll()
+
 		Case $gBtn_Play
 			ShellExecute($URLPlayStore & $apk_PkgName & '&hl=' & $PlayStoreLanguage)
 
@@ -457,7 +462,7 @@ While 1
 			$pos = WinGetPos($hGUI)
 			$width = $minSize[2]
 			$height = 130
-			$sNewNameInput = InputBox($strRenameAPK, $strNewName, $sNewFilenameAPK, "", $width, $height, $pos[0] + ($pos[2] - $width)/2, $pos[1] + ($pos[3] - $height)/2, $hGUI)
+			$sNewNameInput = InputBox($strRenameAPK, $strNewName, $sNewFilenameAPK, "", $width, $height, $pos[0] + ($pos[2] - $width) / 2, $pos[1] + ($pos[3] - $height) / 2, $hGUI)
 			If $ShowLog = "1" Then
 				IniWrite($IniLogReport, "NewFile", "NewFilenameAPK", $sNewFilenameAPK)
 				IniWrite($IniLogReport, "NewFile", "NewNameInput", $sNewNameInput)
@@ -477,6 +482,26 @@ While 1
 WEnd
 
 ;==================== End GUI =====================================
+
+Func _initSelAll($hWnd)
+	; Create dummy for accelerator key to activate
+	$selAll = GUICtrlCreateDummy()
+
+	_setSelAll($selAll, $hWnd)
+	Return $selAll
+EndFunc   ;==>_initSelAll
+
+Func _setSelAll($dummy, $hWnd)
+	; Set accelerators for Ctrl+a
+	Dim $AccelKeys[1][2] = [["^a", $dummy]]
+	GUISetAccelerators($AccelKeys, $hWnd)
+EndFunc   ;==>_setSelAll
+
+Func _SelAll()
+	$hWnd = _WinAPI_GetFocus()
+	$class = _WinAPI_GetClassName($hWnd)
+	If $class == 'Edit' Then _GUICtrlEdit_SetSel($hWnd, 0, -1)
+EndFunc   ;==>_SelAll
 
 Func _makeLangLabel($label)
 	If $ShowLangCode <> "1" Then Return
@@ -959,7 +984,7 @@ Func _parseLines($prmArrayLines)
 				If $anyDensity Then $apk_Densities = StringStripWS($apk_Densities & ' any', $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 			Case 'native-code'
-				For $abi in _StringExplode('armeabi,armeabi-v7a,arm64-v8a,x86,x86_64,mips,mips64', ',')
+				For $abi In _StringExplode('armeabi,armeabi-v7a,arm64-v8a,x86,x86_64,mips,mips64', ',')
 					If Not StringInStr($value, "'" & $abi & "'") Then ContinueLoop
 					If $apk_ABIs <> '' Then $apk_ABIs &= ' '
 					$apk_ABIs &= $abi
@@ -1292,18 +1317,27 @@ Func _showText($title, $message, $text)
 	$btnClose = GUICtrlCreateButton($strClose, $width / 4, $height - 30, $width / 2)
 	GUICtrlSetResizing(-1, $GUI_DOCKHCENTER + $GUI_DOCKBOTTOM + $GUI_DOCKHEIGHT)
 
+	$selAll = _initSelAll($gui)
+
 	GUISetState(@SW_SHOW, $gui)
 	GUISetState(@SW_RESTORE, $gui)
 	GUISetState(@SW_HIDE, $hGUI)
 
 	While 1
 		$Msg = GUIGetMsg()
-		If $Msg == $GUI_EVENT_CLOSE Or $Msg == $btnClose Then ExitLoop
+		Switch $Msg
+			Case $GUI_EVENT_CLOSE, $btnClose
+				ExitLoop
+			Case $selAll
+				_SelAll()
+		EndSwitch
 	WEnd
 	GUISetState(@SW_SHOW, $hGUI)
 	GUISetState(@SW_RESTORE, $hGUI)
 	GUISetState(@SW_HIDE, $gui)
 	GUIDelete($gui)
+
+	_setSelAll($gSelAll, $hGUI)
 EndFunc   ;==>_showText
 
 Func _adbDevice($title)
@@ -1339,7 +1373,7 @@ Func _adbDevice($title)
 	$pos = WinGetPos($hGUI)
 	$width = $minSize[2]
 
-	$gui = GUICreate($title, $width, $height, $pos[0] + ($pos[2] - $width)/2, $pos[1] + ($pos[3] - $height)/2)
+	$gui = GUICreate($title, $width, $height, $pos[0] + ($pos[2] - $width) / 2, $pos[1] + ($pos[3] - $height) / 2)
 
 	For $line In $arrayLines
 		$btn = GUICtrlCreateButton(StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING), 10, $top, $width - 20)
