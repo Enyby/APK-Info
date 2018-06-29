@@ -1147,9 +1147,7 @@ Func _parseXmlIcon($icon)
 EndFunc   ;==>_parseXmlIcon
 
 Func _loadIcon($icon)
-	If StringRight($icon, 4) <> '.png' Then
-		$icon = _searchPng($icon)
-	EndIf
+	$icon = _searchPng($icon)
 
 	_setProgress(1)
 
