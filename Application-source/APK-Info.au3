@@ -1027,16 +1027,10 @@ Func _parseLines($prmArrayLines)
 
 			Case 'uses-gl-es'
 				$ver = _StringBetween2($value, "'", "'")
-				Switch $ver
-					Case '0x10000'
-						$ver = '1.0'
-					Case '0x20000'
-						$ver = '2.0'
-					Case '0x30000'
-						$ver = '3.0'
-					Case '0x30001'
-						$ver = '3.1'
-				EndSwitch
+				If StringLen($ver) > 6 And StringLeft($ver, 2) == '0x' Then
+					$ver = StringTrimLeft($ver, 2)
+					$ver = Dec(StringTrimRight($ver, 4)) & '.' & Dec(StringRight($ver, 4))
+				EndIf
 				$apk_OpenGLES = $strOpenGLES & $ver
 
 				If $featuresUsed <> '' Then $featuresUsed &= @CRLF
