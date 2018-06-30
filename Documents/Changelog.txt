@@ -1,3 +1,15 @@
+*** APK-Info 1.26 (01.07.2018)
+
+- Improved texts.
+- Updated translations.
+- Added detection of density 'any'.
+- Improved lists of permissions and features.
+- Added hotkey Ctrl+A to select all text in the text area.
+- Added button 'more' to display text from text areas in a large field.
+- Fixed the size of dialogs.
+- Improved GUI layout.
+- Improved detection of OpenGL ES.
+
 *** APK-Info 1.25 (29.06.2018)
 
 - Fix dialogs position and size.
