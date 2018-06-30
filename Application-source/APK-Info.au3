@@ -273,7 +273,7 @@ GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT + $GUI_D
 GUICtrlSetState(-1, $globalStyle)
 GUICtrlSetTip(-1, $strLabelInLocales)
 $inpLabel = _makeField($strLabel)
-Local $buildWidth = 65
+Local $buildWidth = 70
 $inpBuild = GUICtrlCreateInput('', $inputStart + $inputWidth - $buildWidth, $offsetHeight, $buildWidth, $inputHeight, $inputFlags)
 GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalInputStyle)
