@@ -147,6 +147,7 @@ $strLabelInLocales = IniRead($IniFile, $LangSection, "LabelInLocales", "Applicat
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
 $strNotRequired = IniRead($IniFile, $LangSection, "NotRequired", "not required")
+$strOthers = IniRead($IniFile, $LangSection, "Others", "others")
 
 $strWinCode = 'WinCode'
 $strOpenGLES = 'OpenGL ES '
@@ -312,7 +313,7 @@ $inpABIs = _makeField($strABIs, 0, $abiWidth)
 $inpTextures = _makeField($strTextures, 0, $editWidth)
 
 $edtPermissions = _makeField($strPermissions, 1, 0)
-$edtFeatures = _makeField($strFeatures & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired, 2, 0, 0, $strFeatures)
+$edtFeatures = _makeField($strFeatures & @CRLF & @CRLF & "+ = " & $strUses & @CRLF & "# = " & $strImplied & @CRLF & "- = " & $strNotRequired & @CRLF & "@ = " & $strOthers, 2, 0, 0, $strFeatures)
 
 $chSignature = GUICtrlCreateCheckbox($strSignature, $labelStart, $offsetHeight + $labelTop, $labelWidth, $inputHeight)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT)
@@ -492,7 +493,7 @@ While 1
 			_showText($strLabel & ': ' & $fileAPK, $strPermissions, $apk_Permissions)
 
 		Case $edtInfo[1][$INFO_BTN]
-			_showText($strLabel & ': ' & $fileAPK, $strFeatures & $whGap & "+ = " & $strUses & $whGap & "# = " & $strImplied & $whGap & "- = " & $strNotRequired, $apk_Features)
+			_showText($strLabel & ': ' & $fileAPK, $strFeatures & $whGap & "+ = " & $strUses & $whGap & "# = " & $strImplied & $whGap & "- = " & $strNotRequired & $whGap & "@ = " & $strOthers, $apk_Features)
 
 		Case $edtInfo[2][$INFO_BTN]
 			_showText($strLabel & ': ' & $fileAPK, $strSignature & $whGap & StringReplace($apk_SignatureName, @CRLF, $whGap), $apk_Signature)
@@ -916,6 +917,7 @@ Func _parseLines($prmArrayLines)
 	$featuresUsed = ''
 	$featuresNotRequired = ''
 	$featuresImplied = ''
+	$featuresOthers = ''
 	For $line In $prmArrayLines
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 
@@ -923,12 +925,12 @@ Func _parseLines($prmArrayLines)
 			$apk_Debuggable = $strDebuggable
 		EndIf
 
-		$arraySplit = _StringExplode($line, ":", 1)
+		$arraySplit = _StringExplode($line, ":", 2)
+		$key = StringStripWS($arraySplit[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
 		If UBound($arraySplit) > 1 Then
-			$key = StringStripWS($arraySplit[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
 			$value = $arraySplit[1]
 		Else
-			ContinueLoop
+			$value = ''
 		EndIf
 
 		If $key == 'leanback-launchable-activity' And Not StringInStr($apk_Support, $strTV) Then
@@ -978,6 +980,13 @@ Func _parseLines($prmArrayLines)
 				$apk_Version = _StringBetween2($value, "versionName='", "'")
 				$apk_CompileSDK = _StringBetween2($value, "compileSdkVersion='", "'")
 
+				$install = _StringBetween2($value, "install-location:'", "'")
+
+				If $install <> '' Then
+					If $featuresOthers <> '' Then $featuresOthers &= @CRLF
+					$featuresOthers &= '@ ' & "install-location: '" & $install & "'"
+				EndIf
+
 			Case 'uses-permission'
 				If $apk_Permissions <> '' Then $apk_Permissions &= @CRLF
 				$apk_Permissions &= _StringBetween2($value, "'", "'")
@@ -999,6 +1008,11 @@ Func _parseLines($prmArrayLines)
 				If $featuresImplied <> '' Then $featuresImplied &= @CRLF
 				$featuresImplied &= '# ' & _StringBetween2($value, "'", "'") & ' (' & _StringBetween2($value, "reason='", "'") & ')'
 
+			Case 'provides-component', 'main', 'other-activities', 'other-receivers', 'other-services', 'requires-smallest-width', 'compatible-width-limit', 'largest-width-limit', 'uses-configuration', 'application-isGame', 'application-debuggable', 'uses-package', 'original-package', 'package-verifier', 'uses-library', 'uses-library-not-required', 'meta-data'
+				If $featuresOthers <> '' Then $featuresOthers &= @CRLF
+				If $value <> '' Then $line = $key & ': ' & StringStripWS($value, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+				$featuresOthers &= '@ ' & StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+
 			Case 'sdkVersion'
 				$apk_MinSDK = _StringBetween2($value, "'", "'")
 
@@ -1018,7 +1032,7 @@ Func _parseLines($prmArrayLines)
 				$apk_Densities = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
 				If $anyDensity Then $apk_Densities = StringStripWS($apk_Densities & ' any', $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
-			Case 'native-code'
+			Case 'native-code', 'alt-native-code'
 				For $abi In _StringExplode('armeabi,armeabi-v7a,arm64-v8a,x86,x86_64,mips,mips64', ',')
 					If Not StringInStr($value, "'" & $abi & "'") Then ContinueLoop
 					If $apk_ABIs <> '' Then $apk_ABIs &= ' '
@@ -1064,6 +1078,10 @@ Func _parseLines($prmArrayLines)
 				EndSwitch
 				$apk_Textures &= $val
 
+				If $featuresOthers <> '' Then $featuresOthers &= @CRLF
+				If $value <> '' Then $line = $key & ': ' & StringStripWS($value, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+				$featuresOthers &= '@ ' & StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+
 			Case 'meta-data'
 				If _StringBetween2($value, "'", "'") == 'com.google.android.gms.car.application' And Not StringInStr($apk_Support, $strAuto) Then
 					$apk_Support &= ', ' & $strAuto
@@ -1096,6 +1114,10 @@ Func _parseLines($prmArrayLines)
 	If $featuresNotRequired <> '' Then
 		If $apk_Features <> '' Then $apk_Features &= @CRLF
 		$apk_Features &= $featuresNotRequired
+	EndIf
+	If $featuresOthers <> '' Then
+		If $apk_Features <> '' Then $apk_Features &= @CRLF
+		$apk_Features &= $featuresOthers
 	EndIf
 
 	;$apk_Permissions = StringReplace(StringLower($apk_Permissions), "android.permission.", "")
