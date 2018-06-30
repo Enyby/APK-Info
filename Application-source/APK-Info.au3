@@ -362,6 +362,7 @@ _GDIPlus_Startup()
 $hGraphic = _GDIPlus_GraphicsCreateFromHWND($hGUI)
 
 $defBkColor = 0
+$bkgColor = 0
 
 If $aCmdLine[0] > 0 Then
 	$tmp_Filename = $aCmdLine[1]
@@ -584,7 +585,9 @@ Func MY_WM_PAINT($hWnd, $Msg, $wParam, $lParam)
 		;$defBkColor = $COLOR_RED
 		$defBkColor = BitOR($defBkColor, 0xFF000000)
 	EndIf
-	$hBrush = _GDIPlus_BrushCreateSolid($defBkColor)
+	$color = $defBkColor
+	If $bkgColor <> 0 Then $color = $bkgColor
+	$hBrush = _GDIPlus_BrushCreateSolid($color)
 	_GDIPlus_GraphicsFillRect($hGraphic, $pos[0], $pos[1], $pos[2], $pos[3], $hBrush)
 	_GDIPlus_BrushDispose($hBrush)
 	If $hImage_bg Then
@@ -1182,15 +1185,14 @@ Func _parseXmlIcon($icon)
 		$png[0] = 0
 		$png[1] = 0
 		For $line In $arrayLines
-			If Not StringInStr($line, 'spec resource ') Then
-				ContinueLoop
+			If StringInStr($line, 'spec resource ') Then
+				For $i = 0 To 1
+					If Not $ids[$i] Or $png[$i] Or Not StringInStr($line, $ids[$i]) Then ContinueLoop
+					$png[$i] = _StringBetween2($line, ":", ":")
+				Next
+			ElseIf $png[0] And StringLeft($png[0], 6) == 'color/' And StringInStr($line, ':' & $png[0] & ': ') And StringInStr($line, ' d=0x') Then
+				$bkgColor = Dec(_StringBetween2($line, " d=0x", " "))
 			EndIf
-			For $i = 0 To 1
-				If Not $ids[$i] Or $png[$i] Or Not StringInStr($line, $ids[$i]) Then
-					ContinueLoop
-				EndIf
-				$png[$i] = _StringBetween2($line, ":", ":")
-			Next
 		Next
 
 		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $png[0] & '; ' & $png[1] & @CRLF)
@@ -1230,6 +1232,7 @@ Func _setProgress($inc)
 EndFunc   ;==>_setProgress
 
 Func _extractIcon()
+	$bkgColor = 0
 	$apk_IconPath = False
 	$apk_IconPathBg = False
 
