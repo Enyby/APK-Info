@@ -299,13 +299,15 @@ $lblDebug = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop,
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
 $inpScreens = _makeField($strScreens)
-$lblOpenGL = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight, $SS_CENTER)
+$lblOpenGL = GUICtrlCreateLabel('', $rightColumnStart, $offsetHeight + $labelTop, $rightColumnWidth, $inputHeight + $fieldHeight, $SS_CENTER)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
+GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 $inpDensities = _makeField($strDensities)
 $lblSupport = GUICtrlCreateLabel('', $inputStart + $abiWidth + 5, $offsetHeight + $labelTop, $inputWidth - $abiWidth - 5 + 5 + $rightColumnWidth, $inputHeight)
 GUICtrlSetResizing(-1, $GUI_DOCKHEIGHT + $GUI_DOCKWIDTH + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 GUICtrlSetState(-1, $globalStyle)
+GUICtrlSetBkColor(-1, $GUI_BKCOLOR_TRANSPARENT)
 $inpABIs = _makeField($strABIs, 0, $abiWidth)
 $inpTextures = _makeField($strTextures, 0, $editWidth)
 
@@ -1026,6 +1028,8 @@ Func _parseLines($prmArrayLines)
 			Case 'uses-gl-es'
 				$ver = _StringBetween2($value, "'", "'")
 				Switch $ver
+					Case '0x10000'
+						$ver = '1.0'
 					Case '0x20000'
 						$ver = '2.0'
 					Case '0x30000'
