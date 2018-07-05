@@ -75,6 +75,7 @@ Else
 	$Language_code = $ForcedGUILanguage
 EndIf
 
+$LocalizeName = _readSettings("LocalizeName", "1")
 $CheckSignature = _readSettings("CheckSignature", "1")
 $FileNamePattern = _readSettings("FileNamePattern", "%label% %version%.%build%")
 $ShowHash = _readSettings("ShowHash", '')
@@ -956,7 +957,7 @@ Func _parseLines($prmArrayLines)
 				If $apk_Label == '' Then $apk_Label = _StringBetween2($value, "'", "'")
 
 			Case 'application-label-' & $Language_code
-				$apk_Label = _StringBetween2($value, "'", "'")
+				If $LocalizeName == '1' Then $apk_Label = _StringBetween2($value, "'", "'")
 
 			Case 'application', 'launchable-activity', 'leanback-launchable-activity'
 				If $apk_Label == '' Then $apk_Label = _StringBetween2($value, "label='", "'")
