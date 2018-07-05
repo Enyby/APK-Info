@@ -1024,6 +1024,11 @@ Func _parseLines($prmArrayLines)
 			Case 'provides-component', 'main', 'other-activities', 'other-receivers', 'other-services', 'requires-smallest-width', 'compatible-width-limit', 'largest-width-limit', 'uses-configuration', 'application-isGame', 'application-debuggable', 'uses-package', 'original-package', 'package-verifier', 'uses-library', 'uses-library-not-required', 'meta-data'
 				If $featuresOthers <> '' Then $featuresOthers &= @CRLF
 				If $value <> '' Then $line = $key & ': ' & StringStripWS($value, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+				If StringInStr($line, 'android.max_aspect') Then
+					$int = _StringBetween2($value, "value='", "'")
+					$float = _Lib_IntToFloat($int)
+					$line &= ' // ' & Round($float, 3)
+				EndIf
 				$featuresOthers &= '@ ' & StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 			Case 'sdkVersion'
@@ -1569,4 +1574,13 @@ Func _checkNewVersion()
 		EndIf
 	EndIf
 	Return False
+EndFunc
+
+Func _Lib_IntToFloat($iInt)
+  Local $tFloat, $tInt
+
+  $tInt   = DllStructCreate("int")
+  $tFloat = DllStructCreate("float", DllStructGetPtr($tInt))
+  DllStructSetData($tInt, 1, $iInt)
+  Return DllStructGetData($tFloat, 1)
 EndFunc
