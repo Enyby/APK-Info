@@ -12,6 +12,7 @@
 
 $ProgramVersion = "1.26"
 $ProgramReleaseDate = "01.07.2018"
+$ProgramName = 'APK-Info'
 
 #include <Constants.au3>
 #include <EditConstants.au3>
@@ -27,6 +28,7 @@ $ProgramReleaseDate = "01.07.2018"
 #include <GuiButton.au3>
 #include <GuiEdit.au3>
 #include <ScrollBarsConstants.au3>
+#include <Date.au3>
 Opt("TrayMenuMode", 1)
 Opt("TrayIconHide", 1)
 
@@ -90,6 +92,8 @@ $RestoreGUI = _readSettings("RestoreGUI", '0')
 
 $OldVirusTotal = _readSettings("OldVirusTotal", '0')
 
+$CheckNewVersion = _readSettings("CheckNewVersion", '1')
+
 $ShowLog = _readSettings("ShowLog", "0")
 $ShowLangCode = _readSettings("ShowLangCode", "1")
 
@@ -145,6 +149,7 @@ $strLanguage = IniRead($IniFile, $LangSection, "Language", "Language")
 $strSupport = IniRead($IniFile, $LangSection, "Support", "Support")
 $strDebuggable = IniRead($IniFile, $LangSection, "Debuggable", "Debuggable")
 $strLabelInLocales = IniRead($IniFile, $LangSection, "LabelInLocales", "Application name in different locales")
+$strNewVersionIsAvailable = IniRead($IniFile, $LangSection, "NewVersionIsAvailable", "A new version is available")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -159,6 +164,8 @@ $strAuto = 'Android Auto'
 $strAndroid = 'Android'
 $strVirusTotal = 'VirusTotal'
 
+$urlUpdate = 'https://github.com/Enyby/APK-Info/releases/latest'
+
 $URLPlayStore = IniRead($IniFile, $LangSection, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
 
 $PlayStoreLanguage = IniRead($IniFile, $LangSection, "PlayStoreLanguage", $Language_code)
@@ -169,7 +176,7 @@ Global $iconProgress = 5
 
 ;================== GUI ===========================
 
-$ProgramTitle = "APK-Info " & $ProgramVersion & " (" & $ProgramReleaseDate & ")"
+$ProgramTitle = $ProgramName & ' ' & $ProgramVersion & " (" & $ProgramReleaseDate & ")"
 If $ShowLog = "1" Then
 	IniWrite($IniLogReport, "APK_Info Version", "Program version", $ProgramVersion)
 	IniWrite($IniLogReport, "APK_Info Version", "Program release date", $ProgramReleaseDate)
@@ -354,6 +361,11 @@ $gBtn_VirusTotal = _makeButton($strVirusTotal, "virustotal.bmp")
 $gBtn_Rename = _makeButton($strRename, "rename.bmp")
 $gBtn_Install = _makeButton($strInstall, "install.bmp")
 $gBtn_Uninstall = _makeButton($strUninstall, "delete.bmp")
+
+$newVersion = _checkNewVersion()
+$gBtn_Update = -1001
+If $newVersion Then $gBtn_Update = _makeButton($strNewVersionIsAvailable & ': ' & $newVersion, "new.bmp")
+
 $gBtn_Exit = _makeButton($strExit, "exit.bmp")
 
 $gSelAll = _initSelAll($hGUI)
@@ -433,6 +445,9 @@ While 1
 
 		Case $gBtn_Play
 			ShellExecute($URLPlayStore & $apk_PkgName & '&hl=' & $PlayStoreLanguage)
+
+		Case $gBtn_Update
+			ShellExecute($urlUpdate)
 
 		Case $gBtn_CustomStore
 			If $CustomStore <> '' Then
@@ -1526,3 +1541,32 @@ Func _readSettings($name, $default)
 	If $ret == '' Then $ret = IniRead($IniFile, "Settings", $name, $default)
 	Return $ret
 EndFunc   ;==>_readSettings
+
+Func _checkNewVersion()
+	If $CheckNewVersion == '1' Then
+		$tag = _StringExplode(IniRead($IniUser, "State", 'LastVersion', ''), '|', 2)
+		If $tag[0] <> _NowDate() Or UBound($tag) <> 2 Then
+			ProgressOn($strLoading & "...", $ProgramName, $urlUpdate)
+			$foo = Run($toolsDir & 'curl -k --ssl-no-revoke -D - "' & $urlUpdate & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+			$output = ''
+			While 1
+				$bin = StdoutRead($foo, False, True)
+				If @error Then ExitLoop
+				$output &= BinaryToString($bin, $SB_UTF8)
+			WEnd
+			ProgressOff()
+			$url = _StringBetween2($output, "Location: ", @CRLF)
+			$tag = ''
+			If StringInStr($url, '/tag/') Then
+				$tag = _StringExplode($url, '/tag/', 2)[1]
+			EndIf
+			$tag = _NowDate() & '|' & $tag
+			IniWrite($IniUser, "State", 'LastVersion', $tag)
+			$tag = _StringExplode($tag, '|', 2)
+		EndIf
+		If $tag[1] <> $ProgramVersion Then
+			Return $tag[1]
+		EndIf
+	EndIf
+	Return False
+EndFunc
