@@ -1,3 +1,14 @@
+*** APK-Info 1.27 (05.07.2018)
+
+- Improved load APK icon.
+- Improved APK info.
+- Updated translations. Thanks to @bovirus
+- Added option AdbTimeout.
+- Add support user.ini for custom settings.
+- Add option LocalizeName.
+- Add check for a new version and option CheckNewVersion.
+- Updated aapt binary.
+
 *** APK-Info 1.26 (01.07.2018)
 
 - Improved texts.
