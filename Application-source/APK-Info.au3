@@ -350,7 +350,7 @@ $offsetWidth = $btnGap
 $gBtn_Play = _makeButton($strPlayStore, "play.bmp")
 $gBtn_CustomStore = -1000
 If $CustomStore <> '' Then
-	$store = _StringExplode($CustomStore, '|', 2)
+	$store = _StringExplode($CustomStore, '|', 1)
 	If UBound($store) == 2 Then
 		$gBtn_CustomStore = _makeButton($store[0], "web.bmp")
 	Else
@@ -451,7 +451,7 @@ While 1
 
 		Case $gBtn_CustomStore
 			If $CustomStore <> '' Then
-				ShellExecute(_ReplacePlaceholders(_StringExplode($CustomStore, '|', 2)[1]))
+				ShellExecute(_ReplacePlaceholders(_StringExplode($CustomStore, '|', 1)[1]))
 			EndIf
 
 		Case $gBtn_VirusTotal
@@ -938,7 +938,7 @@ Func _parseLines($prmArrayLines)
 			$apk_Debuggable = $strDebuggable
 		EndIf
 
-		$arraySplit = _StringExplode($line, ":", 2)
+		$arraySplit = _StringExplode($line, ":", 1)
 		$key = StringStripWS($arraySplit[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
 		If UBound($arraySplit) > 1 Then
 			$value = $arraySplit[1]
@@ -1465,7 +1465,7 @@ Func _adbDevice($title)
 		If $Msg > 0 Then
 			$val = GUICtrlRead($Msg)
 			If $val <> '0' Then
-				$device = _StringExplode($val, ' ')[0]
+				$device = _StringExplode($val, ' ', 1)[0]
 				ExitLoop
 			EndIf
 		EndIf
@@ -1549,7 +1549,7 @@ EndFunc   ;==>_readSettings
 
 Func _checkNewVersion()
 	If $CheckNewVersion == '1' Then
-		$tag = _StringExplode(IniRead($IniUser, "State", 'LastVersion', ''), '|', 2)
+		$tag = _StringExplode(IniRead($IniUser, "State", 'LastVersion', ''), '|', 1)
 		If $tag[0] <> _NowDate() Or UBound($tag) <> 2 Then
 			ProgressOn($strLoading & "...", $ProgramName, $urlUpdate)
 			$foo = Run($toolsDir & 'curl -k --ssl-no-revoke -D - "' & $urlUpdate & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
@@ -1563,11 +1563,11 @@ Func _checkNewVersion()
 			$url = _StringBetween2($output, "Location: ", @CRLF)
 			$tag = ''
 			If StringInStr($url, '/tag/') Then
-				$tag = _StringExplode($url, '/tag/', 2)[1]
+				$tag = _StringExplode($url, '/tag/', 1)[1]
 			EndIf
 			$tag = _NowDate() & '|' & $tag
 			IniWrite($IniUser, "State", 'LastVersion', $tag)
-			$tag = _StringExplode($tag, '|', 2)
+			$tag = _StringExplode($tag, '|', 1)
 		EndIf
 		If $tag[1] <> $ProgramVersion Then
 			Return $tag[1]
