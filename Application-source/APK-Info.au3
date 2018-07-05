@@ -43,7 +43,7 @@ Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 DirCreate($tempPath)
 Global $toolsDir = 'tools/'
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
-Global $IniLogReport, $IniLast
+Global $IniLogReport, $IniUser
 Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK, $tmpAPK
 Global $sNewFilenameAPK, $searchPngCache, $hashCache
 Global $progress = 0
@@ -52,7 +52,7 @@ Global $progressMax = 1
 $Inidir = @ScriptDir & "\"
 
 $IniFile = $Inidir & "APK-Info.ini"
-$IniLast = $Inidir & "APK-Info.LastFolder.ini"
+$IniUser = $Inidir & "user.ini"
 $IniLogReport = $Inidir & "APK-Info.log.txt"
 
 ; $aCmdLine[0] = number of parametrs passed to exe file
@@ -67,40 +67,40 @@ Local $aCmdLine = _WinAPI_CommandLineToArgv($CmdLineRaw)
 ; more info on country code
 ; https://www.autoitscript.com/autoit3/docs/appendix/OSLangCodes.htm
 
-$ForcedGUILanguage = IniRead($IniFile, "Settings", "ForcedGUILanguage", "auto")
+$ForcedGUILanguage = _readSettings("ForcedGUILanguage", "auto")
 $OSLanguageCode = @OSLang
-If $ForcedGUILanguage = "auto" Then
+If $ForcedGUILanguage == "auto" Then
 	$Language_code = IniRead($IniFile, "OSLanguage", @OSLang, "en")
 Else
 	$Language_code = $ForcedGUILanguage
 EndIf
 
-$CheckSignature = IniRead($IniFile, "Settings", "CheckSignature", "1")
-$FileNamePattern = IniRead($IniFile, "Settings", "FileNamePattern", "%label% %version%.%build%")
-$ShowHash = IniRead($IniFile, "Settings", "ShowHash", '')
-$CustomStore = IniRead($IniFile, "Settings", "CustomStore", '')
-$SignatureNames = IniRead($IniFile, "Settings", "SignatureNames", '')
+$CheckSignature = _readSettings("CheckSignature", "1")
+$FileNamePattern = _readSettings("FileNamePattern", "%label% %version%.%build%")
+$ShowHash = _readSettings("ShowHash", '')
+$CustomStore = _readSettings("CustomStore", '')
+$SignatureNames = _readSettings("SignatureNames", '')
 
-$AdbInit = IniRead($IniFile, "Settings", "AdbInit", '')
-$AdbKill = IniRead($IniFile, "Settings", "AdbKill", '0')
-$AdbTimeout = IniRead($IniFile, "Settings", "AdbTimeout", '30')
+$AdbInit = _readSettings("AdbInit", '')
+$AdbKill = _readSettings("AdbKill", '0')
+$AdbTimeout = _readSettings("AdbTimeout", '30')
 
-$RestoreGUI = IniRead($IniFile, "Settings", "RestoreGUI", '0')
+$RestoreGUI = _readSettings("RestoreGUI", '0')
 
-$OldVirusTotal = IniRead($IniFile, "Settings", "OldVirusTotal", '0')
+$OldVirusTotal = _readSettings("OldVirusTotal", '0')
 
-$ShowLog = IniRead($IniFile, "Settings", "ShowLog", "0")
-$ShowLangCode = IniRead($IniFile, "Settings", "ShowLangCode", "1")
-; $ShowCmdLine=Iniread($IniFile,"Settings","ShowCmdLine","1");
+$ShowLog = _readSettings("ShowLog", "0")
+$ShowLangCode = _readSettings("ShowLangCode", "1")
+
 Local $space = 'space'
-$FileNameSpace = IniRead($IniFile, "Settings", "FileNameSpace", $space)
+$FileNameSpace = _readSettings("FileNameSpace", $space)
 If $FileNameSpace == $space Then $FileNameSpace = ' '
-$LastFolder = IniRead($IniLast, "Settings", "LastFolder", @WorkingDir)
+$LastFolder = IniRead($IniUser, "State", "LastFolder", @WorkingDir)
 
-Local $LastTop = IniRead($IniLast, "Settings", "LastTop", 0)
-Local $LastLeft = IniRead($IniLast, "Settings", "LastLeft", 0)
-Local $LastWidth = IniRead($IniLast, "Settings", "LastWidth", 0)
-Local $LastHeight = IniRead($IniLast, "Settings", "LastHeight", 0)
+Local $LastTop = IniRead($IniUser, "State", "LastTop", 0)
+Local $LastLeft = IniRead($IniUser, "State", "LastLeft", 0)
+Local $LastWidth = IniRead($IniUser, "State", "LastWidth", 0)
+Local $LastHeight = IniRead($IniUser, "State", "LastHeight", 0)
 
 Local $LangSection = "Strings-" & $Language_code
 
@@ -169,9 +169,6 @@ Global $iconProgress = 5
 ;================== GUI ===========================
 
 $ProgramTitle = "APK-Info " & $ProgramVersion & " (" & $ProgramReleaseDate & ")"
-; iF $ShowLangCode="1" then
-; $ProgramTitle=$ProgramTitle & "- OSLangCode = " & $OSLanguageCode & " - Lang = " & $Language_code
-; Endif
 If $ShowLog = "1" Then
 	IniWrite($IniLogReport, "APK_Info Version", "Program version", $ProgramVersion)
 	IniWrite($IniLogReport, "APK_Info Version", "Program release date", $ProgramReleaseDate)
@@ -467,7 +464,7 @@ While 1
 			Else
 				$CheckSignature = 0
 			EndIf
-			IniWrite($IniFile, "Settings", "CheckSignature", $CheckSignature)
+			IniWrite($IniUser, "Settings", "CheckSignature", $CheckSignature)
 
 		Case $gBtn_Rename
 			$pos = WinGetPos($hGUI)
@@ -674,10 +671,10 @@ Func _saveGUIPos()
 	If $RestoreGUI == '0' Then Return
 	$pos = WinGetPos($hGUI)
 	If BitAND(WinGetState($hGUI), $WIN_STATE_MAXIMIZED) <> 0 Then $pos[2] = 1
-	IniWrite($IniLast, "Settings", "LastLeft", $pos[0])
-	IniWrite($IniLast, "Settings", "LastTop", $pos[1])
-	IniWrite($IniLast, "Settings", "LastWidth", $pos[2])
-	IniWrite($IniLast, "Settings", "LastHeight", $pos[3])
+	IniWrite($IniUser, "State", "LastLeft", $pos[0])
+	IniWrite($IniUser, "State", "LastTop", $pos[1])
+	IniWrite($IniUser, "State", "LastWidth", $pos[2])
+	IniWrite($IniUser, "State", "LastHeight", $pos[3])
 EndFunc   ;==>_saveGUIPos
 
 Func _renameAPK($prmNewFilenameAPK)
@@ -709,8 +706,7 @@ Func _checkFileParameter($prmFilename)
 		$f_Sel = FileOpenDialog($strSelectAPK, $LastFolder, "(*.apk)", 1, "")
 		If @error Then Exit
 		$LastFolder = _SplitPath($f_Sel, True)
-		IniWrite($IniLast, "Settings", "LastFolder", $LastFolder)
-		;		IniWrite($IniFile, "Settings", "Lastfile", $f_sel);
+		IniWrite($IniUser, "State", "LastFolder", $LastFolder)
 		Return $f_Sel
 	EndIf
 EndFunc   ;==>_checkFileParameter
@@ -1523,3 +1519,9 @@ Func _adb($install)
 
 	If $AdbKill == '1' Then RunWait($toolsDir & 'adb.exe kill-server', @ScriptDir, @SW_HIDE)
 EndFunc   ;==>_adb
+
+Func _readSettings($name, $default)
+	$ret = IniRead($IniUser, "Settings", $name, '')
+	If $ret == '' Then $ret = IniRead($IniFile, "Settings", $name, $default)
+	Return $ret
+EndFunc   ;==>_readSettings
