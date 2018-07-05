@@ -83,6 +83,7 @@ $SignatureNames = IniRead($IniFile, "Settings", "SignatureNames", '')
 
 $AdbInit = IniRead($IniFile, "Settings", "AdbInit", '')
 $AdbKill = IniRead($IniFile, "Settings", "AdbKill", '0')
+$AdbTimeout = IniRead($IniFile, "Settings", "AdbTimeout", '30')
 
 $RestoreGUI = IniRead($IniFile, "Settings", "RestoreGUI", '0')
 
@@ -1487,7 +1488,7 @@ Func _adb($install)
 	$output = ''
 	$timer = TimerInit()
 	$timeout = TimerInit()
-	$max = 30 * 1000
+	$max = $AdbTimeout * 1000
 	$last = 0
 	While 1
 		$time = TimerDiff($timeout)
