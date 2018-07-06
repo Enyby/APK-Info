@@ -7,14 +7,42 @@ Then was updated by jazzruby and this is the [original jazzruby thread on XDA](h
 
 Then was updated by bovirus and this is the [reworked thread on XDA](https://forum.xda-developers.com/showthread.php?t=3614970)
 
-# APK-Info functionalities
+Allows you to view:
+- application icon,
+- package name,
+- name (in all languages),
+- version,
+- build number,
+- the minimum, maximum and target version of the SDK (Android),
+- supported density (DPI) and screen size,
+- architecture (ABI),
+- supported textures,
+- permissions,
+- features,
+- signature,
+- version of OpenGL ES,
+- support Android TV, Wear OS and Adroid Auto,
+- locales,
+- a variety of hashes (MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512)
+- and a lot of other information.
+
+The application is translated into 86 languages. The language is selected automatically based on the language of the operating system, but you can specify the language in the settings file.
+
+The app allows you to go to Google Play, a custom store and VirusTotal.
+
+You can rename an APK file using a pre-defined pattern with substitutions.
+
+You can also install or remove this APK file on a device or emulator connected via ADB.
+
+There is integration in the Windows shell.
+
+# APK-Info features
 - Support up to latest API Levels available
 - To add future SDK don't require program changes because is defined in external ini file.
 - Multilingual GUI. It's possible add new language without program change, but just editing external INI file.
-- Automatic recognition of OS language and set the right GUI language (en/fr/hu/id/it/pl/sk)
-- Option in configuration file to force a specifc GUI language
-- Option in configuration file to define pre and post filename characters
-- Automatic log of the operation (that can be disabled via external ini file)
+- Automatic recognition of OS language and set the right GUI language (86 languages)
+- Option in configuration file to force a specific GUI language
+- Option in configuration file to define pattern for rename filename
 - Windows shell integration (optional)
 
 # Download
