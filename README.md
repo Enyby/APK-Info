@@ -7,6 +7,8 @@ Then was updated by jazzruby and this is the [original jazzruby thread on XDA](h
 
 Then was updated by bovirus and this is the [reworked thread on XDA](https://forum.xda-developers.com/showthread.php?t=3614970)
 
+![APK-Info](https://github.com/Enyby/APK-Info/blob/master/screenshot.png?raw=true "APK-Info")
+
 Allows you to view:
 - application icon,
 - package name,
