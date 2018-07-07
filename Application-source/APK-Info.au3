@@ -176,6 +176,8 @@ Global $iconProgress = 5
 
 ;================== GUI ===========================
 
+ProgressOn($strLoading & "...", $ProgramName)
+
 $ProgramTitle = $ProgramName & ' ' & $ProgramVersion & " (" & $ProgramReleaseDate & ")"
 If $ShowLog = "1" Then
 	IniWrite($IniLogReport, "APK_Info Version", "Program version", $ProgramVersion)
@@ -382,7 +384,7 @@ Else
 	$tmp_Filename = ""
 EndIf
 
-_OpenNewFile($tmp_Filename)
+_OpenNewFile($tmp_Filename, False)
 
 GUIRegisterMsg($WM_PAINT, "MY_WM_PAINT")
 GUIRegisterMsg($WM_GETMINMAXINFO, "MY_WM_GETMINMAXINFO")
@@ -434,6 +436,8 @@ EndIf
 
 _OnShow()
 _saveGUIPos()
+
+ProgressOff()
 
 Local $whGap = '            '
 
@@ -727,7 +731,7 @@ Func _checkFileParameter($prmFilename)
 	EndIf
 EndFunc   ;==>_checkFileParameter
 
-Func _OpenNewFile($apk)
+Func _OpenNewFile($apk, $progress = True)
 	$searchPngCache = False
 	$hashCache = False
 	$fullPathAPK = _checkFileParameter($apk)
@@ -743,7 +747,7 @@ Func _OpenNewFile($apk)
 		EndIf
 	EndIf
 
-	ProgressOn($strLoading & "...", '', $fileAPK)
+	If $progress Then ProgressOn($strLoading & "...", '', $fileAPK)
 
 	ProgressSet(0, $fileAPK, $strPkg & '...')
 
@@ -795,7 +799,7 @@ Func _OpenNewFile($apk)
 	_drawPNG()
 	_OnShow()
 
-	ProgressOff()
+	If $progress Then ProgressOff()
 	If $tmpAPK <> False Then FileDelete($tmpAPK)
 	$searchPngCache = False
 EndFunc   ;==>_OpenNewFile
@@ -1554,7 +1558,7 @@ Func _checkNewVersion()
 		If $CheckNewVersion == '2' Then $now = 'w' & Round(@YDAY / 7)
 		If $CheckNewVersion == '3' Then $now = 'm' & @MON
 		If $tag[0] <> $now Or UBound($tag) <> 2 Then
-			ProgressOn($strLoading & "...", $ProgramName, $urlUpdate)
+			ProgressSet(10, $urlUpdate)
 			$foo = Run($toolsDir & 'curl -k --ssl-no-revoke -D - "' & $urlUpdate & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 			$output = ''
 			While 1
@@ -1562,7 +1566,7 @@ Func _checkNewVersion()
 				If @error Then ExitLoop
 				$output &= BinaryToString($bin, $SB_UTF8)
 			WEnd
-			ProgressOff()
+			ProgressSet(90, '')
 			$url = _StringBetween2($output, "Location: ", @CRLF)
 			$tag = ''
 			If StringInStr($url, '/tag/') Then
