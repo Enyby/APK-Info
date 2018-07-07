@@ -1574,13 +1574,13 @@ Func _checkNewVersion()
 		EndIf
 	EndIf
 	Return False
-EndFunc
+EndFunc   ;==>_checkNewVersion
 
 Func _Lib_IntToFloat($iInt)
-  Local $tFloat, $tInt
+	Local $tFloat, $tInt
 
-  $tInt   = DllStructCreate("int")
-  $tFloat = DllStructCreate("float", DllStructGetPtr($tInt))
-  DllStructSetData($tInt, 1, $iInt)
-  Return DllStructGetData($tFloat, 1)
-EndFunc
+	$tInt = DllStructCreate("int")
+	$tFloat = DllStructCreate("float", DllStructGetPtr($tInt))
+	DllStructSetData($tInt, 1, $iInt)
+	Return DllStructGetData($tFloat, 1)
+EndFunc   ;==>_Lib_IntToFloat
