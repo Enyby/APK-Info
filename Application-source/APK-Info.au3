@@ -28,7 +28,7 @@ $ProgramName = 'APK-Info'
 #include <GuiButton.au3>
 #include <GuiEdit.au3>
 #include <ScrollBarsConstants.au3>
-#include <Date.au3>
+;#include <Date.au3>
 Opt("TrayMenuMode", 1)
 Opt("TrayIconHide", 1)
 
@@ -1548,9 +1548,12 @@ Func _readSettings($name, $default)
 EndFunc   ;==>_readSettings
 
 Func _checkNewVersion()
-	If $CheckNewVersion == '1' Then
+	If $CheckNewVersion <> '0' Then
 		$tag = _StringExplode(IniRead($IniUser, "State", 'LastVersion', ''), '|', 1)
-		If $tag[0] <> _NowDate() Or UBound($tag) <> 2 Then
+		$now = 'd' & @MON & '-' & @MDAY ; If $CheckNewVersion == '1' Then
+		If $CheckNewVersion == '2' Then $now = 'w' & Round(@YDAY / 7)
+		If $CheckNewVersion == '3' Then $now = 'm' & @MON
+		If $tag[0] <> $now Or UBound($tag) <> 2 Then
 			ProgressOn($strLoading & "...", $ProgramName, $urlUpdate)
 			$foo = Run($toolsDir & 'curl -k --ssl-no-revoke -D - "' & $urlUpdate & '"', @ScriptDir, @SW_HIDE, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 			$output = ''
@@ -1565,7 +1568,7 @@ Func _checkNewVersion()
 			If StringInStr($url, '/tag/') Then
 				$tag = _StringExplode($url, '/tag/', 1)[1]
 			EndIf
-			$tag = _NowDate() & '|' & $tag
+			$tag = $now & '|' & $tag
 			IniWrite($IniUser, "State", 'LastVersion', $tag)
 			$tag = _StringExplode($tag, '|', 1)
 		EndIf
