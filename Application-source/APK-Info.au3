@@ -44,8 +44,8 @@ Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 DirCreate($tempPath)
 Global $toolsDir = 'tools/'
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
-Global $IniLogReport, $IniUser
-Global $tmpArrBadge, $tmp_Filename, $dirAPK, $fileAPK, $fullPathAPK, $tmpAPK
+Global $IniUser
+Global $tmpArrBadge, $dirAPK, $fileAPK, $fullPathAPK, $tmpAPK
 Global $sNewFilenameAPK, $searchPngCache, $hashCache
 Global $progress = 0
 Global $progressMax = 1
@@ -54,7 +54,6 @@ $Inidir = @ScriptDir & "\"
 
 $IniFile = $Inidir & "APK-Info.ini"
 $IniUser = $Inidir & "user.ini"
-$IniLogReport = $Inidir & "APK-Info.log.txt"
 
 ; $aCmdLine[0] = number of parametrs passed to exe file
 ; $aCmdLine[1] = first parameter (optional) passed to exe file (apk file name)
@@ -64,6 +63,23 @@ $IniLogReport = $Inidir & "APK-Info.log.txt"
 Local $aCmdLine = _WinAPI_CommandLineToArgv($CmdLineRaw)
 ; Uncomment it to Show all cmdline parameters
 ;_ArrayDisplay($aCmdLine)
+
+Local $tmp_Filename = ''
+If $aCmdLine[0] > 0 Then $tmp_Filename = $aCmdLine[1]
+
+Local $tmp = _StringExplode($tmp_Filename, ':', 2)
+If $tmp[0] == 'debug' Then
+	$tmp_Filename = $tmp[2]
+	$ProgramReleaseDate &= ' Log: ' & _getDebugFile($tmp[1])
+ElseIf _readSettings("DebugLog", "0") == '1' Then
+	$cmd = @ComSpec & ' /c ""' & @ScriptDir & '\' & @ScriptName & '" "debug:' & @AutoItPID & ':' & $tmp_Filename & '" > "' & _getDebugFile(@AutoItPID) & '""'
+	RunWait($cmd, @ScriptDir, @SW_HIDE)
+	Exit
+EndIf
+
+Func _getDebugFile($pid)
+	Return @ScriptDir & '\log,' & $pid  & '.txt'
+EndFunc
 
 ; more info on country code
 ; https://www.autoitscript.com/autoit3/docs/appendix/OSLangCodes.htm
@@ -93,7 +109,6 @@ $OldVirusTotal = _readSettings("OldVirusTotal", '0')
 
 $CheckNewVersion = _readSettings("CheckNewVersion", '1')
 
-$ShowLog = _readSettings("ShowLog", "0")
 $ShowLangCode = _readSettings("ShowLangCode", "1")
 
 Local $space = 'space'
@@ -178,31 +193,6 @@ Global $iconProgress = 5
 ProgressOn($strLoading & "...", $ProgramName)
 
 $ProgramTitle = $ProgramName & ' ' & $ProgramVersion & " (" & $ProgramReleaseDate & ")"
-If $ShowLog = "1" Then
-	IniWrite($IniLogReport, "APK_Info Version", "Program version", $ProgramVersion)
-	IniWrite($IniLogReport, "APK_Info Version", "Program release date", $ProgramReleaseDate)
-	IniWrite($IniLogReport, "Language", "OSLanguage", @OSLang)
-	IniWrite($IniLogReport, "Language", "OSLanguage", @OSLang)
-	IniWrite($IniLogReport, "Language", "OSLanguage", @OSLang)
-	IniWrite($IniLogReport, "Language", "ForcedLanguage", $ForcedGUILanguage)
-	IniWrite($IniLogReport, "IniFile", "IniFileFolderPath", $Inidir)
-	IniWrite($IniLogReport, "IniFile", "IniFile", $IniFile)
-	IniWrite($IniLogReport, "IniFile", "IniFile", $IniFile)
-	; Cleanup not defined variables
-	IniWrite($IniLogReport, "Icon", "TempFilePath", "")
-	IniWrite($IniLogReport, "Icon", "ApkIconeName", "")
-	IniWrite($IniLogReport, "NewFile", "NewFilenameAPK", "")
-	IniWrite($IniLogReport, "NewFile", "NewNameInput", "")
-	IniWrite($IniLogReport, "OpenNewFile", "LastFileName", "")
-	IniWrite($IniLogReport, "OpenNewFile", "TempFileName", "")
-EndIf
-If $aCmdLine[0] = 0 And $ShowLog = "1" Then
-	IniWrite($IniLogReport, "CommandLine", "Parameter1", $aCmdLine[0])
-	IniWrite($IniLogReport, "CommandLine", "Parameter2", "")
-	; Else
-	;	IniWrite($IniLogReport, "CommandLine", "Parameter1", $aCmdLine[0]);
-	;	IniWrite($IniLogReport, "CommandLine", "Parameter2", $aCmdLine[1]);
-EndIf
 
 $rightColumnWidth = 100
 
@@ -377,12 +367,6 @@ $hGraphic = _GDIPlus_GraphicsCreateFromHWND($hGUI)
 $defBkColor = 0
 $bkgColor = 0
 
-If $aCmdLine[0] > 0 Then
-	$tmp_Filename = $aCmdLine[1]
-Else
-	$tmp_Filename = ""
-EndIf
-
 _OpenNewFile($tmp_Filename, False)
 
 GUIRegisterMsg($WM_PAINT, "MY_WM_PAINT")
@@ -490,10 +474,6 @@ While 1
 			$width = $minSize[2]
 			$height = 130
 			$sNewNameInput = InputBox($strRenameAPK, $strNewName, $sNewFilenameAPK, "", $width, $height, $pos[0] + ($pos[2] - $width) / 2, $pos[1] + ($pos[3] - $height) / 2, $hGUI)
-			If $ShowLog = "1" Then
-				IniWrite($IniLogReport, "NewFile", "NewFilenameAPK", $sNewFilenameAPK)
-				IniWrite($IniLogReport, "NewFile", "NewNameInput", $sNewNameInput)
-			EndIf
 			If $sNewNameInput <> "" Then _renameAPK($sNewNameInput)
 
 		Case $gBtn_Install, $gBtn_Uninstall
@@ -1334,10 +1314,6 @@ Func _drawImg($path)
 		EndIf
 	EndIf
 	$hImage_original = _GDIPlus_ImageLoadFromFile($filename)
-	If $ShowLog = "1" Then
-		IniWrite($IniLogReport, "Icon", "TempFilePath", $tempPath)
-		IniWrite($IniLogReport, "Icon", "ApkIconeName", $apk_IconName)
-	EndIf
 	; resize always the bigger icon to 48x48 pixels
 	$hImage_ret = _GDIPlus_ImageResize($hImage_original, $iconSize, $iconSize)
 	_GDIPlus_ImageDispose($hImage_original)
