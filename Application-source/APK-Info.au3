@@ -751,8 +751,9 @@ Func _OpenNewFile($apk, $progress = True)
 
 	ProgressSet(0, $fileAPK, $strPkg & '...')
 
-	$tmpArrBadge = _getBadge($fullPathAPK)
-	_parseLines($tmpArrBadge)
+	$tmp = _getBadge($fullPathAPK)
+	_parseLines($tmp)
+	$tmp = False ; free mem
 
 	ProgressSet(25, $fileAPK, $strIcon & '...')
 
@@ -881,6 +882,8 @@ EndFunc   ;==>_getSignature
 
 Func _getSignatureName()
 	$apk_SignatureName = ''
+	If $apk_Signature == '' Then Return
+	ProgressSet(0, 'names...')
 	$names = ''
 	; Format: 'name=SHA1|'
 	$names &= 'testkey=61ed377e85d386a8dfee6b864bd85b0bfaa5af81|'
@@ -893,20 +896,23 @@ Func _getSignatureName()
 	$names &= 'debug=da75ff38332859408959c7b3b5fee41ff82cac2e|'
 	$names &= $SignatureNames
 	For $item In _StringExplode($names, '|')
-		$name = _StringExplode($item, '=')
+		$name = _StringExplode($item, '=', 1)
 		If UBound($name) <> 2 Then ContinueLoop
 		If StringInStr($apk_Signature, $name[1]) Then $apk_SignatureName &= @CRLF & $name[0]
 	Next
+	ProgressSet(0, 'names... OK')
 EndFunc   ;==>_getSignatureName
 
 Func _getBadge($prmAPK)
 	$foo = _Run('badging', $toolsDir & 'aapt.exe d --include-meta-data badging ' & '"' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
-	$output = _readAll($foo, 'badging')
-	$arrayLines = _StringExplode($output, @CRLF)
-	Return $arrayLines
+	$output = StringStripWS(_readAll($foo, 'badging'), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+	If $output == '' Then $output = StringStripWS(_readAll($foo, 'badging stderr', False), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+	Return $output
 EndFunc   ;==>_getBadge
 
-Func _parseLines($prmArrayLines)
+Func _parseLines($lines)
+	$prmArrayLines = _StringExplode($lines, @CRLF)
+
 	$apk_Debuggable = ''
 	$apk_Label = ''
 	$apk_Labels = ''
@@ -1282,7 +1288,8 @@ Func _extractIcon()
 	If $apk_IconPathBg Then
 		$files &= ' ' & $apk_IconPathBg
 	EndIf
-	_RunWait('icons', $toolsDir & "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"')
+	$files = StringStripWS($files, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+	If $files <> '' Then _RunWait('icons', $toolsDir & "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"')
 EndFunc   ;==>_extractIcon
 
 Func _cleanUp()
