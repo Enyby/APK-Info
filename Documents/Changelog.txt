@@ -1,3 +1,12 @@
+*** APK-Info 1.28 (07.07.2018)
+
+- Improved APK info.
+- Bugs fixes.
+- Improved option CheckNewVersion. 
+- Improved show progress on load. 
+- Remove option ShowLog.
+- Add option DebugLog.
+
 *** APK-Info 1.27 (05.07.2018)
 
 - Improved load APK icon.
