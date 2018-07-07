@@ -29,13 +29,12 @@ $ProgramName = 'APK-Info'
 #include <GuiEdit.au3>
 #include <ScrollBarsConstants.au3>
 ;#include <Date.au3>
+
 Opt("TrayMenuMode", 1)
 Opt("TrayIconHide", 1)
 
-; Adding the directives below, will cause your program be compiled with the indexing
-; of the original lines shown in SciTE:
-#AutoIt3Wrapper_Run_Before=ShowOriginalLine.exe %in%
-#AutoIt3Wrapper_Run_After=ShowOriginalLine.exe %in%
+$Debug = False
+;$Debug = True ; Debug
 
 Global $apk_Label, $apk_Labels, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version, $apk_Support
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MaxSDK, $apk_TargetSDK, $apk_CompileSDK
@@ -723,8 +722,10 @@ Func _checkFileParameter($prmFilename)
 	If FileExists($prmFilename) Then
 		Return $prmFilename
 	Else
+		ProgressOff()
 		$f_Sel = FileOpenDialog($strSelectAPK, $LastFolder, "(*.apk)", 1, "")
 		If @error Then Exit
+		ProgressOn($strLoading & "...", '', $fileAPK)
 		$LastFolder = _SplitPath($f_Sel, True)
 		IniWrite($IniUser, "State", "LastFolder", $LastFolder)
 		Return $f_Sel
