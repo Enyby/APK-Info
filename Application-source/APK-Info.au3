@@ -1165,18 +1165,13 @@ Func _searchPng($res)
 	$apk_IconName = _lastPart($res, "/")
 	$end = '/' & StringLeft($apk_IconName, StringLen($apk_IconName) - 3) & 'png'
 	$bestSize = 0
-	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _searchPng = ' & $start & '; ' & $end & @CRLF)
 	For $line In $searchPngCache
 		$check = _StringBetween($line, $start, $end)
-		;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check & @crlf)
 		If $check <> 0 Then
 			$size = Int(StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING))
-			;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $arrayLines = ' & $line & '; ' & $check[0] & '; ' & $size & '; ' & $bestSize & @crlf)
 			If $size > $bestSize Then
 				$bestSize = $size
 				$ret = $start & $check[0] & $end
-
-				;ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @crlf & $bestSize & ': ' & $apk_IconPath & @crlf)
 			EndIf
 		EndIf
 	Next
@@ -1207,7 +1202,6 @@ Func _parseXmlIcon($icon)
 				$ids[$fg] = _lastPart($line, "@")
 		EndSelect
 	Next
-	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $ids[0] & '; ' & $ids[1] & @CRLF)
 
 	_setProgress(1)
 
@@ -1230,16 +1224,12 @@ Func _parseXmlIcon($icon)
 			EndIf
 		Next
 
-		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $png[0] & '; ' & $png[1] & @CRLF)
-
 		If $png[0] Then
 			$apk_IconPathBg = _searchPng('res/' & $png[0] & '.png')
 		EndIf
 		If $png[1] Then
 			$apk_IconPath = _searchPng('res/' & $png[1] & '.png')
 		EndIf
-
-		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : _parseXmlIcon = ' & $apk_IconPathBg & '; ' & $apk_IconPath & @CRLF)
 	EndIf
 	_setProgress(1)
 EndFunc   ;==>_parseXmlIcon
@@ -1344,7 +1334,6 @@ Func _drawImg($path)
 		EndIf
 	EndIf
 	$hImage_original = _GDIPlus_ImageLoadFromFile($filename)
-	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $type = ' & VarGetType($hImage_original) & '; ' & $hImage_original & @CRLF & '>Error code: ' & @error & @CRLF)
 	If $ShowLog = "1" Then
 		IniWrite($IniLogReport, "Icon", "TempFilePath", $tempPath)
 		IniWrite($IniLogReport, "Icon", "ApkIconeName", $apk_IconName)
