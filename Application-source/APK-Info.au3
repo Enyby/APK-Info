@@ -709,7 +709,6 @@ EndFunc   ;==>_renameAPK
 
 Func _SplitPath($prmFullPath, $prmReturnDir = False)
 	$posSlash = StringInStr($prmFullPath, "\", 0, -1)
-	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $posSlash = ' & $posSlash & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 	Switch $prmReturnDir
 		Case False
 			Return StringMid($prmFullPath, $posSlash + 1)
@@ -944,7 +943,6 @@ Func _parseLines($lines)
 	$featuresImplied = ''
 	$featuresOthers = ''
 	For $line In $prmArrayLines
-		ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $line = ' & $line & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 
 		If $line == 'application-debuggable' Then
 			$apk_Debuggable = $strDebuggable
@@ -1356,7 +1354,6 @@ Func _drawImg($path)
 	_GDIPlus_ImageDispose($hImage_original)
 	FileDelete($filename) ; no need - try delete
 	$type = VarGetType($hImage_ret)
-	ConsoleWrite('@@ Debug(' & @ScriptLineNumber & ') : $type = ' & $type & @CRLF & '>Error code: ' & @error & @CRLF) ;### Debug Console
 	Return $hImage_ret
 EndFunc   ;==>_drawImg
 
