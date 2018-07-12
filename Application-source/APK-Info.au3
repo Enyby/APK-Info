@@ -41,7 +41,6 @@ Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_Min
 Global $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature, $apk_SignatureName, $apk_Debuggable
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
-DirCreate($tempPath)
 Global $toolsDir = 'tools/'
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniUser
@@ -721,6 +720,7 @@ Func _OpenNewFile($apk, $progress = True)
 	$tmpAPK = False
 	If BinaryToString(StringToBinary($fullPathAPK, $SB_ANSI), $SB_ANSI) <> $fullPathAPK Then
 		$tmpAPK = $tempPath & 'base.apk'
+		DirCreate($tempPath)
 		If FileCopy($fullPathAPK, $tmpAPK, $FC_CREATEPATH + $FC_OVERWRITE) == 1 And FileExists($tmpAPK) Then
 			FileSetAttrib($tmpAPK, "-RASH")
 			$fullPathAPK = $tmpAPK
@@ -1258,7 +1258,10 @@ Func _extractIcon()
 		$files &= ' ' & $apk_IconPathBg
 	EndIf
 	$files = StringStripWS($files, $STR_STRIPLEADING + $STR_STRIPTRAILING)
-	If $files <> '' Then _RunWait('icons', $toolsDir & "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"')
+	If $files <> '' Then
+		DirCreate($tempPath)
+		_RunWait('icons', $toolsDir & "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"')
+	EndIf
 EndFunc   ;==>_extractIcon
 
 Func _cleanUp()
@@ -1307,6 +1310,7 @@ Func _drawImg($path)
 	$filename = $tempPath & "\" & $apk_IconName
 	If StringRight($filename, 5) == '.webp' Then
 		$tmpFilename = StringTrimRight($filename, 5) & '.png'
+		DirCreate($tempPath)
 		_RunWait('dwebp', $toolsDir & 'dwebp.exe "' & $filename & '" -o "' & $tmpFilename & '"')
 		If FileExists($tmpFilename) Then
 			FileDelete($filename) ; no need - try delete
