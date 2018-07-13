@@ -23,7 +23,7 @@ Allows you to view:
 - features,
 - signature,
 - version of OpenGL ES,
-- support Android TV, Wear OS and Adroid Auto,
+- support Android TV, Wear OS and Android Auto,
 - locales,
 - a variety of hashes (MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512)
 - and a lot of other information.
