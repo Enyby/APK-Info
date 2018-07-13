@@ -46,6 +46,14 @@ There is integration in the Windows shell.
 - Option in configuration file to force a specific GUI language
 - Option in configuration file to define pattern for rename filename
 - Windows shell integration (optional)
+- Support Drag'n'Drop APK to the program window.
+
+# Using
+You can open the APK file in APK-Info using one of the following methods:
+- Start APK-Info, and then select the APK file in the dialog.
+- Drag the APK file to APK-Info.exe or its shortcut.
+- Drag the APK file into the running APK-Info window.
+- Open the APK file by double-clicking, after installing APK-Info, as a program for opening APK files (via explorer or attached .cmd file).
 
 # Download
 [Latest releases](https://github.com/Enyby/APK-Info/releases)
