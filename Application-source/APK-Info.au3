@@ -1020,6 +1020,9 @@ Func _parseLines($lines)
 					$line &= ' // ' & Round($float, 3)
 				EndIf
 				$featuresOthers &= '@ ' & StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+				If $key == 'meta-data' And _StringBetween2($value, "name='", "'") == 'com.google.android.gms.car.application' And Not StringInStr($apk_Support, $strAuto) Then
+					$apk_Support &= ', ' & $strAuto
+				EndIf
 
 			Case 'sdkVersion'
 				$apk_MinSDK = _StringBetween2($value, "'", "'")
@@ -1089,11 +1092,6 @@ Func _parseLines($lines)
 				If $featuresOthers <> '' Then $featuresOthers &= @CRLF
 				If $value <> '' Then $line = $key & ': ' & StringStripWS($value, $STR_STRIPLEADING + $STR_STRIPTRAILING)
 				$featuresOthers &= '@ ' & StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING)
-
-			Case 'meta-data'
-				If _StringBetween2($value, "'", "'") == 'com.google.android.gms.car.application' And Not StringInStr($apk_Support, $strAuto) Then
-					$apk_Support &= ', ' & $strAuto
-				EndIf
 		EndSwitch
 	Next
 
