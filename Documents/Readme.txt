@@ -80,7 +80,7 @@ If the language strings for the language forced are nota availabel it will show 
 *****************************************************APK-Info GUI translatorForced
 
 Catalan                  - 
-Chinese Traditional      - Li Guiquan
+Simplified Chinese      - Li Guiquan
 Dutch                    - 
 English                  - bovirus
 Farsi                    - HesamEdin
