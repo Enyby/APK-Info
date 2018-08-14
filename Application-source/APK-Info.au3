@@ -759,7 +759,12 @@ Func _OpenNewFile($apk, $progress = True)
 
 	If $progress Then ProgressOn($strLoading & "...", '', $fileAPK)
 
-	ProgressSet(0, $fileAPK, $strPkg & '...')
+	ProgressSet(0, $fileAPK, $strSignature & '...')
+
+	$processSignature = False
+	If $CheckSignature == 1 Then $processSignature = _Run('apksigner', 'java -jar ' & $toolsDir & 'apksigner.jar verify --v --print-certs ' & '"' & $fullPathAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
+
+	ProgressSet(1, $fileAPK, $strPkg & '...')
 
 	$tmp = _getBadge($fullPathAPK)
 	_parseLines($tmp)
@@ -771,7 +776,7 @@ Func _OpenNewFile($apk, $progress = True)
 
 	ProgressSet(75, $fileAPK, $strSignature & '...')
 
-	_getSignature($fullPathAPK, $CheckSignature)
+	_getSignature($fullPathAPK, $CheckSignature, $processSignature)
 
 	$sNewFilenameAPK = _ReplacePlaceholders($FileNamePattern & '.apk')
 	$hash = _ReplacePlaceholders($ShowHash)
@@ -955,16 +960,16 @@ Func _LoadSignature()
 		_deleteTmpApk()
 		ProgressOff()
 		GUICtrlSetData($edtSignature, $apk_Signature)
-		GUICtrlSetState($btnSignatureLoad, $GUI_HIDE)
 	EndIf
 EndFunc
 
-Func _getSignature($prmAPK, $load)
+Func _getSignature($prmAPK, $load, $process = False)
 	$output = ''
 	If $load == 1 Then
-		$foo = _Run('apksigner', 'java -jar ' & $toolsDir & 'apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
-		$output &= _readAll($foo, 'apksigner stderr', False)
-		$output &= _readAll($foo, 'apksigner stdout')
+		If $process == False Then $process = _Run('apksigner', 'java -jar ' & $toolsDir & 'apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
+		$output &= _readAll($process, 'apksigner stdout')
+		$output &= _readAll($process, 'apksigner stderr', False)
+		GUICtrlSetState($btnSignatureLoad, $GUI_HIDE)
 	Else
 		GUICtrlSetState($btnSignatureLoad, $GUI_SHOW)
 	EndIf
