@@ -51,6 +51,7 @@ There is integration in the Windows shell.
 # Using
 You can open the APK file in APK-Info using one of the following methods:
 - Start APK-Info, and then select the APK file in the dialog.
+- Open the APK file by click on the open button in the dialog.
 - Drag the APK file to APK-Info.exe or its shortcut.
 - Drag the APK file into the running APK-Info window.
 - Open the APK file by double-clicking, after installing APK-Info, as a program for opening APK files (via explorer or attached .cmd file).

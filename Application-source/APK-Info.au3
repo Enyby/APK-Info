@@ -346,6 +346,7 @@ $inpNewName = _makeField($strNewFilename, 0, $editWidth, $GUI_DOCKBOTTOM)
 $offsetHeight = 5
 
 $offsetWidth = $btnGap
+$gBtn_Open = _makeButton($strSelectAPK, "open.bmp")
 $gBtn_Play = _makeButton($strPlayStore, "play.bmp")
 $gBtn_CustomStore = -1000
 If $CustomStore <> '' Then
@@ -467,6 +468,10 @@ While 1
 
 		Case $GUI_EVENT_DROPPED
 			_OpenNewFile(@GUI_DragFile)
+			MY_WM_PAINT(0, 0, 0, 0)
+
+		Case $gBtn_Open
+			_OpenNewFile('')
 			MY_WM_PAINT(0, 0, 0, 0)
 
 		Case $btnLabels
