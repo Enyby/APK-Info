@@ -859,6 +859,15 @@ Func _ReplacePlaceholders($pattern)
 
 	$p = '%permissions%'
 	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_Permissions)
+	$p = '%permissions_cnt%'
+	If StringInStr($out, $p) Then
+		If $apk_Permissions == '' Then
+			$cnt = 0
+		Else
+			$cnt = UBound(_StringExplode($apk_Permissions, @CRLF))
+		EndIf
+		$out = StringReplace($out, $p, $cnt)
+	EndIf
 
 	$p = '%features%'
 	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_Features)
