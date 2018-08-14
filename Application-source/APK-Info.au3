@@ -958,7 +958,7 @@ Func _RunWait($label, $cmd)
 EndFunc
 
 Func _LoadSignature()
-	If $CheckSignature == 0 And $apk_Signature == '' Then
+	If $apk_Signature == '' Then
 		ProgressOn($strLoading & "...", $strSignature)
 		_copyTmpApk()
 		_getSignature($fullPathAPK, 1)
