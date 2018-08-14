@@ -180,6 +180,7 @@ $strWatch = 'Wear OS'
 $strAuto = 'Android Auto'
 $strAndroid = 'Android'
 $strVirusTotal = 'VirusTotal'
+$strAdb = 'ADB'
 
 $urlUpdate = 'https://github.com/Enyby/APK-Info/releases/latest'
 
@@ -359,8 +360,7 @@ If $CustomStore <> '' Then
 EndIf
 $gBtn_VirusTotal = _makeButton($strVirusTotal, "virustotal.bmp")
 $gBtn_Rename = _makeButton($strRename, "rename.bmp")
-$gBtn_Install = _makeButton($strInstall, "install.bmp")
-$gBtn_Uninstall = _makeButton($strUninstall, "delete.bmp")
+$gBtn_Adb = _makeButton($strAdb, "adb.bmp")
 
 $gBtn_TextInfo = -1002
 If $TextInfo <> '' Then $gBtn_TextInfo = _makeButton($strTextInformation, "text.bmp")
@@ -495,8 +495,8 @@ While 1
 			$sNewNameInput = InputBox($strRenameAPK, $strNewName, $sNewFilenameAPK, "", $width, $height, $pos[0] + ($pos[2] - $width) / 2, $pos[1] + ($pos[3] - $height) / 2, $hGUI)
 			If $sNewNameInput <> "" Then _renameAPK($sNewNameInput)
 
-		Case $gBtn_Install, $gBtn_Uninstall
-			_adb($nMsg == $gBtn_Install)
+		Case $gBtn_Adb
+			_adb()
 
 		Case $gBtn_Exit, $GUI_EVENT_CLOSE
 			_cleanUp()
@@ -1527,19 +1527,46 @@ Func _adbDevice($title)
 	$arrayLines = _StringExplode($output, @CRLF)
 	$cnt = UBound($arrayLines)
 
-	$top = 10
-	$btnHeight = 40
-	$height = $top + $cnt * $btnHeight
+	$gap = 5
+	$top = $gap
+
+	$lblHeight = 24
+	$btnHeight = 30
+	$itemHeight = $lblHeight + $gap + $btnHeight + $gap
+	$height = $top + $cnt * $itemHeight + $gap
+
+	$cmds = _StringExplode($strInstall & ': %adb% install -r "' & $fullPathAPK & '"; ' & $strUninstall & ': %adb% uninstall "' & $apk_PkgName & '"', '; ')
+
+	$ids = ''
+	$commands = ''
 
 	$pos = WinGetPos($hGUI)
+
 	$width = $minSize[2]
+	$btnWidth = (($width - $gap) / UBound($cmds)) - $gap
 
 	$gui = GUICreate($title, $width, $height, $pos[0] + ($pos[2] - $width) / 2, $pos[1] + ($pos[3] - $height) / 2)
 
 	For $line In $arrayLines
-		$btn = GUICtrlCreateButton(StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING), 10, $top, $width - 20)
-		$top += $btnHeight
+		$device = _StringExplode($line, ' ', 1)[0]
+
+		GUICtrlCreateLabel($line, $gap, $top, $width - $gap*2)
+		$top += $lblHeight + $gap
+		$left = $gap
+		For $cmd In $cmds
+			$cmd = _StringExplode($cmd, ': ', 1)
+
+			$ids &= GUICtrlCreateButton($cmd[0], $left, $top, $btnWidth, $btnHeight) & @CRLF
+			$commands &= StringReplace($cmd[1], '%adb%', 'adb.exe -s "' & $device & '"') & @CRLF
+
+			$left += $btnWidth + $gap
+		Next
+		$top += $btnHeight + $gap
 	Next
+
+	$ids = _StringExplode(StringStripWS($ids, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
+	$cnt = UBound($ids)
+	$commands = _StringExplode($commands, @CRLF)
 
 	ProgressOff()
 
@@ -1551,13 +1578,15 @@ Func _adbDevice($title)
 
 	While 1
 		$Msg = GUIGetMsg()
-		If $Msg == $GUI_EVENT_CLOSE Then ExitLoop
+		If $Msg == $GUI_EVENT_CLOSE Or $device <> '' Then ExitLoop
 		If $Msg > 0 Then
-			$val = GUICtrlRead($Msg)
-			If $val <> '0' Then
-				$device = _StringExplode($val, ' ', 1)[0]
+			$str = $Msg & ''
+			For $i = 0 To $cnt
+				If $ids[$i] <> $str Then ContinueLoop
+				$val = GUICtrlRead($Msg)
+				$device = $val & '|' & $commands[$i]
 				ExitLoop
-			EndIf
+			Next
 		EndIf
 	WEnd
 	GUISetState(@SW_SHOW, $hGUI)
@@ -1579,25 +1608,18 @@ Func _deleteTmpApk()
 	If $tmpAPK <> False Then FileDelete($tmpAPK)
 EndFunc
 
-Func _adb($install)
-	If $install Then
-		$title = $strInstall
-	Else
-		$title = $strUninstall
-	EndIf
-	$device = _adbDevice($title & ': ' & $apk_Label & ' [' & $apk_PkgName & ']')
+Func _adb()
+	$device = _adbDevice($apk_Label & ' [' & $apk_PkgName & ']')
 
 	If $device == '' Then Return
 
+	$parts = _StringExplode($device, '|', 1)
+
+	$title = $parts[0]
+	$cmd = $parts[1]
 	ProgressOn($title, $strLoading)
 
-	If $install Then
-		_copyTmpApk()
-
-		$cmd = 'adb.exe -s "' & $device & '" install -r "' & $fullPathAPK & '"'
-	Else
-		$cmd = 'adb.exe -s "' & $device & '" uninstall "' & $apk_PkgName & '"'
-	EndIf
+	If $tmpAPK <> False And StringInStr($cmd, $tmpAPK) Then _copyTmpApk()
 
 	$foo = _Run('adb', $toolsDir & $cmd, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	$output = ''
