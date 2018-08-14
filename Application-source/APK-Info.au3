@@ -701,6 +701,7 @@ Func _renameAPK($prmNewFilenameAPK)
 	Else
 		$fileAPK = $prmNewFilenameAPK
 		GUICtrlSetData($inpName, $fileAPK)
+		If $tmpAPK == False Then $fullPathAPK = $dirAPK & "\" & $fileAPK
 	EndIf
 EndFunc   ;==>_renameAPK
 
@@ -810,7 +811,7 @@ Func _OpenNewFile($apk, $progress = True)
 	_OnShow()
 
 	If $progress Then ProgressOff()
-	If $tmpAPK <> False Then FileDelete($tmpAPK)
+	_deleteTmpApk()
 	$searchPngCache = False
 EndFunc   ;==>_OpenNewFile
 
@@ -949,7 +950,9 @@ EndFunc
 Func _LoadSignature()
 	If $CheckSignature == 0 And $apk_Signature == '' Then
 		ProgressOn($strLoading & "...", $strSignature)
+		_copyTmpApk()
 		_getSignature($fullPathAPK, 1)
+		_deleteTmpApk()
 		ProgressOff()
 		GUICtrlSetData($edtSignature, $apk_Signature)
 		GUICtrlSetState($btnSignatureLoad, $GUI_HIDE)
@@ -1555,6 +1558,17 @@ Func _adbDevice($title)
 	Return $device
 EndFunc   ;==>_adbDevice
 
+Func _copyTmpApk()
+	If $tmpAPK <> False Then
+		FileCopy($dirAPK & "\" & $fileAPK, $tmpAPK, $FC_CREATEPATH + $FC_OVERWRITE)
+		FileSetAttrib($tmpAPK, "-RASH")
+	EndIf
+EndFunc
+
+Func _deleteTmpApk()
+	If $tmpAPK <> False Then FileDelete($tmpAPK)
+EndFunc
+
 Func _adb($install)
 	If $install Then
 		$title = $strInstall
@@ -1568,10 +1582,7 @@ Func _adb($install)
 	ProgressOn($title, $strLoading)
 
 	If $install Then
-		If $tmpAPK <> False Then
-			FileCopy($dirAPK & "\" & $fileAPK, $tmpAPK, $FC_CREATEPATH + $FC_OVERWRITE)
-			FileSetAttrib($tmpAPK, "-RASH")
-		EndIf
+		_copyTmpApk()
 
 		$cmd = 'adb.exe -s "' & $device & '" install -r "' & $fullPathAPK & '"'
 	Else
@@ -1613,7 +1624,7 @@ Func _adb($install)
 
 	MsgBox(0, $title, $output)
 
-	If $tmpAPK <> False Then FileDelete($tmpAPK)
+	_deleteTmpApk()
 
 	If $AdbKill == '1' Then _RunWait('kill', $toolsDir & 'adb.exe kill-server')
 EndFunc   ;==>_adb
