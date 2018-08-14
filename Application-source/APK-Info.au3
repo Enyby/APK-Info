@@ -1085,6 +1085,10 @@ Func _parseLines($lines)
 					$banners &= $icon
 				EndIf
 
+				If $featuresOthers <> '' Then $featuresOthers &= @CRLF
+				If $value <> '' Then $line = $key & ': ' & StringStripWS($value, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+				$featuresOthers &= '@ ' & StringStripWS($line, $STR_STRIPLEADING + $STR_STRIPTRAILING)
+
 			Case 'package'
 				$apk_PkgName = _StringBetween2($value, "name='", "'")
 				$apk_Build = _StringBetween2($value, "versionCode='", "'")
