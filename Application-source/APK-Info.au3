@@ -166,6 +166,7 @@ $strDebuggable = IniRead($IniFile, $LangSection, "Debuggable", "Debuggable")
 $strLabelInLocales = IniRead($IniFile, $LangSection, "LabelInLocales", "Application name in different locales")
 $strNewVersionIsAvailable = IniRead($IniFile, $LangSection, "NewVersionIsAvailable", "A new version is available")
 $strTextInformation = IniRead($IniFile, $LangSection, "TextInformation", "Text information")
+$strLoadSignature = IniRead($IniFile, $LangSection, "LoadSignature", "Load signature")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -323,6 +324,11 @@ Else
 	$tmpStyle = $tmpStyle + $GUI_UNCHECKED
 EndIf
 GUICtrlSetState(-1, $tmpStyle)
+
+$btnSignatureLoad = GUICtrlCreateButton('->', $inputStart - $inputHeight, $offsetHeight + $fieldHeight, $inputHeight, $inputHeight)
+GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT)
+GUICtrlSetState(-1, $globalStyle)
+GUICtrlSetTip(-1, $strLoadSignature)
 
 $lblSignature = GUICtrlCreateLabel('', $labelStart, $offsetHeight + $labelTop + $fieldHeight, $labelWidth, $editHeight - $fieldHeight)
 GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKLEFT)
@@ -502,6 +508,9 @@ While 1
 
 		Case $edtInfo[2][$INFO_BTN]
 			_showText($strLabel & ': ' & $fileAPK, $strSignature & $whGap & StringReplace($apk_SignatureName, @CRLF, $whGap), $apk_Signature)
+
+		Case $btnSignatureLoad
+			_LoadSignature()
 	EndSwitch
 WEnd
 
@@ -759,7 +768,7 @@ Func _OpenNewFile($apk, $progress = True)
 
 	ProgressSet(75, $fileAPK, $strSignature & '...')
 
-	_getSignature($fullPathAPK)
+	_getSignature($fullPathAPK, $CheckSignature)
 
 	$sNewFilenameAPK = _ReplacePlaceholders($FileNamePattern & '.apk')
 	$hash = _ReplacePlaceholders($ShowHash)
@@ -881,14 +890,7 @@ Func _ReplacePlaceholders($pattern)
 	If StringInStr($out, $p) Then $out = StringReplace($out, $p, @TAB)
 
 	If StringInStr($out, '%sig_') Then
-		If $CheckSignature == 0 And $apk_Signature == '' Then
-			ProgressOn($strLoading & "...", $strSignature)
-			$CheckSignature = 1
-			_getSignature($fullPathAPK)
-			$CheckSignature = 0
-			ProgressOff()
-			GUICtrlSetData($edtSignature, $apk_Signature)
-		EndIf
+		_LoadSignature()
 		$out = StringReplace($out, '%sig_sha256%', _StringBetween2($apk_Signature, ' certificate SHA-256 digest: ', @CRLF))
 		$out = StringReplace($out, '%sig_sha1%', _StringBetween2($apk_Signature, ' certificate SHA-1 digest: ', @CRLF))
 		$out = StringReplace($out, '%sig_md5%', _StringBetween2($apk_Signature, ' certificate MD5 digest: ', @CRLF))
@@ -942,12 +944,24 @@ Func _RunWait($label, $cmd)
 	Return $ret
 EndFunc
 
-Func _getSignature($prmAPK)
+Func _LoadSignature()
+	If $CheckSignature == 0 And $apk_Signature == '' Then
+		ProgressOn($strLoading & "...", $strSignature)
+		_getSignature($fullPathAPK, 1)
+		ProgressOff()
+		GUICtrlSetData($edtSignature, $apk_Signature)
+		GUICtrlSetState($btnSignatureLoad, $GUI_HIDE)
+	EndIf
+EndFunc
+
+Func _getSignature($prmAPK, $load)
 	$output = ''
-	If $CheckSignature == 1 Then
+	If $load == 1 Then
 		$foo = _Run('apksigner', 'java -jar ' & $toolsDir & 'apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
 		$output &= _readAll($foo, 'apksigner stderr', False)
 		$output &= _readAll($foo, 'apksigner stdout')
+	Else
+		GUICtrlSetState($btnSignatureLoad, $GUI_SHOW)
 	EndIf
 	$apk_Signature = StringStripWS($output, $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
