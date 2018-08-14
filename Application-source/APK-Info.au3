@@ -98,6 +98,8 @@ $ShowHash = _readSettings("ShowHash", '')
 $CustomStore = _readSettings("CustomStore", '')
 $SignatureNames = _readSettings("SignatureNames", '')
 
+$TextInfo = _readSettings("TextInfo", '')
+
 $AdbInit = _readSettings("AdbInit", '')
 $AdbKill = _readSettings("AdbKill", '0')
 $AdbTimeout = _readSettings("AdbTimeout", '30')
@@ -163,6 +165,7 @@ $strSupport = IniRead($IniFile, $LangSection, "Support", "Support")
 $strDebuggable = IniRead($IniFile, $LangSection, "Debuggable", "Debuggable")
 $strLabelInLocales = IniRead($IniFile, $LangSection, "LabelInLocales", "Application name in different locales")
 $strNewVersionIsAvailable = IniRead($IniFile, $LangSection, "NewVersionIsAvailable", "A new version is available")
+$strTextInformation = IniRead($IniFile, $LangSection, "TextInformation", "Text information")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -352,6 +355,9 @@ $gBtn_Rename = _makeButton($strRename, "rename.bmp")
 $gBtn_Install = _makeButton($strInstall, "install.bmp")
 $gBtn_Uninstall = _makeButton($strUninstall, "delete.bmp")
 
+$gBtn_TextInfo = -1002
+If $TextInfo <> '' Then $gBtn_TextInfo = _makeButton($strTextInformation, "text.bmp")
+
 $newVersion = _checkNewVersion()
 $gBtn_Update = -1001
 If $newVersion Then $gBtn_Update = _makeButton($strNewVersionIsAvailable & ': ' & $newVersion, "new.bmp")
@@ -459,6 +465,9 @@ While 1
 
 		Case $btnLabels
 			_showText($strLabel & ': ' & $fileAPK, $strLabelInLocales, $apk_Labels)
+
+		Case $gBtn_TextInfo
+			_showText($strLabel & ': ' & $fileAPK, $strTextInformation, _ReplacePlaceholders($TextInfo))
 
 		Case $chSignature
 			If BitAND(GUICtrlRead($chSignature), $GUI_CHECKED) = $GUI_CHECKED Then
@@ -686,6 +695,15 @@ Func _renameAPK($prmNewFilenameAPK)
 	EndIf
 EndFunc   ;==>_renameAPK
 
+Func ByteSuffix($iBytes)
+    Local $iIndex = 0, $aArray = [' bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB']
+    While $iBytes > 1023
+        $iIndex += 1
+        $iBytes /= 1024
+    WEnd
+    Return Round($iBytes) & $aArray[$iIndex]
+EndFunc   ;==>ByteSuffix
+
 Func _SplitPath($prmFullPath, $prmReturnDir = False)
 	$posSlash = StringInStr($prmFullPath, "\", 0, -1)
 	Switch $prmReturnDir
@@ -795,26 +813,90 @@ EndFunc   ;==>_OnShow
 
 Func _ReplacePlaceholders($pattern)
 	$out = $pattern
-	$out = StringReplace($out, '%label%', StringReplace($apk_Label, " ", $FileNameSpace))
-	$out = StringReplace($out, '%version%', StringReplace($apk_Version, " ", $FileNameSpace))
-	$out = StringReplace($out, '%build%', StringReplace($apk_Build, " ", $FileNameSpace))
-	$out = StringReplace($out, '%package%', StringReplace($apk_PkgName, " ", $FileNameSpace))
+	$p = '%label%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_Label, " ", $FileNameSpace))
+	$p = '%version%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_Version, " ", $FileNameSpace))
+	$p = '%build%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_Build, " ", $FileNameSpace))
+	$p = '%package%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_PkgName, " ", $FileNameSpace))
 
-	$out = StringReplace($out, '%min%', $apk_MinSDK)
-	$out = StringReplace($out, '%max%', $apk_MaxSDK)
-	$out = StringReplace($out, '%target%', $apk_TargetSDK)
-	$out = StringReplace($out, '%compile%', $apk_CompileSDK)
+	$p = '%min%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_MinSDK)
+	$p = '%min_android%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, _translateSDKLevel($apk_MinSDK, False))
+	$p = '%max%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_MaxSDK)
+	$p = '%max_android%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, _translateSDKLevel($apk_MaxSDK, False))
+	$p = '%target%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_TargetSDK)
+	$p = '%target_android%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, _translateSDKLevel($apk_TargetSDK, False))
+	$p = '%compile%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_CompileSDK)
+	$p = '%compile_android%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, _translateSDKLevel($apk_CompileSDK, False))
 
-	$out = StringReplace($out, '%screens%', StringReplace($apk_Screens, " ", ','))
-	$out = StringReplace($out, '%dpis%', StringReplace($apk_Densities, " ", ','))
-	$out = StringReplace($out, '%abis%', StringReplace($apk_ABIs, " ", ','))
-	$out = StringReplace($out, '%textures%', StringReplace($apk_Textures, " ", ','))
-	$out = StringReplace($out, '%opengles%', StringReplace($apk_OpenGLES, $strOpenGLES, ''))
+	$p = '%screens%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_Screens, " ", ','))
+	$p = '%dpis%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_Densities, " ", ','))
+	$p = '%abis%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_ABIs, " ", ','))
+	$p = '%textures%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_Textures, " ", ','))
+	$p = '%opengles%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_OpenGLES, $strOpenGLES, ''))
+	$p = '%support%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_Support)
 
-	$out = StringReplace($out, '%lang%', $Language_code)
+	$p = '%file_bytes%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, FileGetSize($dirAPK & "\" & $fileAPK))
+	$p = '%file_size%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, ByteSuffix(FileGetSize($dirAPK & "\" & $fileAPK)))
 
-	$out = StringReplace($out, '\n', @CRLF)
-	$out = StringReplace($out, '\t', @TAB)
+	$p = '%permissions%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_Permissions)
+
+	$p = '%features%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_Features)
+
+	$p = '%lang%'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $Language_code)
+
+	$p = '\n'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, @CRLF)
+	$p = '\t'
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, @TAB)
+
+	If StringInStr($out, '%sig_') Then
+		If $CheckSignature == 0 And $apk_Signature == '' Then
+			ProgressOn($strLoading & "...", $strSignature)
+			$CheckSignature = 1
+			_getSignature($fullPathAPK)
+			$CheckSignature = 0
+			ProgressOff()
+			GUICtrlSetData($edtSignature, $apk_Signature)
+		EndIf
+		$out = StringReplace($out, '%sig_sha256%', _StringBetween2($apk_Signature, ' certificate SHA-256 digest: ', @CRLF))
+		$out = StringReplace($out, '%sig_sha1%', _StringBetween2($apk_Signature, ' certificate SHA-1 digest: ', @CRLF))
+		$out = StringReplace($out, '%sig_md5%', _StringBetween2($apk_Signature, ' certificate MD5 digest: ', @CRLF))
+
+		$dn = _StringBetween2($apk_Signature, ' certificate DN: ', @CRLF)
+		$out = StringReplace($out, '%sig_dn%', $dn)
+
+		$dn = ', ' & $dn & ', '
+		$out = StringReplace($out, '%sig_email%', _StringBetween2($dn, ', EMAILADDRESS=', ', '))
+		$out = StringReplace($out, '%sig_cn%', _StringBetween2($dn, ', CN=', ', '))
+		$out = StringReplace($out, '%sig_ou%', _StringBetween2($dn, ', OU=', ', '))
+		$out = StringReplace($out, '%sig_o%', _StringBetween2($dn, ', O=', ', '))
+		$out = StringReplace($out, '%sig_l%', _StringBetween2($dn, ', L=', ', '))
+		$out = StringReplace($out, '%sig_st%', _StringBetween2($dn, ', ST=', ', '))
+		$out = StringReplace($out, '%sig_s%', _StringBetween2($dn, ', S=', ', '))
+		$out = StringReplace($out, '%sig_c%', _StringBetween2($dn, ', C=', ', '))
+	EndIf
 
 	$hashes = 'md2,md4,md5,sha1,sha256,sha384,sha512'
 	$names = _StringExplode($hashes, ',')
@@ -1280,7 +1362,7 @@ Func _cleanUp()
 	If $AdbKill == '2' Then _RunWait('kill', $toolsDir & 'adb.exe kill-server')
 EndFunc   ;==>_cleanUp
 
-Func _translateSDKLevel($sdk)
+Func _translateSDKLevel($sdk, $withNumber = True)
 	If $sdk == '' Then Return ''
 	If $sdk == "1000" Then
 		$name = $strCurDev & '|' & $strCurDevBuild
@@ -1289,7 +1371,9 @@ Func _translateSDKLevel($sdk)
 	EndIf
 	$tmp = _StringExplode($name, '|')
 	If UBound($tmp) < 2 Then Return 'INI error: SDK-' & $sdk & ' must contain char "|"'
-	Return $sdk & ': Android ' & $tmp[0] & ' (' & $tmp[1] & ')'
+	$ret = $tmp[0] & ' (' & $tmp[1] & ')'
+	If $withNumber Then $ret = $sdk & ': Android ' & $ret
+	Return $ret
 EndFunc   ;==>_translateSDKLevel
 
 Func _drawPNG()
