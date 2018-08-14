@@ -705,7 +705,7 @@ Func _renameAPK($prmNewFilenameAPK)
 EndFunc   ;==>_renameAPK
 
 Func ByteSuffix($iBytes)
-    Local $iIndex = 0, $aArray = [' bytes', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB']
+    Local $iIndex = 0, $aArray = [' B', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB']
     While $iBytes > 1023
         $iIndex += 1
         $iBytes /= 1024
