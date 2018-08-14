@@ -1390,6 +1390,7 @@ Func _adbDevice($title)
 	$output = StringStripWS(StringReplace($output, 'List of devices attached', ''), $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 	If $output == '' Then
+		ProgressOff()
 		MsgBox(0, $title, $strNoAdbDevices)
 		Return ''
 	EndIf
