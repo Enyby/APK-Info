@@ -813,6 +813,9 @@ Func _ReplacePlaceholders($pattern)
 
 	$out = StringReplace($out, '%lang%', $Language_code)
 
+	$out = StringReplace($out, '\n', @CRLF)
+	$out = StringReplace($out, '\t', @TAB)
+
 	$hashes = 'md2,md4,md5,sha1,sha256,sha384,sha512'
 	$names = _StringExplode($hashes, ',')
 	$ids = _StringExplode($CALG_MD2 & ',' & $CALG_MD4 & ',' & $CALG_MD5 & ',' & $CALG_SHA1 & ',' & $CALG_SHA_256 & ',' & $CALG_SHA_384 & ',' & $CALG_SHA_512, ',')
