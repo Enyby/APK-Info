@@ -744,6 +744,8 @@ Func _OpenNewFile($apk, $progress = True)
 	$dirAPK = _SplitPath($fullPathAPK, True)
 	$fileAPK = _SplitPath($fullPathAPK, False)
 
+	WinSetTitle($hGUI, "", $fileAPK & ' - ' & $ProgramTitle)
+
 	$tmpAPK = False
 	If BinaryToString(StringToBinary($fullPathAPK, $SB_ANSI), $SB_ANSI) <> $fullPathAPK Then
 		$tmpAPK = $tempPath & 'base.apk'
