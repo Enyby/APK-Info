@@ -1213,6 +1213,14 @@ Func _parseLines($lines)
 						$val = 'S3TC'
 					Case 'GL_IMG_texture_compression_pvrtc'
 						$val = 'PVR'
+					Case 'GL_KHR_texture_compression_astc_hdr'
+						$val = 'hASTC'
+					Case 'GL_KHR_texture_compression_astc_ldr'
+						$val = 'lASTC'
+					Case 'GL_OES_texture_compression_S3TC'
+						$val = 'oS3TC'
+					Case 'GL_OES_texture_compression_astc'
+						$val = 'ASTC'
 				EndSwitch
 				$apk_Textures &= $val
 
