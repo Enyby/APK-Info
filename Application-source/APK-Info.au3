@@ -981,6 +981,7 @@ Func _getSignature($prmAPK, $load, $process = False)
 	$apk_Signature = StringStripWS($output, $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 	_getSignatureName()
+	GUICtrlSetData($lblSignature, $apk_SignatureName)
 EndFunc   ;==>_getSignature
 
 Func _getSignatureName()
