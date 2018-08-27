@@ -1262,6 +1262,12 @@ Func _parseLines($lines)
 		$apk_Features &= $featuresOthers
 	EndIf
 
+	If StringInStr($apk_Permissions, @CRLF) Then
+		$tmp = _StringExplode($apk_Permissions, @CRLF)
+		_ArraySort($tmp)
+		$apk_Permissions = _ArrayToString($tmp, @CRLF)
+	EndIf
+
 	;$apk_Permissions = StringReplace(StringLower($apk_Permissions), "android.permission.", "")
 	;$apk_Features = StringReplace(StringReplace(StringLower($apk_Features), "android.hardware.", ""), "android.permission.", "")
 EndFunc   ;==>_parseLines
