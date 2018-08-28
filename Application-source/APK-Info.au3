@@ -167,6 +167,7 @@ $strLabelInLocales = IniRead($IniFile, $LangSection, "LabelInLocales", "Applicat
 $strNewVersionIsAvailable = IniRead($IniFile, $LangSection, "NewVersionIsAvailable", "A new version is available")
 $strTextInformation = IniRead($IniFile, $LangSection, "TextInformation", "Text information")
 $strLoadSignature = IniRead($IniFile, $LangSection, "LoadSignature", "Load signature")
+$strStart = IniRead($IniFile, $LangSection, "Start", "Start")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -1550,7 +1551,7 @@ Func _adbDevice($title)
 	$itemHeight = $lblHeight + $gap + $btnHeight + $gap
 	$height = $top + $cnt * $itemHeight + $gap
 
-	$cmds = _StringExplode($strInstall & ': %adb% install -r "' & $fullPathAPK & '"; ' & $strUninstall & ': %adb% uninstall "' & $apk_PkgName & '"', '; ')
+	$cmds = _StringExplode($strInstall & ': %adb% install -r "' & $fullPathAPK & '"; ' & $strStart & ': %adb% shell "monkey -p ' & $apk_PkgName & ' -c android.intent.category.LAUNCHER 1"; ' & $strUninstall & ': %adb% uninstall "' & $apk_PkgName & '"', '; ')
 
 	$ids = ''
 	$commands = ''
