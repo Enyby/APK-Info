@@ -1,3 +1,11 @@
+*** APK-Info 1.30 (29.08.2018)
+
+- Added short names for textures.
+- Add 'Start' button for adb dialog. 
+- Sort permissions.
+- Bugs fixes.
+- Update translations. Thanks to @Li Bibo
+
 *** APK-Info 1.29 (14.08.2018)
 
 - Add option TextInfo.

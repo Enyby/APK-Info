@@ -6,12 +6,12 @@
 #AutoIt3Wrapper_Res_Comment=Shows info about Android Package Files (APK)
 #AutoIt3Wrapper_Res_Description=APK-Info
 #AutoIt3Wrapper_Res_LegalCopyright=zoster
-#AutoIt3Wrapper_Res_Fileversion=1.29.0.0
+#AutoIt3Wrapper_Res_Fileversion=1.30.0.0
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 #pragma compile(AutoItExecuteAllowed True)
 
-$ProgramVersion = "1.29"
-$ProgramReleaseDate = "14.08.2018"
+$ProgramVersion = "1.30"
+$ProgramReleaseDate = "29.08.2018"
 $ProgramName = 'APK-Info'
 
 #include <Constants.au3>
