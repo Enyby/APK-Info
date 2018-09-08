@@ -785,6 +785,17 @@ Func _OpenNewFile($apk, $progress = True)
 	_getSignature($fullPathAPK, $CheckSignature, $processSignature)
 
 	$sNewFilenameAPK = _ReplacePlaceholders($FileNamePattern & '.apk')
+
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, "\\", $FileNameSpace)
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, "/", $FileNameSpace)
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, ":", $FileNameSpace)
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, "*", $FileNameSpace)
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, "?", $FileNameSpace)
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, '"', $FileNameSpace)
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, "<", $FileNameSpace)
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, ">", $FileNameSpace)
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, "|", $FileNameSpace)
+
 	$hash = _ReplacePlaceholders($ShowHash)
 
 	If $apk_Labels == '' Then
