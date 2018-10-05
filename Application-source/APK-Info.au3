@@ -102,7 +102,7 @@ $TextInfo = _readSettings("TextInfo", '')
 
 $AdbInit = _readSettings("AdbInit", '')
 $AdbKill = _readSettings("AdbKill", '0')
-$AdbTimeout = _readSettings("AdbTimeout", '30')
+$AdbTimeout = _readSettings("AdbTimeout", '15')
 
 $RestoreGUI = _readSettings("RestoreGUI", '0')
 
@@ -168,6 +168,7 @@ $strNewVersionIsAvailable = IniRead($IniFile, $LangSection, "NewVersionIsAvailab
 $strTextInformation = IniRead($IniFile, $LangSection, "TextInformation", "Text information")
 $strLoadSignature = IniRead($IniFile, $LangSection, "LoadSignature", "Load signature")
 $strStart = IniRead($IniFile, $LangSection, "Start", "Start")
+$strExceededTimeout = IniRead($IniFile, $LangSection, "ExceededTimeout", "Exceeded timeout response from the command")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -1661,7 +1662,15 @@ Func _adb()
 		$last = 0
 		While 1
 			$time = TimerDiff($timeout)
-			If $time > $max Then ExitLoop
+			If $time > $max Then
+				ProgressOff()
+				If MsgBox($MB_RETRYCANCEL + $MB_ICONQUESTION, $title, $strExceededTimeout) <> $IDRETRY Then ExitLoop
+
+				$timeout = TimerInit()
+
+				$tmp = _StringExplode(StringStripWS($output, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
+				ProgressOn($title, $strLoading, $tmp[UBound($tmp) - 1])
+			EndIf
 			$bin = StdoutRead($foo, False, True)
 			If @error Then ExitLoop
 			If StringLen($bin) > 0 Then $timeout = TimerInit()
