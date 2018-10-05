@@ -1562,7 +1562,7 @@ Func _adbDevice($title)
 	$itemHeight = $lblHeight + $gap + $btnHeight + $gap
 	$height = $top + $cnt * $itemHeight + $gap
 
-	$cmds = _StringExplode($strInstall & ': %adb% install -r "' & $fullPathAPK & '"; ' & $strStart & ': %adb% shell "monkey -p ' & $apk_PkgName & ' -c android.intent.category.LAUNCHER 1"; ' & $strUninstall & ': %adb% uninstall "' & $apk_PkgName & '"', '; ')
+	$cmds = _StringExplode($strInstall & ': %adb% install -r "' & $fullPathAPK & '"; ' & $strInstall & ' + ' & $strStart & ': %adb% install -r "' & $fullPathAPK & '"|%adb% shell "monkey -p ' & $apk_PkgName & ' -c android.intent.category.LAUNCHER 1"; ' & $strStart & ': %adb% shell "monkey -p ' & $apk_PkgName & ' -c android.intent.category.LAUNCHER 1"; ' & $strUninstall & ': %adb% uninstall "' & $apk_PkgName & '"', '; ')
 
 	$ids = ''
 	$commands = ''
@@ -1640,36 +1640,42 @@ Func _adb()
 
 	If $device == '' Then Return
 
-	$parts = _StringExplode($device, '|', 1)
+	$parts = _StringExplode($device, '|')
 
 	$title = $parts[0]
-	$cmd = $parts[1]
 	ProgressOn($title, $strLoading)
 
-	If $tmpAPK <> False And StringInStr($cmd, $tmpAPK) Then _copyTmpApk()
-
-	$foo = _Run('adb', $toolsDir & $cmd, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$tmpAPKCopied = False
 	$output = ''
 	$timer = TimerInit()
-	$timeout = TimerInit()
-	$max = $AdbTimeout * 1000
-	$last = 0
-	While 1
-		$time = TimerDiff($timeout)
-		If $time > $max Then ExitLoop
-		$bin = StdoutRead($foo, False, True)
-		If @error Then ExitLoop
-		If StringLen($bin) > 0 Then $timeout = TimerInit()
-		$output &= BinaryToString($bin, $SB_UTF8)
-		$check = Round(TimerDiff($timer) / 500)
-		If $check <> $last Then
-			$last = $check
-			$tmp = _StringExplode(StringStripWS($output, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
-			ProgressSet($time * 100 / $max, $tmp[UBound($tmp) - 1])
+	For $i = 1 To UBound($parts) - 1
+		$cmd = $parts[$i]
+		If Not $tmpAPKCopied And $tmpAPK <> False And StringInStr($cmd, $tmpAPK) Then
+			$tmpAPKCopied = True
+			_copyTmpApk()
 		EndIf
-		If StringInStr($output, 'waiting for device') Then ExitLoop
-	WEnd
-	ProcessClose($foo)
+
+		$foo = _Run('adb', $toolsDir & $cmd, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+		$timeout = TimerInit()
+		$max = $AdbTimeout * 1000
+		$last = 0
+		While 1
+			$time = TimerDiff($timeout)
+			If $time > $max Then ExitLoop
+			$bin = StdoutRead($foo, False, True)
+			If @error Then ExitLoop
+			If StringLen($bin) > 0 Then $timeout = TimerInit()
+			$output &= BinaryToString($bin, $SB_UTF8)
+			$check = Round(TimerDiff($timer) / 500)
+			If $check <> $last Then
+				$last = $check
+				$tmp = _StringExplode(StringStripWS($output, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
+				ProgressSet($time * 100 / $max, $tmp[UBound($tmp) - 1])
+			EndIf
+			If StringInStr($output, 'waiting for device') Then ExitLoop
+		WEnd
+		ProcessClose($foo)
+	Next
 
 	ProgressOff()
 
