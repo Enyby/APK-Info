@@ -172,6 +172,7 @@ $strExceededTimeout = IniRead($IniFile, $LangSection, "ExceededTimeout", "Exceed
 $strCheckUpdate = IniRead($IniFile, $LangSection, "CheckUpdate", "Check update")
 $strYes = IniRead($IniFile, $LangSection, "Yes", "Yes")
 $strNo = IniRead($IniFile, $LangSection, "No", "No")
+$strNotFound = IniRead($IniFile, $LangSection, "NotFound", "Not found")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -1782,32 +1783,36 @@ Func _checkUpdate()
 	ProgressOn($strCheckUpdate, $strPlayStore)
 	$out = $strPlayStore & ':' & @CRLF
 	$url1 = $playStoreUrl & $apk_PkgName
-	$foo = _Run('latest', $toolsDir & 'curl -k --ssl-no-revoke -L "' & $url1 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = _Run($strPlayStore, $toolsDir & 'curl -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url1 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	ProgressSet(20)
 	$output = _readAll($foo, $strPlayStore)
 	ProgressSet(30)
+	;MsgBox(0, $url1, $output)
 	$ver = StringRegExp($output, 'Current Version</div><span .*?>([^<]*?)</span></div>', $STR_REGEXPARRAYMATCH)
 	If @error == 0 Then
 		$ver = StringStripWS($ver[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
-		If $ver <> $apk_Version Then $ver = $ver & ' <--- ' & $strNewVersionIsAvailable
+		If $ver <> $apk_Version Then $ver = $ver & '   <--- ' & $strNewVersionIsAvailable
 	Else
 		$ver = 'error: ' & @error
+		If StringInStr($output, '<title>Not Found</title>') Then $ver = $strNotFound
 	EndIf
 	$out = $out & $ver & @CRLF
 
 	$out = $out & @CRLF & $strApkPure & ':' & @CRLF
 	ProgressSet(50, '', $strApkPure)
 	$url2 = $apkPureUrl & $apk_PkgName
-	$foo = _Run('latest', $toolsDir & 'curl -k --ssl-no-revoke -L "' & $url2 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = _Run($strApkPure, $toolsDir & 'curl -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url2 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	ProgressSet(70)
 	$output = _readAll($foo, $strApkPure)
 	ProgressSet(80)
-	$ver = StringRegExp($output, '<div class="details-sdk"><span>([^<]*?)</span>', $STR_REGEXPARRAYMATCH)
+	;MsgBox(0, $url2, $output)
+	$ver = StringRegExp($output, "version_name: '([^']*?)'", $STR_REGEXPARRAYMATCH)
 	If @error == 0 Then
 		$ver = StringStripWS($ver[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
 		If $ver <> $apk_Version Then $ver = $ver & '   <--- ' & $strNewVersionIsAvailable
 	Else
 		$ver = 'error: ' & @error
+		If StringInStr($output, '<title>404</title>') Then $ver = $strNotFound
 	EndIf
 	$out = $out & $ver & @CRLF
 
