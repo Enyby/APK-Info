@@ -169,6 +169,9 @@ $strTextInformation = IniRead($IniFile, $LangSection, "TextInformation", "Text i
 $strLoadSignature = IniRead($IniFile, $LangSection, "LoadSignature", "Load signature")
 $strStart = IniRead($IniFile, $LangSection, "Start", "Start")
 $strExceededTimeout = IniRead($IniFile, $LangSection, "ExceededTimeout", "Exceeded timeout response from the command")
+$strCheckUpdate = IniRead($IniFile, $LangSection, "CheckUpdate", "Check update")
+$strYes = IniRead($IniFile, $LangSection, "Yes", "Yes")
+$strNo = IniRead($IniFile, $LangSection, "No", "No")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -187,6 +190,10 @@ $strAdb = 'ADB'
 $urlUpdate = 'https://github.com/Enyby/APK-Info/releases/latest'
 
 $URLPlayStore = IniRead($IniFile, $LangSection, "URLPlaystore", "https://play.google.com/store/apps/details?id=")
+
+$playStoreUrl = "https://play.google.com/store/apps/details?hl=en&id="
+$apkPureUrl = "https://apkpure.com/apk-info/"
+$strApkPure = "APKPure"
 
 $PlayStoreLanguage = IniRead($IniFile, $LangSection, "PlayStoreLanguage", $Language_code)
 
@@ -360,6 +367,7 @@ If $CustomStore <> '' Then
 		$CustomStore = ''
 	EndIf
 EndIf
+$gBtn_CheckUpdate = _makeButton($strCheckUpdate, "update.bmp")
 $gBtn_VirusTotal = _makeButton($strVirusTotal, "virustotal.bmp")
 $gBtn_Rename = _makeButton($strRename, "rename.bmp")
 $gBtn_Adb = _makeButton($strAdb, "adb.bmp")
@@ -454,6 +462,9 @@ While 1
 			If $CustomStore <> '' Then
 				ShellExecute(_ReplacePlaceholders(_StringExplode($CustomStore, '|', 1)[1]))
 			EndIf
+
+		Case $gBtn_CheckUpdate
+			_checkUpdate()
 
 		Case $gBtn_VirusTotal
 			If $OldVirusTotal == '0' Then
@@ -1766,6 +1777,47 @@ Func _checkNewVersion()
 	EndIf
 	Return False
 EndFunc   ;==>_checkNewVersion
+
+Func _checkUpdate()
+	ProgressOn($strCheckUpdate, $strPlayStore)
+	$out = $strPlayStore & ':' & @CRLF
+	$url1 = $playStoreUrl & $apk_PkgName
+	$foo = _Run('latest', $toolsDir & 'curl -k --ssl-no-revoke -L "' & $url1 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	ProgressSet(20)
+	$output = _readAll($foo, $strPlayStore)
+	ProgressSet(30)
+	$ver = StringRegExp($output, 'Current Version</div><span .*?>([^<]*?)</span></div>', $STR_REGEXPARRAYMATCH)
+	If @error == 0 Then
+		$ver = StringStripWS($ver[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
+		If $ver <> $apk_Version Then $ver = $ver & ' <--- ' & $strNewVersionIsAvailable
+	Else
+		$ver = 'error: ' & @error
+	EndIf
+	$out = $out & $ver & @CRLF
+
+	$out = $out & @CRLF & $strApkPure & ':' & @CRLF
+	ProgressSet(50, '', $strApkPure)
+	$url2 = $apkPureUrl & $apk_PkgName
+	$foo = _Run('latest', $toolsDir & 'curl -k --ssl-no-revoke -L "' & $url2 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	ProgressSet(70)
+	$output = _readAll($foo, $strApkPure)
+	ProgressSet(80)
+	$ver = StringRegExp($output, '<div class="details-sdk"><span>([^<]*?)</span>', $STR_REGEXPARRAYMATCH)
+	If @error == 0 Then
+		$ver = StringStripWS($ver[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
+		If $ver <> $apk_Version Then $ver = $ver & '   <--- ' & $strNewVersionIsAvailable
+	Else
+		$ver = 'error: ' & @error
+	EndIf
+	$out = $out & $ver & @CRLF
+
+	$out = $out & @CRLF & $strYes & ' = ' & $strPlayStore & @CRLF & $strNo & ' = ' & $strApkPure
+
+	ProgressOff()
+	$ret = MsgBox($MB_ICONINFORMATION + $MB_YESNOCANCEL, $strCheckUpdate, $out)
+	If $ret == $IDYES Then ShellExecute($URLPlayStore & $apk_PkgName & '&hl=' & $PlayStoreLanguage)
+	If $ret == $IDNO Then ShellExecute($url2)
+EndFunc   ;==>_checkUpdate
 
 Func _Lib_IntToFloat($iInt)
 	Local $tFloat, $tInt
