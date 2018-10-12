@@ -1791,7 +1791,7 @@ Func _checkUpdate()
 	$ver = StringRegExp($output, 'Current Version</div><span .*?>([^<]*?)</span></div>', $STR_REGEXPARRAYMATCH)
 	If @error == 0 Then
 		$ver = StringStripWS($ver[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
-		If $ver <> $apk_Version Then $ver = $ver & '   <--- ' & $strNewVersionIsAvailable
+		If $ver <> $apk_Version And $ver <> 'Varies with device' Then $ver = $ver & '   <--- ' & $strNewVersionIsAvailable
 	Else
 		$ver = 'error: ' & @error
 		If StringInStr($output, '<title>Not Found</title>') Then $ver = $strNotFound
