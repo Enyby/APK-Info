@@ -173,6 +173,7 @@ $strCheckUpdate = IniRead($IniFile, $LangSection, "CheckUpdate", "Check update")
 $strYes = IniRead($IniFile, $LangSection, "Yes", "Yes")
 $strNo = IniRead($IniFile, $LangSection, "No", "No")
 $strNotFound = IniRead($IniFile, $LangSection, "NotFound", "Not found")
+$strNoUpdatesFound = IniRead($IniFile, $LangSection, "NoUpdatesFound", "No updates found")
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -1815,6 +1816,8 @@ Func _checkUpdate()
 		If StringInStr($output, '<title>404</title>') Then $ver = $strNotFound
 	EndIf
 	$out = $out & $ver & @CRLF
+
+	If Not StringInStr($out, $strNewVersionIsAvailable) Then $out = $strNoUpdatesFound & @CRLF & @CRLF & $out
 
 	$out = $out & @CRLF & $strYes & ' = ' & $strPlayStore & @CRLF & $strNo & ' = ' & $strApkPure
 
