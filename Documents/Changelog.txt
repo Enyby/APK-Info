@@ -1,3 +1,10 @@
+*** APK-Info 1.31 (26.10.2018)
+
+- Added "Install + Start" button for ADB dialog.
+- Improved work with timeout for ADB.
+- Added check for APK update.
+- Fixed bugs.
+
 *** APK-Info 1.30 (29.08.2018)
 
 - Added short names for textures.
