@@ -1761,7 +1761,7 @@ Func _checkNewVersion()
 		If $CheckNewVersion == '3' Then $now = 'm' & @MON
 		If $tag[0] <> $now Or UBound($tag) <> 2 Then
 			ProgressSet(10, $urlUpdate)
-			$foo = _Run('latest', $toolsDir & 'curl -k --ssl-no-revoke -D - "' & $urlUpdate & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+			$foo = _Run('latest', $toolsDir & 'curl -s -k --ssl-no-revoke -D - "' & $urlUpdate & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 			$output = _readAll($foo, 'latest')
 			ProgressSet(90, '')
 			$url = _StringBetween2($output, "Location: ", @CRLF)
@@ -1784,7 +1784,7 @@ Func _checkUpdate()
 	ProgressOn($strCheckUpdate, $strPlayStore)
 	$out = $strPlayStore & ':' & @CRLF
 	$url1 = $playStoreUrl & $apk_PkgName
-	$foo = _Run($strPlayStore, $toolsDir & 'curl -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url1 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = _Run($strPlayStore, $toolsDir & 'curl -s -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url1 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	ProgressSet(20)
 	$output = _readAll($foo, $strPlayStore)
 	ProgressSet(30)
@@ -1802,11 +1802,12 @@ Func _checkUpdate()
 	$out = $out & @CRLF & $strApkPure & ':' & @CRLF
 	ProgressSet(50, '', $strApkPure)
 	$url2 = $apkPureUrl & $apk_PkgName
-	$foo = _Run($strApkPure, $toolsDir & 'curl -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url2 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = _Run($strApkPure, $toolsDir & 'curl -s -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url2 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	ProgressSet(70)
 	$output = _readAll($foo, $strApkPure)
 	ProgressSet(80)
 	;MsgBox(0, $url2, $output)
+	;MsgBox(0, $url2, StringRight($output, 2000))
 	$ver = StringRegExp($output, "version_name: '([^']*?)'", $STR_REGEXPARRAYMATCH)
 	If @error == 0 Then
 		$ver = StringStripWS($ver[0], $STR_STRIPLEADING + $STR_STRIPTRAILING)
