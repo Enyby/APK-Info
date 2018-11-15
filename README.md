@@ -38,6 +38,13 @@ You can also install or remove this APK file on a device or emulator connected v
 
 There is integration in the Windows shell.
 
+# False positive report about virus on APK-Info.exe
+
+Some antivirus may recognize APK-Info.exe as a virus.   
+It's a wrong report (false positive).   
+Please ignore it.   
+The application didn't contain any virus. See [#4](https://github.com/Enyby/APK-Info/issues/4)
+
 # APK-Info features
 - Support up to latest API Levels available
 - To add future SDK don't require program changes because is defined in external ini file.
