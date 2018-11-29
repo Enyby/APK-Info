@@ -722,6 +722,7 @@ Func _renameAPK($prmNewFilenameAPK)
 		$fileAPK = $prmNewFilenameAPK
 		GUICtrlSetData($inpName, $fileAPK)
 		If $tmpAPK == False Then $fullPathAPK = $dirAPK & "\" & $fileAPK
+		WinSetTitle($hGUI, "", $fileAPK & ' - ' & $ProgramTitle)
 	EndIf
 EndFunc   ;==>_renameAPK
 
