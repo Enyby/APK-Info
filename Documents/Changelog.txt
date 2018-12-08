@@ -1,3 +1,12 @@
+*** APK-Info 1.32 (08.12.2018)
+
+- Updated binaries for adb and aapt.
+- Improved work with unicode in apk name.
+- Improved shell integration. 
+- Add aditional command in context menu Explorer.
+- Update translations. Thanks to @Li Bibo
+- Fixed bugs.
+
 *** APK-Info 1.31 (26.10.2018)
 
 - Added "Install + Start" button for ADB dialog.
