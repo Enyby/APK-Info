@@ -44,7 +44,7 @@ Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
 Global $toolsDir = 'tools/'
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniUser
-Global $tmpArrBadge, $dirAPK, $fileAPK, $fullPathAPK, $tmpAPK
+Global $tmpArrBadge, $dirAPK, $fileAPK, $fullPathAPK
 Global $sNewFilenameAPK, $searchPngCache, $hashCache
 Global $progress = 0
 Global $progressMax = 1
@@ -77,8 +77,8 @@ ElseIf _readSettings("DebugLog", "0") == '1' Then
 EndIf
 
 Func _getDebugFile($pid)
-	Return @ScriptDir & '\log,' & $pid  & '.txt'
-EndFunc
+	Return @ScriptDir & '\log,' & $pid & '.txt'
+EndFunc   ;==>_getDebugFile
 
 ; more info on country code
 ; https://www.autoitscript.com/autoit3/docs/appendix/OSLangCodes.htm
@@ -721,18 +721,18 @@ Func _renameAPK($prmNewFilenameAPK)
 	Else
 		$fileAPK = $prmNewFilenameAPK
 		GUICtrlSetData($inpName, $fileAPK)
-		If $tmpAPK == False Then $fullPathAPK = $dirAPK & "\" & $fileAPK
+		_setFullPathAPK($dirAPK & "\" & $fileAPK)
 		WinSetTitle($hGUI, "", $fileAPK & ' - ' & $ProgramTitle)
 	EndIf
 EndFunc   ;==>_renameAPK
 
 Func ByteSuffix($iBytes)
-    Local $iIndex = 0, $aArray = [' B', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB']
-    While $iBytes > 1023
-        $iIndex += 1
-        $iBytes /= 1024
-    WEnd
-    Return Round($iBytes) & $aArray[$iIndex]
+	Local $iIndex = 0, $aArray = [' B', ' KB', ' MB', ' GB', ' TB', ' PB', ' EB', ' ZB', ' YB']
+	While $iBytes > 1023
+		$iIndex += 1
+		$iBytes /= 1024
+	WEnd
+	Return Round($iBytes) & $aArray[$iIndex]
 EndFunc   ;==>ByteSuffix
 
 Func _SplitPath($prmFullPath, $prmReturnDir = False)
@@ -759,24 +759,24 @@ Func _checkFileParameter($prmFilename)
 	EndIf
 EndFunc   ;==>_checkFileParameter
 
+Func _setFullPathAPK($apk)
+	If BinaryToString(StringToBinary($apk, $SB_ANSI), $SB_ANSI) <> $apk Then
+		$fullPathAPK = FileGetShortName($apk)
+	Else
+		$fullPathAPK = $apk
+	EndIf
+EndFunc   ;==>_setFullPathAPK
+
 Func _OpenNewFile($apk, $progress = True)
 	$searchPngCache = False
 	$hashCache = False
-	$fullPathAPK = _checkFileParameter($apk)
-	$dirAPK = _SplitPath($fullPathAPK, True)
-	$fileAPK = _SplitPath($fullPathAPK, False)
+	$apk = _checkFileParameter($apk)
+	$dirAPK = _SplitPath($apk, True)
+	$fileAPK = _SplitPath($apk, False)
 
 	WinSetTitle($hGUI, "", $fileAPK & ' - ' & $ProgramTitle)
 
-	$tmpAPK = False
-	If BinaryToString(StringToBinary($fullPathAPK, $SB_ANSI), $SB_ANSI) <> $fullPathAPK Then
-		$tmpAPK = $tempPath & 'base.apk'
-		DirCreate($tempPath)
-		If FileCopy($fullPathAPK, $tmpAPK, $FC_CREATEPATH + $FC_OVERWRITE) == 1 And FileExists($tmpAPK) Then
-			FileSetAttrib($tmpAPK, "-RASH")
-			$fullPathAPK = $tmpAPK
-		EndIf
-	EndIf
+	_setFullPathAPK($apk)
 
 	If $progress Then ProgressOn($strLoading & "...", '', $fileAPK)
 
@@ -848,7 +848,6 @@ Func _OpenNewFile($apk, $progress = True)
 	_OnShow()
 
 	If $progress Then ProgressOff()
-	_deleteTmpApk()
 	$searchPngCache = False
 EndFunc   ;==>_OpenNewFile
 
@@ -955,13 +954,11 @@ Func _ReplacePlaceholders($pattern)
 
 	If Not $hashCache Then $hashCache = $ids
 
-	$apk = $dirAPK & "\" & $fileAPK
-	;$apk = $fullPathAPK
 	For $i = 0 To UBound($names) - 1
 		$pll = '%' & $names[$i] & '%'
 		$plu = '%' & StringUpper($names[$i]) & '%'
 		If Not StringInStr($out, $pll) And Not StringInStr($out, $plu) Then ContinueLoop
-		If $hashCache[$i] == $ids[$i] Then $hashCache[$i] = StringReplace(_Crypt_HashFile($apk, $ids[$i]), '0x', '')
+		If $hashCache[$i] == $ids[$i] Then $hashCache[$i] = StringReplace(_Crypt_HashFile($fullPathAPK, $ids[$i]), '0x', '')
 		$hash = $hashCache[$i]
 		$out = StringReplace($out, $pll, StringLower($hash), 0, 1)
 		$out = StringReplace($out, $plu, StringUpper($hash), 0, 1)
@@ -975,25 +972,23 @@ Func _Run($label, $cmd, $options)
 	$process = Run($cmd, @ScriptDir, @SW_HIDE, $options)
 	ProgressSet(100, $label & '... OK')
 	Return $process
-EndFunc
+EndFunc   ;==>_Run
 
 Func _RunWait($label, $cmd)
 	ProgressSet(0, $label & '...')
 	$ret = RunWait($cmd, @ScriptDir, @SW_HIDE)
 	ProgressSet(100, $label & '... OK')
 	Return $ret
-EndFunc
+EndFunc   ;==>_RunWait
 
 Func _LoadSignature()
 	If $apk_Signature == '' Then
 		ProgressOn($strLoading & "...", $strSignature)
-		_copyTmpApk()
 		_getSignature($fullPathAPK, 1)
-		_deleteTmpApk()
 		ProgressOff()
 		GUICtrlSetData($edtSignature, $apk_Signature)
 	EndIf
-EndFunc
+EndFunc   ;==>_LoadSignature
 
 Func _getSignature($prmAPK, $load, $process = False)
 	$output = ''
@@ -1592,7 +1587,7 @@ Func _adbDevice($title)
 	For $line In $arrayLines
 		$device = _StringExplode($line, ' ', 1)[0]
 
-		GUICtrlCreateLabel($line, $gap, $top, $width - $gap*2)
+		GUICtrlCreateLabel($line, $gap, $top, $width - $gap * 2)
 		$top += $lblHeight + $gap
 		$left = $gap
 		For $cmd In $cmds
@@ -1639,17 +1634,6 @@ Func _adbDevice($title)
 	Return $device
 EndFunc   ;==>_adbDevice
 
-Func _copyTmpApk()
-	If $tmpAPK <> False Then
-		FileCopy($dirAPK & "\" & $fileAPK, $tmpAPK, $FC_CREATEPATH + $FC_OVERWRITE)
-		FileSetAttrib($tmpAPK, "-RASH")
-	EndIf
-EndFunc
-
-Func _deleteTmpApk()
-	If $tmpAPK <> False Then FileDelete($tmpAPK)
-EndFunc
-
 Func _adb()
 	$device = _adbDevice($apk_Label & ' [' & $apk_PkgName & ']')
 
@@ -1660,15 +1644,10 @@ Func _adb()
 	$title = $parts[0]
 	ProgressOn($title, $strLoading)
 
-	$tmpAPKCopied = False
 	$output = ''
 	$timer = TimerInit()
 	For $i = 1 To UBound($parts) - 1
 		$cmd = $parts[$i]
-		If Not $tmpAPKCopied And $tmpAPK <> False And StringInStr($cmd, $tmpAPK) Then
-			$tmpAPKCopied = True
-			_copyTmpApk()
-		EndIf
 
 		$foo = _Run('adb', $toolsDir & $cmd, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 		$timeout = TimerInit()
@@ -1711,8 +1690,6 @@ Func _adb()
 	Next
 
 	MsgBox(0, $title, $output)
-
-	_deleteTmpApk()
 
 	If $AdbKill == '1' Then _RunWait('kill', $toolsDir & 'adb.exe kill-server')
 EndFunc   ;==>_adb
