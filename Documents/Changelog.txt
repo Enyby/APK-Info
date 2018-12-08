@@ -3,7 +3,7 @@
 - Updated binaries for adb and aapt.
 - Improved work with unicode in apk name.
 - Improved shell integration. 
-- Add aditional command in context menu Explorer.
+- Add additional command in context menu Explorer.
 - Update translations. Thanks to @Li Bibo
 - Fixed bugs.
 
