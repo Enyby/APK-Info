@@ -1,7 +1,7 @@
 # APK-Info
 APK-Info is a Windows tool to get detailed info about an apk file.
 
-The app was originally created by ZoSTeR and posted on [Total Commander Forum](http://www.ghisler.ch/board/viewtopic.php?t=32908)
+The app was originally created by ZoSTeR and posted on [Total Commander Forum](https://www.ghisler.ch/board/viewtopic.php?t=32908)
 
 Then was updated by jazzruby and this is the [original jazzruby thread on XDA](https://forum.xda-developers.com/showthread.php?t=2359373)
 
@@ -10,27 +10,28 @@ Then was updated by bovirus and this is the [reworked thread on XDA](https://for
 ![APK-Info](https://github.com/Enyby/APK-Info/blob/master/screenshot.png?raw=true "APK-Info")
 
 Allows you to view:
-- application icon,
-- package name,
-- name (in all languages),
-- version,
-- build number,
-- the minimum, maximum and target version of the SDK (Android),
-- supported density (DPI) and screen size,
-- architecture (ABI),
-- supported textures,
-- permissions,
-- features,
-- signature,
-- version of OpenGL ES,
-- support Android TV, Wear OS and Android Auto,
-- locales,
+- application icon
+- package name
+- name (in all languages)
+- version
+- build number
+- the minimum, maximum, and target version of the SDK (Android)
+- supported density (DPI) and screen size
+- architecture (ABI)
+- supported textures
+- permissions
+- features
+- signature
+- OpenGL ES version
+- whether app supports Android TV, Wear OS, and/or Android Auto
+- locales
 - a variety of hashes (MD2, MD4, MD5, SHA1, SHA256, SHA384, SHA512)
-- and a lot of other information.
+- and a lot of other information
 
-The application is translated into 86 languages. The language is selected automatically based on the language of the operating system, but you can specify the language in the settings file.
+The application is currently translated into 86 languages.
+The language is selected automatically based on the language of the operating system, but you can specify the language in the settings file.
 
-The app allows you to go to Google Play, a custom store and VirusTotal.
+The app allows you to go to Google Play, a custom store (APKPure by default) and VirusTotal.
 
 You can rename an APK file using a pre-defined pattern with substitutions.
 
@@ -38,27 +39,27 @@ You can also install or remove this APK file on a device or emulator connected v
 
 There is integration in the Windows shell.
 
-# False positive report about virus on APK-Info.exe
+# False positive report about a virus on APK-Info.exe
 
 Some antivirus may recognize APK-Info.exe as a virus.   
 It's a wrong report (false positive).   
 Please ignore it.   
-The application didn't contain any virus. See [#4](https://github.com/Enyby/APK-Info/issues/4)
+The application doesn't contain any viruses. See [#4](https://github.com/Enyby/APK-Info/issues/4)
 
 # APK-Info features
-- Support up to latest API Levels available
-- To add future SDK don't require program changes because is defined in external ini file.
-- Multilingual GUI. It's possible add new language without program change, but just editing external INI file.
-- Automatic recognition of OS language and set the right GUI language (86 languages)
+- Supports latest API levels available
+- SDK levels is defined in external ini file
+- Multilingual GUI (to add a new language, just edit the external ini file)
+- Automatic recognition of OS language, and setting the right GUI language (86 languages currently available)
 - Option in configuration file to force a specific GUI language
-- Option in configuration file to define pattern for rename filename
+- Option in configuration file to define pattern for renaming filename
 - Windows shell integration (optional)
-- Support Drag'n'Drop APK to the program window.
+- Support Drag'n'Drop APK to the program window
 
 # Using
 You can open the APK file in APK-Info using one of the following methods:
 - Start APK-Info, and then select the APK file in the dialog.
-- Open the APK file by click on the open button in the dialog.
+- Open the APK file by clicking on the open button in the dialog.
 - Drag the APK file to APK-Info.exe or its shortcut.
 - Drag the APK file into the running APK-Info window.
 - Open the APK file by double-clicking, after installing APK-Info, as a program for opening APK files (via explorer or attached .cmd file).
@@ -76,7 +77,7 @@ You can open the APK file in APK-Info using one of the following methods:
 4. Open the `Application-source\APK-Info.au3` file in the [SciTE4AutoIt3 editor](https://www.autoitscript.com/site/autoit-script-editor/downloads/).
 5. Press F7. The `Apk-Info.exe` file will be updated.
 
-# API Level supported
+# API Levels supported
 ```
 Level  1 = Base
 Level  2 = Base 1.1
