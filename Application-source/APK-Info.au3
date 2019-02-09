@@ -36,12 +36,15 @@ Opt("TrayIconHide", 1)
 $Debug = False
 ;$Debug = True ; Debug
 
+$ScriptDir = @ScriptDir
+If @Compiled == 0 Then $ScriptDir &= '\..'
+
 Global $apk_Label, $apk_Labels, $apk_Icons, $apk_IconPath, $apk_IconPathBg, $apk_PkgName, $apk_Build, $apk_Version, $apk_Support
 Global $apk_Permissions, $apk_Features, $hGraphic, $hImage, $hImage_bg, $apk_MinSDK, $apk_MaxSDK, $apk_TargetSDK, $apk_CompileSDK
 Global $apk_Screens, $apk_Densities, $apk_ABIs, $apk_Signature, $apk_SignatureName, $apk_Debuggable
 Global $apk_Locales, $apk_OpenGLES, $apk_Textures
 Global $tempPath = @TempDir & "\APK-Info\" & @AutoItPID
-Global $toolsDir = 'tools/'
+Global $toolsDir = $ScriptDir & '\tools\'
 Global $Inidir, $ProgramVersion, $ProgramReleaseDate, $ForceGUILanguage
 Global $IniUser
 Global $tmpArrBadge, $dirAPK, $fileAPK, $fullPathAPK
@@ -49,7 +52,7 @@ Global $sNewFilenameAPK, $searchPngCache, $hashCache
 Global $progress = 0
 Global $progressMax = 1
 
-$Inidir = @ScriptDir & "\"
+$Inidir = $ScriptDir & "\"
 
 $IniFile = $Inidir & "APK-Info.ini"
 $IniUser = $Inidir & "user.ini"
@@ -71,13 +74,13 @@ If $tmp[0] == 'debug' Then
 	$tmp_Filename = $tmp[2]
 	$ProgramReleaseDate &= ' Log: ' & _getDebugFile($tmp[1])
 ElseIf _readSettings("DebugLog", "0") == '1' Then
-	$cmd = @ComSpec & ' /c ""' & @ScriptDir & '\' & @ScriptName & '" "debug:' & @AutoItPID & ':' & $tmp_Filename & '" > "' & _getDebugFile(@AutoItPID) & '""'
-	RunWait($cmd, @ScriptDir, @SW_HIDE)
+	$cmd = @ComSpec & ' /c ""' & $ScriptDir & '\' & @ScriptName & '" "debug:' & @AutoItPID & ':' & $tmp_Filename & '" > "' & _getDebugFile(@AutoItPID) & '""'
+	RunWait($cmd, $ScriptDir, @SW_HIDE)
 	Exit
 EndIf
 
 Func _getDebugFile($pid)
-	Return @ScriptDir & '\log,' & $pid & '.txt'
+	Return $ScriptDir & '\log,' & $pid & '.txt'
 EndFunc   ;==>_getDebugFile
 
 ; more info on country code
@@ -567,7 +570,7 @@ Func _makeButton($label, $icon)
 	$ret = GUICtrlCreateButton('', $btnStart, $offsetHeight, $btnIconSize, $btnIconSize, $BS_BITMAP)
 	GUICtrlSetResizing(-1, $GUI_DOCKWIDTH + $GUI_DOCKHEIGHT + $GUI_DOCKRIGHT + $GUI_DOCKTOP)
 	GUICtrlSetTip(-1, $label)
-	_GUICtrlButton_SetImage($ret, @ScriptDir & '\icons\' & $icon)
+	_GUICtrlButton_SetImage($ret, $ScriptDir & '\icons\' & $icon)
 	GUICtrlSetState(-1, $globalStyle)
 	$offsetHeight += $btnIconSize + $btnGap
 	Return $ret
@@ -969,14 +972,14 @@ EndFunc   ;==>_ReplacePlaceholders
 
 Func _Run($label, $cmd, $options)
 	ProgressSet(0, $label & '...')
-	$process = Run($cmd, @ScriptDir, @SW_HIDE, $options)
+	$process = Run($cmd, $ScriptDir, @SW_HIDE, $options)
 	ProgressSet(100, $label & '... OK')
 	Return $process
 EndFunc   ;==>_Run
 
 Func _RunWait($label, $cmd)
 	ProgressSet(0, $label & '...')
-	$ret = RunWait($cmd, @ScriptDir, @SW_HIDE)
+	$ret = RunWait($cmd, $ScriptDir, @SW_HIDE)
 	ProgressSet(100, $label & '... OK')
 	Return $ret
 EndFunc   ;==>_RunWait
