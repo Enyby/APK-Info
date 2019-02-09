@@ -1605,7 +1605,7 @@ Func _adbDevice($title)
 	Next
 
 	$ids = _StringExplode(StringStripWS($ids, $STR_STRIPLEADING + $STR_STRIPTRAILING), @CRLF)
-	$cnt = UBound($ids)
+	$cnt = UBound($ids) - 1
 	$commands = _StringExplode($commands, @CRLF)
 
 	ProgressOff()
