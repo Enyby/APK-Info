@@ -41,9 +41,9 @@ There is integration in the Windows shell.
 
 # False positive report about a virus on APK-Info.exe
 
-Some antivirus may recognize APK-Info.exe as a virus.   
-It's a wrong report (false positive).   
-Please ignore it.   
+Some antivirus may recognize APK-Info.exe as a virus.
+It's a wrong report (false positive).
+Please ignore it.
 The application doesn't contain any viruses. See [#4](https://github.com/Enyby/APK-Info/issues/4)
 
 # APK-Info features
@@ -107,6 +107,7 @@ Level 25 = Nougat MR1
 Level 26 = Oreo
 Level 27 = Oreo MR1
 Level 28 = Pie
+Level 29 = Android Q
 ```
 
 # Additional info
