@@ -103,6 +103,8 @@ $SignatureNames = _readSettings("SignatureNames", '')
 
 $TextInfo = _readSettings("TextInfo", '')
 
+$JavaPath = _readSettings("JavaPath", '')
+
 $AdbInit = _readSettings("AdbInit", '')
 $AdbKill = _readSettings("AdbKill", '0')
 $AdbTimeout = _readSettings("AdbTimeout", '15')
@@ -786,7 +788,7 @@ Func _OpenNewFile($apk, $progress = True)
 	ProgressSet(0, $fileAPK, $strSignature & '...')
 
 	$processSignature = False
-	If $CheckSignature == 1 Then $processSignature = _Run('apksigner', 'java -jar "' & $toolsDir & 'apksigner.jar" verify --v --print-certs "' & $fullPathAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
+	If $CheckSignature == 1 Then $processSignature = _Run('apksigner', '"' & $JavaPath & 'java" -jar "' & $toolsDir & 'apksigner.jar" verify --v --print-certs "' & $fullPathAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
 
 	ProgressSet(1, $fileAPK, $strPkg & '...')
 
@@ -996,7 +998,7 @@ EndFunc   ;==>_LoadSignature
 Func _getSignature($prmAPK, $load, $process = False)
 	$output = ''
 	If $load == 1 Then
-		If $process == False Then $process = _Run('apksigner', 'java -jar "' & $toolsDir & 'apksigner.jar" verify --v --print-certs "' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
+		If $process == False Then $process = _Run('apksigner', '"' & $JavaPath & 'java" -jar "' & $toolsDir & 'apksigner.jar" verify --v --print-certs "' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
 		$output &= _readAll($process, 'apksigner stdout')
 		$output &= _readAll($process, 'apksigner stderr', False)
 		GUICtrlSetState($btnSignatureLoad, $GUI_HIDE)
