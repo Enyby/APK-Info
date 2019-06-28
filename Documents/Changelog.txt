@@ -1,3 +1,8 @@
+*** APK-Info 1.33 (28.06.2019)
+
+- Updated binaries for adb and aapt.
+- Fixed bugs.
+
 *** APK-Info 1.32 (08.12.2018)
 
 - Updated binaries for adb and aapt.
