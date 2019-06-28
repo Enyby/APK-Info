@@ -786,7 +786,7 @@ Func _OpenNewFile($apk, $progress = True)
 	ProgressSet(0, $fileAPK, $strSignature & '...')
 
 	$processSignature = False
-	If $CheckSignature == 1 Then $processSignature = _Run('apksigner', 'java -jar ' & $toolsDir & 'apksigner.jar verify --v --print-certs ' & '"' & $fullPathAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
+	If $CheckSignature == 1 Then $processSignature = _Run('apksigner', 'java -jar "' & $toolsDir & 'apksigner.jar" verify --v --print-certs "' & $fullPathAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
 
 	ProgressSet(1, $fileAPK, $strPkg & '...')
 
@@ -996,7 +996,7 @@ EndFunc   ;==>_LoadSignature
 Func _getSignature($prmAPK, $load, $process = False)
 	$output = ''
 	If $load == 1 Then
-		If $process == False Then $process = _Run('apksigner', 'java -jar ' & $toolsDir & 'apksigner.jar verify --v --print-certs ' & '"' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
+		If $process == False Then $process = _Run('apksigner', 'java -jar "' & $toolsDir & 'apksigner.jar" verify --v --print-certs "' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
 		$output &= _readAll($process, 'apksigner stdout')
 		$output &= _readAll($process, 'apksigner stderr', False)
 		GUICtrlSetState($btnSignatureLoad, $GUI_HIDE)
@@ -1033,7 +1033,7 @@ Func _getSignatureName()
 EndFunc   ;==>_getSignatureName
 
 Func _getBadge($prmAPK)
-	$foo = _Run('badging', $toolsDir & 'aapt.exe d --include-meta-data badging ' & '"' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
+	$foo = _Run('badging', '"' & $toolsDir & 'aapt.exe" d --include-meta-data badging ' & '"' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
 	$output = StringStripWS(_readAll($foo, 'badging'), $STR_STRIPLEADING + $STR_STRIPTRAILING)
 	If $output == '' Then $output = StringStripWS(_readAll($foo, 'badging stderr', False), $STR_STRIPLEADING + $STR_STRIPTRAILING)
 	Return $output
@@ -1301,7 +1301,7 @@ Func _searchPng($res)
 	$ret = $res
 
 	If Not $searchPngCache Then
-		$foo = _Run('list', $toolsDir & 'unzip.exe -l ' & '"' & $fullPathAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
+		$foo = _Run('list', '"' & $toolsDir & 'unzip.exe" -l ' & '"' & $fullPathAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
 		$output = _readAll($foo, 'list')
 		$searchPngCache = _StringExplode($output, @CRLF)
 	EndIf
@@ -1324,7 +1324,7 @@ Func _searchPng($res)
 EndFunc   ;==>_searchPng
 
 Func _parseXmlIcon($icon)
-	$foo = _Run('xmltree', $toolsDir & 'aapt.exe d xmltree ' & '"' & $fullPathAPK & '" "' & $icon & '"', $STDERR_CHILD + $STDOUT_CHILD)
+	$foo = _Run('xmltree', '"' & $toolsDir & 'aapt.exe" d xmltree ' & '"' & $fullPathAPK & '" "' & $icon & '"', $STDERR_CHILD + $STDOUT_CHILD)
 	$output = _readAll($foo, 'xmltree')
 	$arrayLines = _StringExplode($output, @CRLF)
 
@@ -1351,7 +1351,7 @@ Func _parseXmlIcon($icon)
 	_setProgress(1)
 
 	If $ids[0] Or $ids[1] Then
-		$foo = _Run('resources', $toolsDir & 'aapt.exe d resources ' & '"' & $fullPathAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
+		$foo = _Run('resources', '"' & $toolsDir & 'aapt.exe" d resources ' & '"' & $fullPathAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
 		$output = _readAll($foo, 'resources')
 		$arrayLines = _StringExplode($output, @CRLF)
 
@@ -1425,7 +1425,7 @@ Func _extractIcon()
 	$files = StringStripWS($files, $STR_STRIPLEADING + $STR_STRIPTRAILING)
 	If $files <> '' Then
 		DirCreate($tempPath)
-		_RunWait('icons', $toolsDir & "unzip.exe -o -j " & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"')
+		_RunWait('icons', '"' & $toolsDir & 'unzip.exe" -o -j ' & '"' & $fullPathAPK & '" ' & $files & " -d " & '"' & $tempPath & '"')
 	EndIf
 EndFunc   ;==>_extractIcon
 
@@ -1441,7 +1441,7 @@ Func _cleanUp()
 
 	DirRemove($tempPath, 1) ; clean own dir
 	DirRemove(@TempDir & "\APK-Info", 1) ; clean files from previous runs
-	If $AdbKill == '2' Then _RunWait('kill', $toolsDir & 'adb.exe kill-server')
+	If $AdbKill == '2' Then _RunWait('kill', '"' & $toolsDir & 'adb.exe" kill-server')
 EndFunc   ;==>_cleanUp
 
 Func _translateSDKLevel($sdk, $withNumber = True)
@@ -1478,7 +1478,7 @@ Func _drawImg($path)
 	If StringRight($filename, 5) == '.webp' Then
 		$tmpFilename = StringTrimRight($filename, 5) & '.png'
 		DirCreate($tempPath)
-		_RunWait('dwebp', $toolsDir & 'dwebp.exe "' & $filename & '" -o "' & $tmpFilename & '"')
+		_RunWait('dwebp', '"' & $toolsDir & 'dwebp.exe" "' & $filename & '" -o "' & $tmpFilename & '"')
 		If FileExists($tmpFilename) Then
 			FileDelete($filename) ; no need - try delete
 			$filename = $tmpFilename
@@ -1546,14 +1546,14 @@ EndFunc   ;==>_showText
 
 Func _adbDevice($title)
 	ProgressOn($title, 'ADB')
-	_RunWait('start', $toolsDir & 'adb.exe start-server')
+	_RunWait('start', '"' & $toolsDir & 'adb.exe" start-server')
 
 	For $cmd In _StringExplode($AdbInit, '|')
 		If $cmd == '' Then ContinueLoop
-		_RunWait('init', $toolsDir & 'adb.exe ' & $cmd)
+		_RunWait('init', '"' & $toolsDir & 'adb.exe" ' & $cmd)
 	Next
 
-	$foo = _Run('devices', $toolsDir & 'adb.exe devices -l', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = _Run('devices', '"' & $toolsDir & 'adb.exe" devices -l', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	$output = _readAll($foo, 'devices')
 
 	$output = StringStripWS(StringReplace($output, 'List of devices attached', ''), $STR_STRIPLEADING + $STR_STRIPTRAILING)
@@ -1597,7 +1597,7 @@ Func _adbDevice($title)
 			$cmd = _StringExplode($cmd, ': ', 1)
 
 			$ids &= GUICtrlCreateButton($cmd[0], $left, $top, $btnWidth, $btnHeight) & @CRLF
-			$commands &= StringReplace($cmd[1], '%adb%', 'adb.exe -s "' & $device & '"') & @CRLF
+			$commands &= StringReplace($cmd[1], '%adb%', '"' & $toolsDir & 'adb.exe" -s "' & $device & '"') & @CRLF
 
 			$left += $btnWidth + $gap
 		Next
@@ -1652,7 +1652,7 @@ Func _adb()
 	For $i = 1 To UBound($parts) - 1
 		$cmd = $parts[$i]
 
-		$foo = _Run('adb', $toolsDir & $cmd, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+		$foo = _Run('adb', $cmd, $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 		$timeout = TimerInit()
 		$max = $AdbTimeout * 1000
 		$last = 0
@@ -1694,7 +1694,7 @@ Func _adb()
 
 	MsgBox(0, $title, $output)
 
-	If $AdbKill == '1' Then _RunWait('kill', $toolsDir & 'adb.exe kill-server')
+	If $AdbKill == '1' Then _RunWait('kill', '"' & $toolsDir & 'adb.exe" kill-server')
 EndFunc   ;==>_adb
 
 Func _readAll($process, $error, $stdout = True)
@@ -1742,7 +1742,7 @@ Func _checkNewVersion()
 		If $CheckNewVersion == '3' Then $now = 'm' & @MON
 		If $tag[0] <> $now Or UBound($tag) <> 2 Then
 			ProgressSet(10, $urlUpdate)
-			$foo = _Run('latest', $toolsDir & 'curl -s -k --ssl-no-revoke -D - "' & $urlUpdate & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+			$foo = _Run('latest', '"' & $toolsDir & 'curl" -s -k --ssl-no-revoke -D - "' & $urlUpdate & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 			$output = _readAll($foo, 'latest')
 			ProgressSet(90, '')
 			$url = _StringBetween2($output, "Location: ", @CRLF)
@@ -1765,7 +1765,7 @@ Func _checkUpdate()
 	ProgressOn($strCheckUpdate, $strPlayStore)
 	$out = $strPlayStore & ':' & @CRLF
 	$url1 = $playStoreUrl & $apk_PkgName
-	$foo = _Run($strPlayStore, $toolsDir & 'curl -s -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url1 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = _Run($strPlayStore, '"' & $toolsDir & 'curl" -s -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url1 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	ProgressSet(20)
 	$output = _readAll($foo, $strPlayStore)
 	ProgressSet(30)
@@ -1783,7 +1783,7 @@ Func _checkUpdate()
 	$out = $out & @CRLF & $strApkPure & ':' & @CRLF
 	ProgressSet(50, '', $strApkPure)
 	$url2 = $apkPureUrl & $apk_PkgName
-	$foo = _Run($strApkPure, $toolsDir & 'curl -s -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url2 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
+	$foo = _Run($strApkPure, '"' & $toolsDir & 'curl" -s -k --ssl-no-revoke -L -A "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:62.0) Gecko/20100101 Firefox/62.0" "' & $url2 & '"', $STDERR_CHILD + $STDOUT_CHILD + $STDERR_MERGED)
 	ProgressSet(70)
 	$output = _readAll($foo, $strApkPure)
 	ProgressSet(80)
