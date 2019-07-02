@@ -1,3 +1,8 @@
+*** APK-Info 1.35 (03.07.2019)
+
+- Revert bugged aapt binary.
+- Fix work on Windows XP.
+
 *** APK-Info 1.34 (02.07.2019)
 
 - Add option JavaPath.
