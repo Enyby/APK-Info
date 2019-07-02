@@ -179,6 +179,7 @@ $strYes = IniRead($IniFile, $LangSection, "Yes", "Yes")
 $strNo = IniRead($IniFile, $LangSection, "No", "No")
 $strNotFound = IniRead($IniFile, $LangSection, "NotFound", "Not found")
 $strNoUpdatesFound = IniRead($IniFile, $LangSection, "NoUpdatesFound", "No updates found")
+$strNeedJava = IniRead($IniFile, $LangSection, "NeedJava", 'Need Java 1.8 or higher.')
 
 $strUses = IniRead($IniFile, $LangSection, "Uses", "uses")
 $strImplied = IniRead($IniFile, $LangSection, "Implied", "implied")
@@ -1001,6 +1002,11 @@ Func _getSignature($prmAPK, $load, $process = False)
 		If $process == False Then $process = _Run('apksigner', '"' & $JavaPath & 'java" -jar "' & $toolsDir & 'apksigner.jar" verify --v --print-certs "' & $prmAPK & '"', $STDERR_CHILD + $STDOUT_CHILD)
 		$output &= _readAll($process, 'apksigner stdout')
 		$output &= _readAll($process, 'apksigner stderr', False)
+
+		If $output == '' Or StringInStr($output, 'java.lang.UnsupportedClassVersionError') Or StringInStr($output, 'Unsupported major.minor version') Then
+			$output = $strNeedJava & @CRLF & @CRLF & $output
+		EndIf
+
 		GUICtrlSetState($btnSignatureLoad, $GUI_HIDE)
 	Else
 		GUICtrlSetState($btnSignatureLoad, $GUI_SHOW)
