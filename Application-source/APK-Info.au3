@@ -975,14 +975,21 @@ EndFunc   ;==>_ReplacePlaceholders
 
 Func _Run($label, $cmd, $options)
 	ProgressSet(0, $label & '...')
-	$process = Run($cmd, $ScriptDir, @SW_HIDE, $options)
+	$process = Run(_FixCmd($cmd), $ScriptDir, @SW_HIDE, $options)
 	ProgressSet(100, $label & '... OK')
 	Return $process
 EndFunc   ;==>_Run
 
+Func _FixCmd($cmd)
+	If StringInStr(@OSVersion, 'WIN_XP') And StringInStr($cmd, '\tools\adb"') Then
+		$cmd = StringReplace($cmd, '\tools\adb"', '\tools\xp\adb"')
+	EndIf
+	Return $cmd
+EndFunc   ;==>_RunWait
+
 Func _RunWait($label, $cmd)
 	ProgressSet(0, $label & '...')
-	$ret = RunWait($cmd, $ScriptDir, @SW_HIDE)
+	$ret = RunWait(_FixCmd($cmd), $ScriptDir, @SW_HIDE)
 	ProgressSet(100, $label & '... OK')
 	Return $ret
 EndFunc   ;==>_RunWait
