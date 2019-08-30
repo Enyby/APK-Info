@@ -1467,8 +1467,8 @@ Func _translateSDKLevel($sdk, $withNumber = True)
 		$name = IniRead($IniFile, "AndroidName", "SDK-" & $sdk, '??|' & $strUnknown)
 	EndIf
 	$tmp = _StringExplode($name, '|')
-	If UBound($tmp) < 2 Then Return 'INI error: SDK-' & $sdk & ' must contain char "|"'
-	$ret = $tmp[0] & ' (' & $tmp[1] & ')'
+	$ret = $tmp[0]
+	If UBound($tmp) >= 2 Then $ret = $ret & ' (' & $tmp[1] & ')'
 	If $withNumber Then $ret = $sdk & ': Android ' & $ret
 	Return $ret
 EndFunc   ;==>_translateSDKLevel
