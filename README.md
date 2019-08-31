@@ -107,7 +107,7 @@ Level 25 = Nougat MR1
 Level 26 = Oreo
 Level 27 = Oreo MR1
 Level 28 = Pie
-Level 29 = Q
+Level 29 = 10
 ```
 
 # Additional info
