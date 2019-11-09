@@ -52,6 +52,8 @@ Global $sNewFilenameAPK, $searchPngCache, $hashCache
 Global $progress = 0
 Global $progressMax = 1
 
+Global $nbsp = ChrW(0xA0)
+
 $Inidir = $ScriptDir & "\"
 
 $IniFile = $Inidir & "APK-Info.ini"
@@ -816,6 +818,7 @@ Func _OpenNewFile($apk, $progress = True)
 	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, "<", $FileNameSpace)
 	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, ">", $FileNameSpace)
 	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, "|", $FileNameSpace)
+	$sNewFilenameAPK = StringReplace($sNewFilenameAPK, $nbsp, $FileNameSpace)
 
 	$hash = _ReplacePlaceholders($ShowHash)
 
@@ -865,16 +868,20 @@ Func _OnShow()
 	EndIf
 EndFunc   ;==>_OnShow
 
+Func _FixSpaces($str)
+	Return StringReplace(StringReplace($str, " ", $FileNameSpace), $nbsp, $FileNameSpace)
+EndFunc
+
 Func _ReplacePlaceholders($pattern)
 	$out = $pattern
 	$p = '%label%'
-	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_Label, " ", $FileNameSpace))
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, _FixSpaces($apk_Label))
 	$p = '%version%'
-	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_Version, " ", $FileNameSpace))
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, _FixSpaces($apk_Version))
 	$p = '%build%'
-	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_Build, " ", $FileNameSpace))
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, _FixSpaces($apk_Build))
 	$p = '%package%'
-	If StringInStr($out, $p) Then $out = StringReplace($out, $p, StringReplace($apk_PkgName, " ", $FileNameSpace))
+	If StringInStr($out, $p) Then $out = StringReplace($out, $p, _FixSpaces($apk_PkgName))
 
 	$p = '%min%'
 	If StringInStr($out, $p) Then $out = StringReplace($out, $p, $apk_MinSDK)
