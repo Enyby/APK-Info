@@ -1216,7 +1216,16 @@ Func _parseLines($lines)
 
 			Case 'densities'
 				$apk_Densities = StringStripWS(StringReplace($value, "'", ""), $STR_STRIPLEADING + $STR_STRIPTRAILING)
-				If $anyDensity Then $apk_Densities = StringStripWS($apk_Densities & ' any', $STR_STRIPLEADING + $STR_STRIPTRAILING)
+				$apk_Densities = StringReplace($apk_Densities, "120", "ldpi")
+				$apk_Densities = StringReplace($apk_Densities, "160", "mdpi")
+				$apk_Densities = StringReplace($apk_Densities, "240", "hdpi")
+				$apk_Densities = StringReplace($apk_Densities, "320", "xhdpi")
+				$apk_Densities = StringReplace($apk_Densities, "480", "xxhdpi")
+				$apk_Densities = StringReplace($apk_Densities, "640", "xxxhdpi")
+				$apk_Densities = StringReplace($apk_Densities, "65534", "anydpi")
+				$apk_Densities = StringReplace($apk_Densities, "65535", "nodpi")
+				$apk_Densities = StringReplace($apk_Densities, "-1", "undefineddpi")
+				If $anyDensity Then $apk_Densities = StringStripWS($apk_Densities & ' anydpi', $STR_STRIPLEADING + $STR_STRIPTRAILING)
 
 			Case 'native-code', 'alt-native-code'
 				For $abi In _StringExplode('armeabi,armeabi-v7a,arm64-v8a,x86,x86_64,mips,mips64', ',')
